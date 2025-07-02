@@ -1,0 +1,187 @@
+﻿@model BeatBay.DTOs.CreateUserDto
+
+@{
+    ViewData["Title"] = "Register as Artist";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-warning text-dark text-center">
+                <h3><i class="fas fa-microphone"></i> Join BeatBay as Artist</h3>
+                <p class="mb-0">Share your music with the world!</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Artist Account Benefits:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Upload and manage your music</li>
+                        <li>Track your song performance</li>
+                        <li>Connect with your fans</li>
+                        <li>Earn revenue from your streams</li>
+                    </ul>
+                </div>
+
+                <form asp-action="RegisterArtist" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="UserName" class="form-control" id="floatingUserName" placeholder="Username" />
+                                <label for="floatingUserName"><i class="fas fa-user"></i> Artist Username *</label>
+                                <span asp-validation-for="UserName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Email" type="email" class="form-control" id="floatingEmail" placeholder="Email" />
+                                <label for="floatingEmail"><i class="fas fa-envelope"></i> Email *</label>
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Password" type="password" class="form-control" id="floatingPassword" placeholder="Password" />
+                        <label for="floatingPassword"><i class="fas fa-lock"></i> Password *</label>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                        <div class="form-text">Password must be at least 6 characters long</div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Name" class="form-control" id="floatingName" placeholder="Artist Name" />
+                        <label for="floatingName"><i class="fas fa-music"></i> Artist/Band Name *</label>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <div class="form-text">This will be displayed as your public artist name</div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <textarea asp-for="Bio" class="form-control" id="floatingBio" placeholder="Artist Bio" style="height: 120px"></textarea>
+                        <label for="floatingBio"><i class="fas fa-pen"></i> Artist Bio *</label>
+                        <span asp-validation-for="Bio" class="text-danger"></span>
+                        <div class="form-text">Tell your fans about your music, influences, and journey</div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <select asp-for="PlanId" class="form-select" id="floatingPlan">
+                            <option value="">Select a Plan (Optional)</option>
+                            <option value="1">Free Plan - $0/month (Basic features)</option>
+                            <option value="2">Personal Plan - $1/month (Enhanced features)</option>
+                            <option value="3">Family Plan - $3.50/month (Multiple accounts)</option>
+                            <option value="4">Business Plan - $35/month (Commercial license)</option>
+                        </select>
+                        <label for="floatingPlan"><i class="fas fa-crown"></i> Subscription Plan</label>
+                        <span asp-validation-for="PlanId" class="text-danger"></span>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title"><i class="fas fa-star"></i> Artist Agreement</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                <label class="form-check-label" for="termsCheck">
+                                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a> *
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="artistTerms" required>
+                                <label class="form-check-label" for="artistTerms">
+                                    I agree to the <a href="#" class="text-primary">Artist Agreement</a> and content guidelines *
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="copyrightCheck" required>
+                                <label class="form-check-label" for="copyrightCheck">
+                                    I confirm that I own or have rights to all music I will upload *
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning btn-lg text-dark">
+                            <i class="fas fa-microphone"></i> Create Artist Account
+                        </button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <div class="text-center">
+                    <p class="mb-2">Already have an account?</p>
+                    <div class="d-grid gap-2 d-md-block">
+                        <a asp-action="Login" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                        <a asp-action="Register" class="btn btn-outline-success">
+                            <i class="fas fa-user-plus"></i> Register as User
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+        padding: 25px;
+    }
+
+    .form-floating > label {
+        padding-left: 2.5rem;
+    }
+
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+        padding-left: 2.5rem;
+    }
+
+    .form-floating > label i {
+        position: absolute;
+        left: -1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    body {
+        background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
+        min-height: 100vh;
+    }
+
+    .btn-lg {
+        padding: 12px 24px;
+        font-size: 1.1rem;
+    }
+
+    .form-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    .alert-info {
+        border-left: 4px solid #0dcaf0;
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

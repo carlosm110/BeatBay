@@ -1,82 +1,71 @@
-﻿using BeatBay.DTOs;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using BeatBay.DTOs;
+using BeatBay.APIConsumer;
+using Newtonsoft.Json;
 using System.Text;
-using System.Text.Json;
 
-namespace BeatBay.MVC.Controllers
+namespace BeatBayMVC.Controllers
 {
-    public class VAuthController : Controller
+    public class AuthController : Controller
     {
-        private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
         private readonly string _apiBaseUrl;
+        private readonly HttpClient _httpClient;
 
-        public VAuthController(HttpClient httpClient, IConfiguration configuration)
+        public AuthController(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
-            _configuration = configuration;
-            _apiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7194/api";
+            _apiBaseUrl = configuration.GetSection("ApiSettings:BaseUrl").Value ?? "https://localhost:7037/api";
+            _httpClient = httpClientFactory.CreateClient();
         }
 
         // GET: Login
-        [HttpGet]
         public IActionResult Login()
         {
-            // Si ya está autenticado, redirigir al dashboard
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Home");
-            }
             return View();
         }
 
         // POST: Login
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginDto model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             try
             {
-                var json = JsonSerializer.Serialize(model);
+                var json = JsonConvert.SerializeObject(model);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/auth/login", content);
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/login", content);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    var result = JsonSerializer.Deserialize<LoginResponseDto>(responseContent);
+                    var authResponse = JsonConvert.DeserializeObject<AuthResponseDto>(responseContent);
 
-                    // Guardar token en cookie o session
-                    HttpContext.Session.SetString("JwtToken", result.Token);
-                    HttpContext.Session.SetString("UserId", result.UserId.ToString());
-                    HttpContext.Session.SetString("UserName", result.UserName);
+                    // Guardar token en sesión
+                    HttpContext.Session.SetString("JwtToken", authResponse.Token);
+                    HttpContext.Session.SetString("RefreshToken", authResponse.RefreshToken);
+                    HttpContext.Session.SetString("UserData", JsonConvert.SerializeObject(authResponse.User));
 
-                    TempData["SuccessMessage"] = "Login successful!";
+                    TempData["Success"] = "Login successful!";
                     return RedirectToAction("Index", "Home");
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    var errorResult = JsonSerializer.Deserialize<ErrorResponseDto>(errorContent);
-                    ModelState.AddModelError("", errorResult.Message ?? "Login failed");
+                    var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
+                    ModelState.AddModelError("", errorResponse?.message?.ToString() ?? "Login failed");
                 }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "An error occurred while processing your request.");
+                ModelState.AddModelError("", $"Error: {ex.Message}");
             }
 
             return View(model);
         }
 
         // GET: Register
-        [HttpGet]
         public IActionResult Register()
         {
             return View();
@@ -84,230 +73,177 @@ namespace BeatBay.MVC.Controllers
 
         // POST: Register
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(CreateUserDto model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             try
             {
-                var json = JsonSerializer.Serialize(model);
+                var json = JsonConvert.SerializeObject(model);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/auth/register", content);
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/register", content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["SuccessMessage"] = "Registration successful! Please check your email to confirm your account.";
+                    TempData["Success"] = "Registration successful! Please check your email to confirm your account.";
                     return RedirectToAction("Login");
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    var errorResult = JsonSerializer.Deserialize<ErrorResponseDto>(errorContent);
-                    ModelState.AddModelError("", errorResult.Message ?? "Registration failed");
+                    var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
+                    ModelState.AddModelError("", errorResponse?.message?.ToString() ?? "Registration failed");
                 }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "An error occurred while processing your request.");
+                ModelState.AddModelError("", $"Error: {ex.Message}");
             }
 
             return View(model);
         }
 
-        // GET: RegisterArtist
-        [HttpGet]
+        // GET: Register Artist
         public IActionResult RegisterArtist()
         {
             return View();
         }
 
-        // POST: RegisterArtist
+        // POST: Register Artist
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterArtist(CreateUserDto model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             try
             {
-                var json = JsonSerializer.Serialize(model);
+                var json = JsonConvert.SerializeObject(model);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/auth/register-artist", content);
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/register-artist", content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["SuccessMessage"] = "Artist registration successful! You can now login.";
+                    TempData["Success"] = "Artist registration successful! Please check your email to confirm your account.";
                     return RedirectToAction("Login");
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    var errorResult = JsonSerializer.Deserialize<ErrorResponseDto>(errorContent);
-                    ModelState.AddModelError("", errorResult.Message ?? "Artist registration failed");
+                    var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
+                    ModelState.AddModelError("", errorResponse?.message?.ToString() ?? "Registration failed");
                 }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "An error occurred while processing your request.");
+                ModelState.AddModelError("", $"Error: {ex.Message}");
             }
 
             return View(model);
         }
 
-        // GET: ForgotPassword
-        [HttpGet]
+        // Logout
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                var token = HttpContext.Session.GetString("JwtToken");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                    await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/logout", null);
+                }
+            }
+            catch
+            {
+                // Ignorar errores de logout en la API
+            }
+            finally
+            {
+                // Limpiar sesión local
+                HttpContext.Session.Clear();
+            }
+
+            TempData["Success"] = "Logged out successfully!";
+            return RedirectToAction("Index", "Home");
+        }
+
+        // GET: Forgot Password
         public IActionResult ForgotPassword()
         {
             return View();
         }
 
-        // POST: ForgotPassword
+        // POST: Forgot Password
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordDto model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             try
             {
-                var json = JsonSerializer.Serialize(model);
+                var json = JsonConvert.SerializeObject(model);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/auth/forgot-password", content);
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/forgot-password", content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["SuccessMessage"] = "Password reset link sent to your email.";
+                    TempData["Success"] = "Password reset link sent to your email!";
                     return RedirectToAction("Login");
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    var errorResult = JsonSerializer.Deserialize<ErrorResponseDto>(errorContent);
-                    ModelState.AddModelError("", errorResult.Message ?? "Failed to send reset link");
+                    var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
+                    ModelState.AddModelError("", errorResponse?.message?.ToString() ?? "Error sending reset link");
                 }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "An error occurred while processing your request.");
+                ModelState.AddModelError("", $"Error: {ex.Message}");
             }
 
             return View(model);
         }
 
-        // GET: ResetPassword
-        [HttpGet]
-        public IActionResult ResetPassword(string userId, string token)
+        // GET: Profile
+        public async Task<IActionResult> Profile()
         {
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
-            {
-                TempData["ErrorMessage"] = "Invalid reset link.";
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login");
-            }
-
-            var model = new ResetPasswordDto
-            {
-                UserId = userId,
-                Token = token
-            };
-
-            return View(model);
-        }
-
-        // POST: ResetPassword
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(ResetPasswordDto model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            if (model.NewPassword != model.ConfirmPassword)
-            {
-                ModelState.AddModelError("", "Passwords do not match.");
-                return View(model);
-            }
 
             try
             {
-                var json = JsonSerializer.Serialize(model);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/auth/reset-password", content);
+                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/Auth/profile");
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["SuccessMessage"] = "Password reset successfully! You can now login.";
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var user = JsonConvert.DeserializeObject<UserDto>(responseContent);
+                    return View(user);
+                }
+                else
+                {
+                    TempData["Error"] = "Unable to load profile";
                     return RedirectToAction("Login");
                 }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    var errorResult = JsonSerializer.Deserialize<ErrorResponseDto>(errorContent);
-                    ModelState.AddModelError("", errorResult.Message ?? "Password reset failed");
-                }
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", "An error occurred while processing your request.");
-            }
-
-            return View(model);
-        }
-
-        // GET: ConfirmEmail
-        [HttpGet]
-        public async Task<IActionResult> ConfirmEmail(string userId, string token)
-        {
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
-            {
-                TempData["ErrorMessage"] = "Invalid confirmation link.";
+                TempData["Error"] = $"Error: {ex.Message}";
                 return RedirectToAction("Login");
             }
-
-            try
-            {
-                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/auth/confirm-email?userId={userId}&token={Uri.EscapeDataString(token)}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["SuccessMessage"] = "Email confirmed successfully! You can now login.";
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Email confirmation failed.";
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "An error occurred while confirming your email.";
-            }
-
-            return RedirectToAction("Login");
-        }
-
-        // POST: Logout
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Logout()
-        {
-            HttpContext.Session.Clear();
-            TempData["SuccessMessage"] = "You have been logged out successfully.";
-            return RedirectToAction("Login");
         }
     }
 }

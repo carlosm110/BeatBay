@@ -1,0 +1,157 @@
+﻿@model BeatBay.DTOs.UserDto
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center">
+                <div class="profile-avatar mb-3">
+                    <i class="fas fa-user-circle fa-5x"></i>
+                </div>
+                <h4>@(Model.Name ?? Model.UserName)</h4>
+                <p class="mb-0">@Model.UserName</p>
+                @if (!string.IsNullOrEmpty(Model.PlanName))
+                {
+                    <span class="badge bg-warning mt-2">
+                        <i class="fas fa-crown"></i> @Model.PlanName
+                    </span>
+                }
+            </div>
+            <div class="card-body">
+                <div class="profile-info">
+                    <div class="info-item mb-3">
+                        <i class="fas fa-envelope text-primary"></i>
+                        <strong>Email:</strong>
+                        <span>@Model.Email</span>
+                    </div>
+
+                    <div class="info-item mb-3">
+                        <i class="fas fa-calendar text-success"></i>
+                        <strong>Member since:</strong>
+                        <span>@Model.CreatedAt.ToString("MMMM dd, yyyy")</span>
+                    </div>
+
+                    <div class="info-item mb-3">
+                        <i class="fas fa-circle text-@(Model.IsActive ? "success" : "danger")"></i>
+                        <strong>Status:</strong>
+                        <span class="text-@(Model.IsActive ? "success" : "danger")">
+                            @(Model.IsActive ? "Active" : "Inactive")
+                        </span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Bio))
+                    {
+                        <div class="info-item">
+                            <i class="fas fa-info-circle text-info"></i>
+                            <strong>Bio:</strong>
+                            <p class="mt-2">@Model.Bio</p>
+                        </div>
+                    }
+                </div>
+
+                <hr>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                    <button class="btn btn-outline-warning">
+                        <i class="fas fa-crown"></i> Upgrade Plan
+                    </button>
+                    <button class="btn btn-outline-secondary">
+                        <i class="fas fa-cog"></i> Account Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="row">
+            <!-- Statistics Cards -->
+            <div class="col-md-6 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-music fa-2x text-primary mb-2"></i>
+                        <h5>Songs Played</h5>
+                        <h2 class="text-primary">1,234</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-list fa-2x text-success mb-2"></i>
+                        <h5>Playlists</h5>
+                        <h2 class="text-success">12</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                        <h5>Hours Listened</h5>
+                        <h2 class="text-info">156</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card stat-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-heart fa-2x text-danger mb-2"></i>
+                        <h5>Favorites</h5>
+                        <h2 class="text-danger">89</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-history"></i> Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-play text-primary"></i>
+                    </div>
+                    <div class="activity-content">
+                        <strong>Played "Bohemian Rhapsody"</strong>
+                        <br><small class="text-muted">by Queen • 2 hours ago</small>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-plus text-success"></i>
+                    </div>
+                    <div class="activity-content">
+                        <strong>Created playlist "Road Trip Mix"</strong>
+                        <br><small class="text-muted">1 day ago</small>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-heart text-danger"></i>
+                    </div>
+                    <div class="activity-content">
+                        <strong>Liked "Imagine"</strong>
+                        <br><small class="text-muted">by John Lennon • 2 days ago</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">
+                    <i class="fas fa-

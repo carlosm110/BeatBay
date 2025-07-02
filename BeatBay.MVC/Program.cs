@@ -1,74 +1,62 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1) Servicios
+// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// 2) HttpClient nombrado para interactuar con la API
-builder.Services.AddHttpClient("BeatBay.API", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]);  // Usa la URL de la API definida en appsettings.json
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
-});
-
-// 3) Autenticación con Cookie (almacena el JWT en la cookie)
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+// Configurar autenticación JWT para el cliente
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        options.LoginPath = "/VAuth/Login";  // Redirige al login en el controlador VAuthController
-        options.LogoutPath = "/VAuth/Logout"; // Redirige al logout en el controlador VAuthController
-        options.Cookie.Name = "auth_cookie"; // Nombre de la cookie de autenticación
-        options.Cookie.HttpOnly = true;  // Solo accesible por el servidor, no en JavaScript
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // Asegura la cookie en producción
-        options.ExpireTimeSpan = TimeSpan.FromHours(2);  // Duración de la sesión (2 horas)
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+            ClockSkew = TimeSpan.Zero
+        };
     });
 
-// 4) Configuración de CORS (permitir acceso desde tu frontend MVC)
-builder.Services.AddCors(options =>
+// Configurar sesiones para almacenar el token JWT
+builder.Services.AddSession(options =>
 {
-    options.AddPolicy("AllowWeb",
-        policy => policy
-            .WithOrigins("https://localhost:7194")  // Cambia esto por tu URL de frontend en producción
-            .AllowAnyHeader()
-            .AllowAnyMethod());
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
+
+// Configurar HttpClient para el API Consumer
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// 5) Middleware de excepciones y HSTS
-if (app.Environment.IsDevelopment())
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();  // Mostrar excepciones completas en desarrollo
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");  // Redirige a la acción Error en producción
-    app.UseHsts();  // HSTS en producción para mayor seguridad
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
-// 6) Resto del pipeline
-app.UseHttpsRedirection();  // Redirige todo a HTTPS
-app.UseStaticFiles();  // Permite servir archivos estáticos
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 
-app.UseRouting();  // Habilita el enrutamiento
+app.UseRouting();
 
-// 7) Middleware de autenticación y autorización
-app.UseAuthentication();  // Habilita la autenticación
-app.UseAuthorization();   // Habilita la autorización
+app.UseSession(); // Habilitar sesiones
 
-// 8) Configuración de CORS
-app.UseCors("AllowWeb");  // Habilita CORS para el frontend
+app.UseAuthentication();
+app.UseAuthorization();
 
-// 9) Mapear rutas MVC
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"  // Ruta predeterminada para los controladores MVC
-);
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

@@ -3,6 +3,198 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <div class="hero-section py-5 mb-5">
+        <h1 class="display-4 mb-4">
+            <i class="fas fa-music text-primary"></i> Welcome to BeatBay
+        </h1>
+        <p class="lead">Your ultimate music streaming platform</p>
+        
+        @if (ViewBag.IsLoggedIn)
+        {
+            <div class="alert alert-success" role="alert">
+                <i class="fas fa-user-check"></i> Welcome back, <strong>@(ViewBag.CurrentUser.Name ?? ViewBag.CurrentUser.UserName)</strong>!
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-music fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">Discover Music</h5>
+                            <p class="card-text">Explore thousands of songs from your favorite artists.</p>
+                            <a href="#" class="btn btn-primary">Browse Songs</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-list fa-3x text-success mb-3"></i>
+                            <h5 class="card-title">Create Playlists</h5>
+                            <p class="card-text">Organize your favorite songs into custom playlists.</p>
+                            <a href="#" class="btn btn-success">My Playlists</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-circle fa-3x text-info mb-3"></i>
+                            <h5 class="card-title">Your Profile</h5>
+                            <p class="card-text">Manage your account settings and preferences.</p>
+                            <a asp-controller="Auth" asp-action="Profile" class="btn btn-info">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="mt-4">
+                <p class="lead">Join millions of music lovers on BeatBay</p>
+                <div class="d-grid gap-2 d-md-block">
+                    <a class="btn btn-primary btn-lg me-2" asp-controller="Auth" asp-action="Register">
+                        <i class="fas fa-user-plus"></i> Sign Up Now
+                    </a>
+                    <a class="btn btn-outline-primary btn-lg me-2" asp-controller="Auth" asp-action="Login">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a class="btn btn-success btn-lg" asp-controller="Auth" asp-action="RegisterArtist">
+                        <i class="fas fa-microphone"></i> Join as Artist
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!ViewBag.IsLoggedIn)
+    {
+        <div class="row features-section">
+            <div class="col-md-12 mb-4">
+                <h2 class="text-center mb-4">Why Choose BeatBay?</h2>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-item text-center p-3">
+                    <i class="fas fa-infinity fa-2x text-primary mb-3"></i>
+                    <h5>Unlimited Streaming</h5>
+                    <p>Stream millions of songs without limits</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-item text-center p-3">
+                    <i class="fas fa-headphones fa-2x text-success mb-3"></i>
+                    <h5>High Quality Audio</h5>
+                    <p>Crystal clear sound quality for the best experience</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-item text-center p-3">
+                    <i class="fas fa-mobile-alt fa-2x text-info mb-3"></i>
+                    <h5>Multi-Device Access</h5>
+                    <p>Listen anywhere, on any device</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="feature-item text-center p-3">
+                    <i class="fas fa-users fa-2x text-warning mb-3"></i>
+                    <h5>Family Plans</h5>
+                    <p>Share your music with family and friends</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pricing-section mt-5">
+            <h2 class="text-center mb-4">Choose Your Plan</h2>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card plan-card">
+                        <div class="card-header text-center bg-light">
+                            <h5>Free</h5>
+                            <h2>$0<small>/month</small></h2>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> 1 Connection</li>
+                                <li><i class="fas fa-check text-success"></i> Basic Features</li>
+                                <li><i class="fas fa-check text-success"></i> Ad-supported</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card plan-card">
+                        <div class="card-header text-center bg-primary text-white">
+                            <h5>Personal</h5>
+                            <h2>$1<small>/month</small></h2>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> 1 Connection</li>
+                                <li><i class="fas fa-check text-success"></i> Ad-free</li>
+                                <li><i class="fas fa-check text-success"></i> Offline Downloads</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card plan-card border-success">
+                        <div class="card-header text-center bg-success text-white">
+                            <h5>Family <span class="badge bg-warning">Popular</span></h5>
+                            <h2>$3.50<small>/month</small></h2>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> 4 Connections</li>
+                                <li><i class="fas fa-check text-success"></i> Ad-free</li>
+                                <li><i class="fas fa-check text-success"></i> Family Mix</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card plan-card">
+                        <div class="card-header text-center bg-dark text-white">
+                            <h5>Business</h5>
+                            <h2>$35<small>/month</small></h2>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> 50 Connections</li>
+                                <li><i class="fas fa-check text-success"></i> Commercial License</li>
+                                <li><i class="fas fa-check text-success"></i> Priority Support</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    margin: -20px -15px 30px -15px;
+    padding: 60px 15px !important;
+}
+
+.plan-card {
+    margin-bottom: 20px;
+    transition: transform 0.3s;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.feature-item {
+    transition: transform 0.3s;
+}
+
+.feature-item:hover {
+    transform: translateY(-3px);
+}
+</style>
