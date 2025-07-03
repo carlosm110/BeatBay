@@ -42,7 +42,7 @@
                             <i class="fas fa-user-circle fa-3x text-info mb-3"></i>
                             <h5 class="card-title">Your Profile</h5>
                             <p class="card-text">Manage your account settings and preferences.</p>
-                            <a asp-controller="Auth" asp-action="Profile" class="btn btn-info">View Profile</a>
+                            <a asp-controller="VAuth" asp-action="Profile" class="btn btn-info">View Profile</a>
                         </div>
                     </div>
                 </div>
@@ -53,13 +53,13 @@
             <div class="mt-4">
                 <p class="lead">Join millions of music lovers on BeatBay</p>
                 <div class="d-grid gap-2 d-md-block">
-                    <a class="btn btn-primary btn-lg me-2" asp-controller="Auth" asp-action="Register">
+                    <a class="btn btn-primary btn-lg me-2" asp-controller="VAuth" asp-action="Register">
                         <i class="fas fa-user-plus"></i> Sign Up Now
                     </a>
-                    <a class="btn btn-outline-primary btn-lg me-2" asp-controller="Auth" asp-action="Login">
+                    <a class="btn btn-outline-primary btn-lg me-2" asp-controller="VAuth" asp-action="Login">
                         <i class="fas fa-sign-in-alt"></i> Login
                     </a>
-                    <a class="btn btn-success btn-lg" asp-controller="Auth" asp-action="RegisterArtist">
+                    <a class="btn btn-success btn-lg" asp-controller="VAuth" asp-action="RegisterArtist">
                         <i class="fas fa-microphone"></i> Join as Artist
                     </a>
                 </div>
@@ -70,98 +70,109 @@
     @if (!ViewBag.IsLoggedIn)
     {
         <div class="row features-section">
-            <div class="col-md-12 mb-4">
-                <h2 class="text-center mb-4">Why Choose BeatBay?</h2>
+            <div class="col-md-12 mb-5">
+                <h2 class="text-center mb-4 section-title">Why Choose BeatBay?</h2>
+                <div class="title-underline"></div>
             </div>
-            <div class="col-md-3">
-                <div class="feature-item text-center p-3">
-                    <i class="fas fa-infinity fa-2x text-primary mb-3"></i>
-                    <h5>Unlimited Streaming</h5>
-                    <p>Stream millions of songs without limits</p>
+            <div class="col-md-3 mb-4">
+                <div class="feature-item text-center p-4">
+                    <div class="feature-icon-wrapper mb-3">
+                        <i class="fas fa-infinity fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="feature-title">Unlimited Streaming</h5>
+                    <p class="feature-description">Stream your favorite music without any restrictions</p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="feature-item text-center p-3">
-                    <i class="fas fa-headphones fa-2x text-success mb-3"></i>
-                    <h5>High Quality Audio</h5>
-                    <p>Crystal clear sound quality for the best experience</p>
+            <div class="col-md-3 mb-4">
+                <div class="feature-item text-center p-4">
+                    <div class="feature-icon-wrapper mb-3">
+                        <i class="fas fa-download fa-3x text-success"></i>
+                    </div>
+                    <h5 class="feature-title">Download Songs</h5>
+                    <p class="feature-description">Save your favorite tracks for offline listening anywhere</p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="feature-item text-center p-3">
-                    <i class="fas fa-mobile-alt fa-2x text-info mb-3"></i>
-                    <h5>Multi-Device Access</h5>
-                    <p>Listen anywhere, on any device</p>
+            <div class="col-md-3 mb-4">
+                <div class="feature-item text-center p-4">
+                    <div class="feature-icon-wrapper mb-3">
+                        <i class="fas fa-forward fa-3x text-info"></i>
+                    </div>
+                    <h5 class="feature-title">Unlimited Skips</h5>
+                    <p class="feature-description">Skip as many songs as you want to find your perfect track</p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="feature-item text-center p-3">
-                    <i class="fas fa-users fa-2x text-warning mb-3"></i>
-                    <h5>Family Plans</h5>
-                    <p>Share your music with family and friends</p>
+            <div class="col-md-3 mb-4">
+                <div class="feature-item text-center p-4">
+                    <div class="feature-icon-wrapper mb-3">
+                        <i class="fas fa-users fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="feature-title">Family Plans</h5>
+                    <p class="feature-description">Share your music with family and friends</p>
                 </div>
             </div>
         </div>
 
         <div class="pricing-section mt-5">
-            <h2 class="text-center mb-4">Choose Your Plan</h2>
+            <h2 class="text-center mb-4 section-title">Choose Your Plan</h2>
+            <div class="title-underline mb-5"></div>
             <div class="row">
-                <div class="col-md-3">
-                    <div class="card plan-card">
+                <div class="col-md-3 mb-4">
+                    <div class="card plan-card h-100">
                         <div class="card-header text-center bg-light">
-                            <h5>Free</h5>
-                            <h2>$0<small>/month</small></h2>
+                            <h5 class="plan-name">Free</h5>
+                            <h2 class="plan-price">$0<small>/month</small></h2>
                         </div>
                         <div class="card-body">
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-check text-success"></i> 1 Connection</li>
-                                <li><i class="fas fa-check text-success"></i> Basic Features</li>
-                                <li><i class="fas fa-check text-success"></i> Ad-supported</li>
+                            <ul class="list-unstyled plan-features">
+                                <li><i class="fas fa-check text-success me-2"></i> 1 Connection</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Basic Features</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Ad-supported</li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card plan-card">
+                <div class="col-md-3 mb-4">
+                    <div class="card plan-card h-100">
                         <div class="card-header text-center bg-primary text-white">
-                            <h5>Personal</h5>
-                            <h2>$1<small>/month</small></h2>
+                            <h5 class="plan-name">Personal</h5>
+                            <h2 class="plan-price">$1<small>/month</small></h2>
                         </div>
                         <div class="card-body">
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-check text-success"></i> 1 Connection</li>
-                                <li><i class="fas fa-check text-success"></i> Ad-free</li>
-                                <li><i class="fas fa-check text-success"></i> Offline Downloads</li>
+                            <ul class="list-unstyled plan-features">
+                                <li><i class="fas fa-check text-success me-2"></i> 1 Connection</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Ad-free</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Offline Downloads</li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card plan-card border-success">
-                        <div class="card-header text-center bg-success text-white">
-                            <h5>Family <span class="badge bg-warning">Popular</span></h5>
-                            <h2>$3.50<small>/month</small></h2>
+                <div class="col-md-3 mb-4">
+                    <div class="card plan-card border-success h-100 featured-plan">
+                        <div class="card-header text-center bg-success text-white position-relative">
+                            <span class="badge bg-warning position-absolute top-0 start-50 translate-middle">Popular</span>
+                            <h5 class="plan-name mt-2">Family</h5>
+                            <h2 class="plan-price">$3.50<small>/month</small></h2>
                         </div>
                         <div class="card-body">
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-check text-success"></i> 4 Connections</li>
-                                <li><i class="fas fa-check text-success"></i> Ad-free</li>
-                                <li><i class="fas fa-check text-success"></i> Family Mix</li>
+                            <ul class="list-unstyled plan-features">
+                                <li><i class="fas fa-check text-success me-2"></i> 4 Connections</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Ad-free</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Family Mix</li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card plan-card">
+                <div class="col-md-3 mb-4">
+                    <div class="card plan-card h-100">
                         <div class="card-header text-center bg-dark text-white">
-                            <h5>Business</h5>
-                            <h2>$35<small>/month</small></h2>
+                            <h5 class="plan-name">Business</h5>
+                            <h2 class="plan-price">$35<small>/month</small></h2>
                         </div>
                         <div class="card-body">
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-check text-success"></i> 50 Connections</li>
-                                <li><i class="fas fa-check text-success"></i> Commercial License</li>
-                                <li><i class="fas fa-check text-success"></i> Priority Support</li>
+                            <ul class="list-unstyled plan-features">
+                                <li><i class="fas fa-check text-success me-2"></i> 50 Connections</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Commercial License</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Priority Support</li>
                             </ul>
                         </div>
                     </div>
@@ -178,23 +189,144 @@
     border-radius: 15px;
     margin: -20px -15px 30px -15px;
     padding: 60px 15px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-.plan-card {
-    margin-bottom: 20px;
-    transition: transform 0.3s;
+.section-title {
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1rem;
 }
 
-.plan-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+.title-underline {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    margin: 0 auto;
+    border-radius: 2px;
+}
+
+.features-section {
+    padding: 2rem 0;
 }
 
 .feature-item {
-    transition: transform 0.3s;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #f8f9fa;
+    height: 100%;
 }
 
 .feature-item:hover {
-    transform: translateY(-3px);
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon-wrapper {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover .feature-icon-wrapper {
+    transform: scale(1.1);
+}
+
+.feature-title {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.feature-description {
+    color: #6c757d;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.pricing-section {
+    padding: 3rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 20px;
+    margin: 2rem -15px;
+}
+
+.plan-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.plan-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.featured-plan {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+}
+
+.featured-plan:hover {
+    transform: scale(1.05) translateY(-10px);
+}
+
+.plan-name {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.plan-price {
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.plan-features {
+    padding: 1rem 0;
+}
+
+.plan-features li {
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    color: #495057;
+}
+
+.card-header {
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+@@media (max-width: 768px) {
+    .hero-section {
+        margin: -20px -15px 20px -15px;
+        padding: 40px 15px !important;
+    }
+    
+    .pricing-section {
+        margin: 2rem -15px;
+        padding: 2rem 1rem;
+    }
+    
+    .featured-plan {
+        transform: none;
+    }
+    
+    .feature-item {
+        margin-bottom: 2rem;
+    }
 }
 </style>

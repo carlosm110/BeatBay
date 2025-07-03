@@ -277,7 +277,7 @@ Una vez confirmado, podrás subir tu música y compartirla con la comunidad.
                 return BadRequest(new { message = "Email not found" });
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var resetLink = Url.Action("ResetPassword", "Auth", new { userId = user.Id, token = token }, Request.Scheme);
+            var resetLink = $"https://localhost:7194/Auth/ResetPassword?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
             var emailBody = $@"Restablecer Contraseña - BeatBay
 
