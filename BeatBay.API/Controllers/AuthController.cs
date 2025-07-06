@@ -1,13 +1,19 @@
-﻿using BeatBay.Data;
+﻿
+using BeatBay.Data;
 using BeatBay.DTOs;
 using BeatBay.Model;
+using BeatBay.Model.DTOs;
 using BeatBay.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
 namespace BeatBay.Controllers
@@ -22,6 +28,8 @@ namespace BeatBay.Controllers
         private readonly IEmailSender _emailSender;
         private readonly IJwtService _jwtService;
         private readonly IConfiguration _configuration;
+        private readonly UrlEncoder _urlEncoder;
+        private readonly I2FAService _twoFactorService;
 
         public AuthController(
             BeatBayDbContext context,
@@ -29,7 +37,9 @@ namespace BeatBay.Controllers
             SignInManager<User> signInManager,
             IEmailSender emailSender,
             IJwtService jwtService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            UrlEncoder urlEncoder,
+            I2FAService twoFactorService)
         {
             _context = context;
             _userManager = userManager;
@@ -37,6 +47,8 @@ namespace BeatBay.Controllers
             _emailSender = emailSender;
             _jwtService = jwtService;
             _configuration = configuration;
+            _urlEncoder = urlEncoder;
+            _twoFactorService = twoFactorService;
         }
 
         // **Registro de Usuario**
@@ -93,7 +105,7 @@ El equipo de BeatBay";
             return Ok(new { message = "Email confirmed successfully." });
         }
 
-        // **Login con JWT**
+        // **Login Normal (sin 2FA)**
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
@@ -113,15 +125,23 @@ El equipo de BeatBay";
             if (!result.Succeeded)
                 return Unauthorized(new { message = "Invalid credentials" });
 
-            // Generar JWT token
+            // Verificar si el usuario tiene 2FA habilitado
+            if (await _userManager.GetTwoFactorEnabledAsync(user))
+            {
+                return Ok(new
+                {
+                    requiresTwoFactor = true,
+                    message = "Two-factor authentication required. Use /login-2fa endpoint."
+                });
+            }
+
+            // Login normal sin 2FA
             var jwtToken = await _jwtService.GenerateTokenAsync(user);
             var refreshToken = _jwtService.GenerateRefreshToken();
 
-            // Calcular tiempo de expiración
             var expireMinutes = Convert.ToDouble(_configuration["Jwt:ExpireMinutes"]);
             var expiresAt = DateTime.UtcNow.AddMinutes(expireMinutes);
 
-            // Crear DTO del usuario
             var userDto = new UserDto
             {
                 Id = user.Id,
@@ -134,7 +154,6 @@ El equipo de BeatBay";
                 CreatedAt = user.CreatedAt
             };
 
-            // Respuesta con token
             var response = new AuthResponseDto
             {
                 Token = jwtToken,
@@ -144,6 +163,156 @@ El equipo de BeatBay";
             };
 
             return Ok(response);
+        }
+
+        // **Login con 2FA**
+        [HttpPost("login-2fa")]
+        public async Task<IActionResult> LoginWith2FA(Verify2FADto dto)
+        {
+            var user = await _userManager.FindByNameAsync(dto.UserName);
+            if (user == null)
+                return Unauthorized(new { message = "Invalid credentials" });
+
+            // Verificar si el usuario está activo
+            if (!user.IsActive)
+                return Unauthorized(new { message = "Account is deactivated. Contact support." });
+
+            // Verificar si el usuario tiene 2FA habilitado
+            if (!await _userManager.GetTwoFactorEnabledAsync(user))
+                return BadRequest(new { message = "Two-factor authentication is not enabled for this user." });
+
+            // Validar el código 2FA
+            var isValidCode = await _twoFactorService.ValidateCodeAsync(user.Id, dto.Code);
+            if (!isValidCode)
+                return Unauthorized(new { message = "Invalid or expired verification code." });
+
+            // Generar tokens JWT
+            var jwtToken = await _jwtService.GenerateTokenAsync(user);
+            var refreshToken = _jwtService.GenerateRefreshToken();
+
+            var expireMinutes = Convert.ToDouble(_configuration["Jwt:ExpireMinutes"]);
+            var expiresAt = DateTime.UtcNow.AddMinutes(expireMinutes);
+
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Name = user.Name,
+                Bio = user.Bio,
+                PlanId = user.PlanId,
+                IsActive = user.IsActive,
+                CreatedAt = user.CreatedAt
+            };
+
+            var response = new AuthResponseDto
+            {
+                Token = jwtToken,
+                RefreshToken = refreshToken,
+                ExpiresAt = expiresAt,
+                User = userDto
+            };
+
+            return Ok(response);
+        }
+
+        // **Habilitar 2FA Simple**
+        [HttpPost("enable-2fa")]
+        [Authorize] // <- Este atributo faltaba
+        public async Task<IActionResult> EnableSimple2FA(Enable2FADto dto)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user == null)
+                return NotFound();
+
+            // Verificar contraseña
+            var passwordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+            if (!passwordValid)
+                return BadRequest(new { message = "Invalid password" });
+
+            // Habilitar 2FA
+            await _userManager.SetTwoFactorEnabledAsync(user, true);
+
+            // Generar códigos de recuperación
+            var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+
+            return Ok(new
+            {
+                message = "Two-factor authentication enabled successfully",
+                recoveryCodes = recoveryCodes.ToList()
+            });
+        }
+
+        // **Deshabilitar 2FA**
+        [HttpPost("disable-2fa")]
+        [Authorize] // <- Este atributo también faltaba
+        public async Task<IActionResult> DisableSimple2FA(Disable2FADto dto)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user == null)
+                return NotFound();
+
+            // Verificar contraseña
+            var passwordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+            if (!passwordValid)
+                return BadRequest(new { message = "Invalid password" });
+
+            // Deshabilitar 2FA
+            await _userManager.SetTwoFactorEnabledAsync(user, false);
+
+            return Ok(new { message = "Two-factor authentication disabled successfully" });
+        }
+
+        // **Solicitar Código 2FA**
+        [HttpPost("request-2fa-code")]
+        public async Task<IActionResult> RequestTwoFactorCode(ResendCodeDto dto)
+        {
+            var user = await _userManager.FindByNameAsync(dto.UserName);
+            if (user == null)
+                return NotFound(new { message = "User not found" });
+
+            // Verificar si el usuario tiene 2FA habilitado
+            if (!await _userManager.GetTwoFactorEnabledAsync(user))
+                return BadRequest(new { message = "Two-factor authentication is not enabled for this user." });
+
+            // Generar y enviar código
+            var code = await _twoFactorService.GenerateCodeAsync(user.Id);
+            await _twoFactorService.SendCodeByEmailAsync(user.Email, code);
+
+            return Ok(new { message = "Verification code sent to your email." });
+        }
+
+        // **Generar Nuevos Códigos de Recuperación**
+        [HttpPost("generate-recovery-codes")]
+        [Authorize]
+        public async Task<IActionResult> GenerateRecoveryCodes([FromBody] string password)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user == null)
+                return NotFound();
+
+            // Verificar contraseña
+            var passwordValid = await _userManager.CheckPasswordAsync(user, password);
+            if (!passwordValid)
+                return BadRequest(new { message = "Invalid password" });
+
+            // Verificar que 2FA esté habilitado
+            if (!await _userManager.GetTwoFactorEnabledAsync(user))
+                return BadRequest(new { message = "Two-factor authentication is not enabled" });
+
+            // Generar nuevos códigos
+            var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+
+            return Ok(new
+            {
+                recoveryCodes = recoveryCodes.ToList()
+            });
         }
 
         // **Registro de Artista**
@@ -277,7 +446,7 @@ Una vez confirmado, podrás subir tu música y compartirla con la comunidad.
                 return BadRequest(new { message = "Email not found" });
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var resetLink = $"https://localhost:7194/Auth/ResetPassword?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+            var resetLink = Url.Action("ResetPassword", "Auth", new { userId = user.Id, token = token }, Request.Scheme);
 
             var emailBody = $@"Restablecer Contraseña - BeatBay
 
@@ -293,7 +462,6 @@ Este enlace expirará en 24 horas por seguridad.
 
 El equipo de BeatBay";
 
-            // Enviar correo con enlace para resetear la contraseña
             await _emailSender.SendEmailAsync(user.Email, "Restablecer Contraseña - BeatBay", emailBody);
 
             return Ok(new { message = "Password reset link sent to email" });
@@ -353,7 +521,7 @@ El equipo de BeatBay";
             return Ok(userDto);
         }
 
-        // **Actualizar Usuario (Solo el propio usuario o admin puede modificar)**
+        // **Actualizar Usuario**
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateUser(int id, UpdateUserDto dto)
@@ -376,7 +544,7 @@ El equipo de BeatBay";
             return Ok(new { message = "User updated successfully" });
         }
 
-        // **Obtener Usuario (Solo admin puede ver todos los usuarios)**
+        // **Obtener Usuario (Solo admin)**
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UserDto>> GetUser(int id)
@@ -404,7 +572,7 @@ El equipo de BeatBay";
             return Ok(userDto);
         }
 
-        // **Desactivar Usuario (Solo admin puede hacerlo)**
+        // **Desactivar Usuario (Solo admin)**
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
@@ -428,6 +596,28 @@ El equipo de BeatBay";
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "User deactivated successfully" });
+        }
+
+        // **Verificar estado de 2FA**
+        [HttpGet("2fa-status")]
+        [Authorize]
+        public async Task<IActionResult> Get2FAStatus()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user == null)
+                return NotFound();
+
+            var is2FAEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
+            var recoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user);
+
+            return Ok(new
+            {
+                is2FAEnabled = is2FAEnabled,
+                recoveryCodesLeft = recoveryCodesLeft,
+                phoneNumber = user.PhoneNumber
+            });
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BeatBay.APIConsumer;
 using BeatBay.DTOs;
-using BeatBay.APIConsumer;
+using BeatBay.Model.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -23,7 +24,7 @@ namespace BeatBayMVC.Controllers
             return View();
         }
 
-        // POST: Login
+        // Modificar el método Login existente para manejar 2FA
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto model)
         {
@@ -40,12 +41,20 @@ namespace BeatBayMVC.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    var authResponse = JsonConvert.DeserializeObject<AuthResponseDto>(responseContent);
+                    var authResponse = JsonConvert.DeserializeObject<dynamic>(responseContent);
 
-                    // Guardar token en sesión
-                    HttpContext.Session.SetString("JwtToken", authResponse.Token);
-                    HttpContext.Session.SetString("RefreshToken", authResponse.RefreshToken);
-                    HttpContext.Session.SetString("UserData", JsonConvert.SerializeObject(authResponse.User));
+                    // Verificar si requiere 2FA
+                    if (authResponse.requiresTwoFactor == true)
+                    {
+                        TempData["Info"] = "Two-factor authentication required";
+                        return RedirectToAction("TwoFactorLogin", new { userName = model.UserName });
+                    }
+
+                    // Login normal sin 2FA
+                    var fullAuthResponse = JsonConvert.DeserializeObject<AuthResponseDto>(responseContent);
+                    HttpContext.Session.SetString("JwtToken", fullAuthResponse.Token);
+                    HttpContext.Session.SetString("RefreshToken", fullAuthResponse.RefreshToken);
+                    HttpContext.Session.SetString("UserData", JsonConvert.SerializeObject(fullAuthResponse.User));
 
                     TempData["Success"] = "Login successful!";
                     return RedirectToAction("Index", "Home");
@@ -494,6 +503,365 @@ namespace BeatBayMVC.Controllers
                 return JsonConvert.DeserializeObject<UserDto>(userDataJson);
             }
             return null;
+        }
+
+        public async Task<IActionResult> TwoFactorSettings()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login");
+
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/Auth/2fa-status");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var status = JsonConvert.DeserializeObject<dynamic>(responseContent);
+
+                    ViewBag.Is2FAEnabled = status.is2FAEnabled;
+                    ViewBag.RecoveryCodesLeft = status.recoveryCodesLeft;
+
+                    return View();
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    if (await TryRefreshToken())
+                    {
+                        return await TwoFactorSettings();
+                    }
+                    TempData["Error"] = "Session expired. Please login again.";
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    TempData["Error"] = "Unable to load 2FA settings";
+                    return RedirectToAction("Profile");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error: {ex.Message}";
+                return RedirectToAction("Profile");
+            }
+        }
+
+        // API ENDPOINT: Get 2FA Status (Para el JavaScript)
+        [HttpGet]
+        public async Task<IActionResult> Get2FAStatus()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return Json(new { success = false, message = "Not authenticated" });
+
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/Auth/2fa-status");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var status = JsonConvert.DeserializeObject<dynamic>(responseContent);
+
+                    return Json(new
+                    {
+                        success = true,
+                        is2FAEnabled = status.is2FAEnabled,
+                        recoveryCodesLeft = status.recoveryCodesLeft ?? 0
+                    });
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    if (await TryRefreshToken())
+                    {
+                        return await Get2FAStatus();
+                    }
+                    return Json(new { success = false, message = "Session expired" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Unable to load 2FA status" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        // API ENDPOINT: Enable 2FA (Para el JavaScript)
+        [HttpPost]
+        public async Task<IActionResult> Enable2FA([FromBody] Enable2FADto model)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return Json(new { success = false, message = "Not authenticated" });
+
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Please provide a valid password" });
+            }
+
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var json = JsonConvert.SerializeObject(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/enable-2fa", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Two-factor authentication enabled successfully!",
+                        recoveryCodes = result.recoveryCodes
+                    });
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    if (await TryRefreshToken())
+                    {
+                        return await Enable2FA(model);
+                    }
+                    return Json(new { success = false, message = "Session expired" });
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    try
+                    {
+                        var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
+                        return Json(new { success = false, message = errorResponse?.message?.ToString() ?? "Failed to enable 2FA" });
+                    }
+                    catch
+                    {
+                        return Json(new { success = false, message = errorContent ?? "Failed to enable 2FA" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        // API ENDPOINT: Disable 2FA (Para el JavaScript)
+        [HttpPost]
+        public async Task<IActionResult> Disable2FA([FromBody] Disable2FADto model)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return Json(new { success = false, message = "Not authenticated" });
+
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Please provide a valid password" });
+            }
+
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var json = JsonConvert.SerializeObject(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/disable-2fa", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Two-factor authentication disabled successfully!"
+                    });
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    if (await TryRefreshToken())
+                    {
+                        return await Disable2FA(model);
+                    }
+                    return Json(new { success = false, message = "Session expired" });
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    try
+                    {
+                        var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
+                        return Json(new { success = false, message = errorResponse?.message?.ToString() ?? "Failed to disable 2FA" });
+                    }
+                    catch
+                    {
+                        return Json(new { success = false, message = errorContent ?? "Failed to disable 2FA" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        // API ENDPOINT: Generate Recovery Codes (Para el JavaScript)
+        [HttpPost]
+        public async Task<IActionResult> GenerateRecoveryCodes([FromBody] string password)
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            if (string.IsNullOrEmpty(token))
+                return Json(new { success = false, message = "Not authenticated" });
+
+            if (string.IsNullOrEmpty(password))
+            {
+                return Json(new { success = false, message = "Password is required" });
+            }
+
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var requestBody = new { Password = password };
+                var json = JsonConvert.SerializeObject(requestBody);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/generate-recovery-codes", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Recovery codes generated successfully!",
+                        recoveryCodes = result.recoveryCodes
+                    });
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    if (await TryRefreshToken())
+                    {
+                        return await GenerateRecoveryCodes(password);
+                    }
+                    return Json(new { success = false, message = "Session expired" });
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    try
+                    {
+                        var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
+                        return Json(new { success = false, message = errorResponse?.message?.ToString() ?? "Failed to generate recovery codes" });
+                    }
+                    catch
+                    {
+                        return Json(new { success = false, message = errorContent ?? "Failed to generate recovery codes" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        // GET: Two Factor Login
+        public IActionResult TwoFactorLogin(string userName)
+        {
+            if (string.IsNullOrEmpty(userName))
+                return RedirectToAction("Login");
+
+            var model = new Verify2FADto { UserName = userName };
+            return View(model);
+        }
+
+        // POST: Two Factor Login
+        [HttpPost]
+        public async Task<IActionResult> TwoFactorLogin(Verify2FADto model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            try
+            {
+                var json = JsonConvert.SerializeObject(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/login-2fa", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var authResponse = JsonConvert.DeserializeObject<AuthResponseDto>(responseContent);
+
+                    // Guardar token en sesión
+                    HttpContext.Session.SetString("JwtToken", authResponse.Token);
+                    HttpContext.Session.SetString("RefreshToken", authResponse.RefreshToken);
+                    HttpContext.Session.SetString("UserData", JsonConvert.SerializeObject(authResponse.User));
+
+                    TempData["Success"] = "Login successful!";
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
+                    ModelState.AddModelError("", errorResponse?.message?.ToString() ?? "Two-factor authentication failed");
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error: {ex.Message}");
+            }
+
+            return View(model);
+        }
+
+        // POST: Request 2FA Code
+        [HttpPost]
+        public async Task<IActionResult> Request2FACode(ResendCodeDto model)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/request-2fa-code", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["Success"] = "Verification code sent to your email!";
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
+                    TempData["Error"] = errorResponse?.message?.ToString() ?? "Failed to send verification code";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error: {ex.Message}";
+            }
+
+            return RedirectToAction("TwoFactorLogin", new { userName = model.UserName });
         }
     }
 }

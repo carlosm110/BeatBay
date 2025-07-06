@@ -1,60 +1,83 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+ï»¿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
 using BeatBay.Data;
 using BeatBay.Model;
 using BeatBay.Services;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 1. Add services to the container.
 builder.Services.AddControllers();
 
-// Swagger/OpenAPI Configuration
+// 2. Swagger/OpenAPI Configuration con autenticaciï¿½n Bearer
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Ingresa 'Bearer <token>'"
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement {
+        {
+            new OpenApiSecurityScheme {
+                Reference = new OpenApiReference {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
-// Configurar DbContext con PostgreSQL
+// 3. Configurar DbContext con PostgreSQL
 builder.Services.AddDbContext<BeatBayDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("BeatBayDbContext")));
 
-// Configurar Identity con roles personalizados, confirmación de cuenta y correo único
-builder.Services.AddIdentity<User, Role>(options =>
-{
+// 4. Configurar Identity con roles personalizados, confirmaciï¿½n de cuenta y soporte 2FA
+builder.Services.AddIdentity<User, Role>(options => {
     options.SignIn.RequireConfirmedAccount = true;
-    options.User.RequireUniqueEmail = true; // Evita registros con el mismo correo
+    options.User.RequireUniqueEmail = true;
+    options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
 
-    // Configuración de contraseña
+    // Configuraciï¿½n de contraseï¿½a
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 6;
 
-    // Configuración de lockout
-    options.Lockout.MaxFailedAccessAttempts = 5;  // Número máximo de intentos fallidos antes de bloquear la cuenta
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);  // Tiempo de bloqueo (1 minuto)
-    options.Lockout.AllowedForNewUsers = true;  // Permite el lockout para usuarios nuevos
+    // Configuraciï¿½n de lockout
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
+    options.Lockout.AllowedForNewUsers = true;
 })
 .AddEntityFrameworkStores<BeatBayDbContext>()
 .AddDefaultTokenProviders();
 
-// Registrar servicios personalizados
+// 5. Registrar servicios personalizados
 builder.Services.AddTransient<IEmailSender, EmailService>();
-builder.Services.AddScoped<IJwtService, JwtService>(); // Registrar JWT Service
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<I2FAService, TwoFactorAuthService>();
 
-// Configuración de autenticación JWT
-builder.Services.AddAuthentication(options =>
-{
+// 6. Configuraciï¿½n de autenticaciï¿½n JWT
+builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options =>
-{
+.AddJwtBearer(options => {
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -64,14 +87,13 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-        ClockSkew = TimeSpan.Zero // Eliminar tolerancia de tiempo
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+        ClockSkew = TimeSpan.Zero
     };
 });
 
-// Configuración de CORS para permitir el acceso desde el frontend MVC
-builder.Services.AddCors(options =>
-{
+// 7. Configuraciï¿½n de CORS para permitir el acceso desde el frontend MVC
+builder.Services.AddCors(options => {
     options.AddPolicy("AllowWeb",
         policy => policy
             .WithOrigins("https://localhost:7194")
@@ -79,30 +101,33 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
-// Agregar servicios adicionales
+// 8. Agregar servicios adicionales
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
-// Configuración del middleware
+// 9. Configuraciï¿½n del middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
+    app.UseSwaggerUI(c => {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "BeatBay API V1");
+        c.DisplayRequestDuration();
     });
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();  // Si necesitas servir archivos estáticos
+
+// Permitir servir archivos estï¿½ticos (ej. wwwroot)
+app.UseStaticFiles();
 
 app.UseRouting();
 
-// Configuración de CORS
+// Aplicar CORS
 app.UseCors("AllowWeb");
 
-// Middleware para autenticación y autorización
+// Autenticaciï¿½n y autorizaciï¿½n
 app.UseAuthentication();
 app.UseAuthorization();
 
