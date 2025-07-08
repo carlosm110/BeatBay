@@ -1,0 +1,50 @@
+﻿@model List<BeatBay.DTOs.SongDto>
+
+@{
+    ViewData["Title"] = "Canciones";
+}
+
+<h2>Canciones</h2>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Subir Nueva Canción</a>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Duración</th>
+            <th>Género</th>
+            <th>Artista</th>
+            <th>Reproducciones</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var song in Model)
+        {
+            <tr>
+                <td>@song.Title</td>
+                <td>@song.Duration</td>
+                <td>@song.Genre</td>
+                <td>@song.ArtistName</td>
+                <td>@song.PlayCount</td>
+                <td>@(song.IsActive ? "Activa" : "Inactiva")</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@song.Id" class="btn btn-sm btn-info">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@song.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@song.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

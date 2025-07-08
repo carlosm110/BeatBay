@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using BeatBay.API.Settings;
+using BeatBay.Data;
+using BeatBay.Model;
+using BeatBay.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -6,9 +10,6 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using BeatBay.Data;
-using BeatBay.Model;
-using BeatBay.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,6 +92,8 @@ builder.Services.AddAuthentication(options => {
         ClockSkew = TimeSpan.Zero
     };
 });
+
+builder.Services.Configure<AzureBlobStorageSettings>(builder.Configuration.GetSection("AzureBlobStorageSettings"));
 
 // 7. Configuraci�n de CORS para permitir el acceso desde el frontend MVC
 builder.Services.AddCors(options => {

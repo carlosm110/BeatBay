@@ -1,0 +1,44 @@
+﻿@model BeatBay.DTOs.CreateSongDto
+
+@{
+    ViewData["Title"] = "Subir Canción";
+}
+
+<h2>Subir Nueva Canción</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form asp-action="Create" enctype="multipart/form-data" method="post">
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Duration"></label>
+        <input asp-for="Duration" class="form-control" type="time" step="1" />
+        <span asp-validation-for="Duration" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Genre"></label>
+        <input asp-for="Genre" class="form-control" />
+        <span asp-validation-for="Genre" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="audioFile">Archivo de audio</label>
+        <input type="file" name="audioFile" class="form-control" accept=".mp3,.wav,.flac,.m4a" required />
+    </div>
+
+    <button type="submit" class="btn btn-success">Subir Canción</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

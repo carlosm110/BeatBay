@@ -46,7 +46,10 @@ namespace BeatBayMVC.Controllers
                     // Verificar si requiere 2FA
                     if (authResponse.requiresTwoFactor == true)
                     {
-                        TempData["Info"] = "Two-factor authentication required";
+                        // Enviar código 2FA automáticamente
+                        await SendTwoFactorCodeAsync(model.UserName);
+
+                        TempData["Info"] = "Two-factor authentication required. A verification code has been sent to your email.";
                         return RedirectToAction("TwoFactorLogin", new { userName = model.UserName });
                     }
 
@@ -72,6 +75,27 @@ namespace BeatBayMVC.Controllers
             }
 
             return View(model);
+        }
+
+        // Método auxiliar para enviar código 2FA
+        private async Task<bool> SendTwoFactorCodeAsync(string userName)
+        {
+            try
+            {
+                var resendCodeDto = new ResendCodeDto { UserName = userName };
+                var json = JsonConvert.SerializeObject(resendCodeDto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/request-2fa-code", content);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                // Log del error si es necesario
+                Console.WriteLine($"Error sending 2FA code: {ex.Message}");
+                return false;
+            }
         }
 
         // GET: Register
@@ -141,7 +165,6 @@ namespace BeatBayMVC.Controllers
                 }
                 else
                 {
-                    // **Corrección: Usar el mismo enfoque que en el método Register**
                     var errorContent = await response.Content.ReadAsStringAsync();
                     var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
                     ModelState.AddModelError("", errorResponse?.message?.ToString() ?? "Artist registration failed");
@@ -505,6 +528,7 @@ namespace BeatBayMVC.Controllers
             return null;
         }
 
+        // GET: Two Factor Settings
         public async Task<IActionResult> TwoFactorSettings()
         {
             var token = HttpContext.Session.GetString("JwtToken");
@@ -524,8 +548,6 @@ namespace BeatBayMVC.Controllers
                     var status = JsonConvert.DeserializeObject<dynamic>(responseContent);
 
                     ViewBag.Is2FAEnabled = status.is2FAEnabled;
-                    ViewBag.RecoveryCodesLeft = status.recoveryCodesLeft;
-
                     return View();
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
@@ -573,8 +595,7 @@ namespace BeatBayMVC.Controllers
                     return Json(new
                     {
                         success = true,
-                        is2FAEnabled = status.is2FAEnabled,
-                        recoveryCodesLeft = status.recoveryCodesLeft ?? 0
+                        is2FAEnabled = status.is2FAEnabled
                     });
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
@@ -621,14 +642,10 @@ namespace BeatBayMVC.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
-
                     return Json(new
                     {
                         success = true,
-                        message = "Two-factor authentication enabled successfully!",
-                        recoveryCodes = result.recoveryCodes
+                        message = "Two-factor authentication enabled successfully!"
                     });
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
@@ -718,70 +735,6 @@ namespace BeatBayMVC.Controllers
             }
         }
 
-        // API ENDPOINT: Generate Recovery Codes (Para el JavaScript)
-        [HttpPost]
-        public async Task<IActionResult> GenerateRecoveryCodes([FromBody] string password)
-        {
-            var token = HttpContext.Session.GetString("JwtToken");
-            if (string.IsNullOrEmpty(token))
-                return Json(new { success = false, message = "Not authenticated" });
-
-            if (string.IsNullOrEmpty(password))
-            {
-                return Json(new { success = false, message = "Password is required" });
-            }
-
-            try
-            {
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-                var requestBody = new { Password = password };
-                var json = JsonConvert.SerializeObject(requestBody);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/Auth/generate-recovery-codes", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
-
-                    return Json(new
-                    {
-                        success = true,
-                        message = "Recovery codes generated successfully!",
-                        recoveryCodes = result.recoveryCodes
-                    });
-                }
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                {
-                    if (await TryRefreshToken())
-                    {
-                        return await GenerateRecoveryCodes(password);
-                    }
-                    return Json(new { success = false, message = "Session expired" });
-                }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    try
-                    {
-                        var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
-                        return Json(new { success = false, message = errorResponse?.message?.ToString() ?? "Failed to generate recovery codes" });
-                    }
-                    catch
-                    {
-                        return Json(new { success = false, message = errorContent ?? "Failed to generate recovery codes" });
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Error: {ex.Message}" });
-            }
-        }
-
         // GET: Two Factor Login
         public IActionResult TwoFactorLogin(string userName)
         {
@@ -836,7 +789,7 @@ namespace BeatBayMVC.Controllers
 
         // POST: Request 2FA Code
         [HttpPost]
-        public async Task<IActionResult> Request2FACode(ResendCodeDto model)
+        public async Task<IActionResult> Request2FACode([FromBody] ResendCodeDto model)
         {
             try
             {
@@ -847,21 +800,19 @@ namespace BeatBayMVC.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["Success"] = "Verification code sent to your email!";
+                    return Json(new { success = true, message = "Verification code sent to your email!" });
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
                     var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
-                    TempData["Error"] = errorResponse?.message?.ToString() ?? "Failed to send verification code";
+                    return Json(new { success = false, message = errorResponse?.message?.ToString() ?? "Failed to send verification code" });
                 }
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error: {ex.Message}";
+                return Json(new { success = false, message = $"Error: {ex.Message}" });
             }
-
-            return RedirectToAction("TwoFactorLogin", new { userName = model.UserName });
         }
     }
 }

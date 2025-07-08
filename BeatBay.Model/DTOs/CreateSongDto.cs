@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using BeatBay.Model;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BeatBay.DTOs
 {
@@ -14,7 +14,5 @@ namespace BeatBay.DTOs
         [MaxLength(100)]
         public string? Genre { get; set; }
 
-        [Required]
-        public string StreamingUrl { get; set; }
     }
 }
