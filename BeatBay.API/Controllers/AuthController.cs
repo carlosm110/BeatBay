@@ -50,52 +50,108 @@ namespace BeatBay.Controllers
             _twoFactorService = twoFactorService;
         }
 
-        // **Registro de Usuario**
+        // **Registro de Usuario** - Actualizado para apuntar al MVC
         [HttpPost("register")]
-        public async Task<IActionResult> Register(CreateUserDto dto)
+        public async Task<IActionResult> Register([FromBody] CreateUserDto dto)
         {
+            // Validación de contraseña
+            if (dto.Password != dto.ConfirmPassword)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Las contraseñas no coinciden",
+                    errors = new { ConfirmPassword = new[] { "Las contraseñas deben coincidir" } }
+                });
+            }
+            // Verificar si el plan existe (1-4 según tu tabla)
+            var planExists = await _context.Plans.AnyAsync(p => p.Id == dto.PlanId);
+            if (!planExists)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Plan no válido",
+                    errors = new { PlanId = new[] { "Seleccione un plan válido (1-4)" } }
+                });
+            }
             var user = new User
             {
                 UserName = dto.UserName,
                 Email = dto.Email,
                 Name = dto.Name,
                 Bio = dto.Bio,
-                PlanId = dto.PlanId
+                PlanId = dto.PlanId,
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
             };
-
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
-                return BadRequest(result.Errors);
-
-            // Enviar correo de confirmación
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Error en el registro",
+                    errors = errors
+                });
+            }
+            // Generar token de confirmación
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, token = token }, Request.Scheme);
+            // URL del MVC en lugar del API
+            var baseUrl = _configuration["MvcBaseUrl"] ?? "https://localhost:7194"; // Ajusta el puerto del MVC
+            var confirmationLink = $"{baseUrl}/VAuth/ConfirmEmail?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
-            var emailBody = $@"¡Bienvenido a BeatBay!
+            // Mensaje personalizado según la imagen
+            var emailMessage = $@"
+        ¡Bienvenido a BeatBay!
 
-Hola {user.Name ?? user.UserName},
+        Hola {user.Name},
 
-Gracias por registrarte en BeatBay. Para completar tu registro, por favor confirma tu email haciendo clic en el siguiente enlace:
+        Gracias por registrarte en BeatBay. Para completar tu registro, por favor confirma tu email haciendo clic en el siguiente enlace:
 
-{confirmationLink}
+        {confirmationLink}
 
-¡Gracias por unirte a nuestra comunidad musical!
+        ¡Gracias por unirte a nuestra comunidad musical!
 
-El equipo de BeatBay";
+        El equipo de BeatBay
+    ";
 
-            await _emailSender.SendEmailAsync(user.Email, "Confirma tu email - BeatBay", emailBody);
-
-            await _userManager.AddToRoleAsync(user, "User");
-            return Ok(new { message = "User created successfully. Please confirm your email." });
+            // Enviar email
+            try
+            {
+                await _emailSender.SendEmailAsync(
+                    user.Email,
+                    "Confirma tu email - BeatBay",
+                    emailMessage);
+                await _userManager.AddToRoleAsync(user, "User");
+                return Ok(new
+                {
+                    success = true,
+                    message = "Registro exitoso. Verifica tu email para activar la cuenta.",
+                    userId = user.Id
+                });
+            }
+            catch (Exception ex)
+            {
+                // Rollback si falla el email
+                await _userManager.DeleteAsync(user);
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Error enviando email de confirmación",
+                    error = ex.Message
+                });
+            }
         }
 
-        // **Confirmación de Email**
+        // **Confirmación de Email** - Simplificado solo para API
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return NotFound();
+                return NotFound(new { message = "User not found" });
 
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (!result.Succeeded)
@@ -278,44 +334,88 @@ El equipo de BeatBay";
             return Ok(new { message = "Verification code sent to your email." });
         }
 
-        // **Registro de Artista**
+        // **Registro de Artista** - Actualizado para apuntar al MVC
         [HttpPost("register-artist")]
-        public async Task<IActionResult> RegisterArtist(CreateUserDto dto)
+        public async Task<IActionResult> RegisterArtist([FromBody] CreateUserDto dto)
         {
+            // Validación de contraseña
+            if (dto.Password != dto.ConfirmPassword)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Las contraseñas no coinciden",
+                    errors = new { ConfirmPassword = new[] { "Las contraseñas deben coincidir" } }
+                });
+            }
             var user = new User
             {
                 UserName = dto.UserName,
                 Email = dto.Email,
                 Name = dto.Name,
                 Bio = dto.Bio,
-                PlanId = dto.PlanId
+                PlanId = 2, // Fuerza plan Free
+                CreatedAt = DateTime.UtcNow,
+                IsActive = true
             };
-
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
-                return BadRequest(result.Errors);
-
-            // Enviar correo de confirmación para artista
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Error en el registro de artista",
+                    errors = errors
+                });
+            }
+            // Generar token de confirmación
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = Url.Action("ConfirmEmail", "Auth", new { userId = user.Id, token = token }, Request.Scheme);
+            // URL del MVC en lugar del API
+            var baseUrl = _configuration["MvcBaseUrl"] ?? "https://localhost:7194"; // Ajusta el puerto del MVC
+            var confirmationLink = $"{baseUrl}/VAuth/ConfirmEmail?userId={user.Id}&token={Uri.EscapeDataString(token)}";
 
-            var emailBody = $@"¡Bienvenido a BeatBay como Artista!
+            // Mensaje personalizado para artistas según la imagen
+            var emailMessage = $@"
+        ¡Bienvenido a BeatBay como Artista!
 
-Hola {user.Name ?? user.UserName},
+        Hola {user.Name},
 
-Te has registrado como artista en BeatBay. Para completar tu registro, por favor confirma tu email:
+        Te has registrado como artista en BeatBay. Para completar tu registro, por favor confirma tu email:
 
-{confirmationLink}
+        {confirmationLink}
 
-Una vez confirmado, podrás subir tu música y compartirla con la comunidad.
+        Una vez confirmado, podrás subir tu música y compartirla con la comunidad.
 
-¡El equipo de BeatBay";
+        El equipo de BeatBay
+    ";
 
-            await _emailSender.SendEmailAsync(user.Email, "Confirma tu email de Artista - BeatBay", emailBody);
-
-            await _userManager.AddToRoleAsync(user, "Artist");
-
-            return Ok(new { message = "Artist registered successfully. Please confirm your email." });
+            // Enviar email personalizado para artistas
+            try
+            {
+                await _emailSender.SendEmailAsync(
+                    user.Email,
+                    "Confirma tu email de Artista - BeatBay",
+                    emailMessage);
+                await _userManager.AddToRoleAsync(user, "Artist");
+                return Ok(new
+                {
+                    success = true,
+                    message = "Artista registrado. Verifica tu email para activar la cuenta.",
+                    userId = user.Id,
+                    isArtist = true
+                });
+            }
+            catch (Exception ex)
+            {
+                await _userManager.DeleteAsync(user);
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Error enviando email de confirmación",
+                    error = ex.Message
+                });
+            }
         }
 
         // **Validar Token**

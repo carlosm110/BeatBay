@@ -111,6 +111,13 @@ namespace BeatBayMVC.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            // Validación adicional de confirmación de contraseña
+            if (model.Password != model.ConfirmPassword)
+            {
+                ModelState.AddModelError("ConfirmPassword", "Las contraseñas no coinciden.");
+                return View(model);
+            }
+
             try
             {
                 var json = JsonConvert.SerializeObject(model);
@@ -127,7 +134,19 @@ namespace BeatBayMVC.Controllers
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
                     var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
-                    ModelState.AddModelError("", errorResponse?.message?.ToString() ?? "Registration failed");
+
+                    // Manejar errores específicos de la API
+                    if (errorResponse?.errors != null)
+                    {
+                        foreach (var error in errorResponse.errors)
+                        {
+                            ModelState.AddModelError("", error.ToString());
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", errorResponse?.message?.ToString() ?? "Registration failed");
+                    }
                 }
             }
             catch (Exception ex)
@@ -151,6 +170,13 @@ namespace BeatBayMVC.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            // Validación adicional de confirmación de contraseña
+            if (model.Password != model.ConfirmPassword)
+            {
+                ModelState.AddModelError("ConfirmPassword", "Las contraseñas no coinciden.");
+                return View(model);
+            }
+
             try
             {
                 var json = JsonConvert.SerializeObject(model);
@@ -167,7 +193,19 @@ namespace BeatBayMVC.Controllers
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
                     var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
-                    ModelState.AddModelError("", errorResponse?.message?.ToString() ?? "Artist registration failed");
+
+                    // Manejar errores específicos de la API
+                    if (errorResponse?.errors != null)
+                    {
+                        foreach (var error in errorResponse.errors)
+                        {
+                            ModelState.AddModelError("", error.ToString());
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", errorResponse?.message?.ToString() ?? "Artist registration failed");
+                    }
                 }
             }
             catch (Exception ex)
@@ -578,7 +616,7 @@ namespace BeatBayMVC.Controllers
         {
             var token = HttpContext.Session.GetString("JwtToken");
             if (string.IsNullOrEmpty(token))
-                return Json(new { success = false, message = "Not authenticated" });
+                return Json(new { success = false, is2FAEnabled = false, message = "Not authenticated" });
 
             try
             {
@@ -590,30 +628,18 @@ namespace BeatBayMVC.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
+                    // Asegúrate de que la API devuelve un campo booleano claro
                     var status = JsonConvert.DeserializeObject<dynamic>(responseContent);
+                    bool isEnabled = status?.is2FAEnabled ?? false; // Valor predeterminado false
 
-                    return Json(new
-                    {
-                        success = true,
-                        is2FAEnabled = status.is2FAEnabled
-                    });
+                    return Json(new { success = true, is2FAEnabled = isEnabled });
                 }
-                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                {
-                    if (await TryRefreshToken())
-                    {
-                        return await Get2FAStatus();
-                    }
-                    return Json(new { success = false, message = "Session expired" });
-                }
-                else
-                {
-                    return Json(new { success = false, message = "Unable to load 2FA status" });
-                }
+
+                return Json(new { success = false, is2FAEnabled = false }); // Fallback seguro
             }
-            catch (Exception ex)
+            catch
             {
-                return Json(new { success = false, message = $"Error: {ex.Message}" });
+                return Json(new { success = false, is2FAEnabled = false }); // Fallback seguro
             }
         }
 

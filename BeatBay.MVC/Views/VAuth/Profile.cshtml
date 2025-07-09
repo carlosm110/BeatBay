@@ -138,7 +138,7 @@
                 <!-- Success message will be inserted here -->
             </div>
         </div>
-        
+
         <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header bg-danger text-white">
                 <i class="fas fa-exclamation-circle me-2"></i>
@@ -223,7 +223,7 @@
                         </div>
                         <div class="status-indicator">
                             <i class="fas fa-circle text-danger" id="2faStatusIcon"></i>
-                            <span id="2faStatus">Checking...</span>
+                            <span id="2faStatus">Disabled</span>
                         </div>
                     </div>
 
@@ -340,13 +340,6 @@
                             <label for="Bio" class="form-label">Bio</label>
                             <textarea class="form-control" id="Bio" name="Bio" rows="3">@Model?.Bio</textarea>
                         </div>
-                        <div class="mb-3">
-                            <label for="PlanId" class="form-label">Plan</label>
-                            <select class="form-select" id="PlanId" name="PlanId">
-                                <option value="0" selected="@(Model?.PlanId == 0)">Free Plan</option>
-                                <option value="1" selected="@(Model?.PlanId == 1)">Premium Plan</option>
-                            </select>
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -435,15 +428,15 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             check2FAStatus();
-            
+
             // Mostrar mensajes de TempData si existen
             @if (TempData["Success"] != null)
             {
-                <text>showToast('success', '@TempData["Success"]');</text>
+                        <text>showToast('success', '@TempData["Success"]');</text>
             }
             @if (TempData["Error"] != null)
             {
-                <text>showToast('error', '@TempData["Error"]');</text>
+                        <text>showToast('error', '@TempData["Error"]');</text>
             }
         });
 
@@ -451,7 +444,7 @@
         function showToast(type, message) {
             const toastId = type === 'success' ? 'successToast' : 'errorToast';
             const messageId = type === 'success' ? 'successMessage' : 'errorMessage';
-            
+
             document.getElementById(messageId).textContent = message;
             const toast = new bootstrap.Toast(document.getElementById(toastId));
             toast.show();

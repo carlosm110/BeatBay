@@ -1,4 +1,5 @@
-﻿using BeatBay.API.Settings;
+﻿using BeatBay.API.Services;
+using BeatBay.API.Settings;
 using BeatBay.Data;
 using BeatBay.Model;
 using BeatBay.Services;
@@ -16,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Add services to the container.
 builder.Services.AddControllers();
 
-// 2. Swagger/OpenAPI Configuration con autenticaci�n Bearer
+// 2. Swagger/OpenAPI Configuration con autenticación Bearer
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -45,20 +46,20 @@ builder.Services.AddSwaggerGen(options => {
 builder.Services.AddDbContext<BeatBayDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("BeatBayDbContext")));
 
-// 4. Configurar Identity con roles personalizados, confirmaci�n de cuenta y soporte 2FA
+// 4. Configurar Identity con roles personalizados, confirmación de cuenta y soporte 2FA
 builder.Services.AddIdentity<User, Role>(options => {
     options.SignIn.RequireConfirmedAccount = true;
     options.User.RequireUniqueEmail = true;
     options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
 
-    // Configuraci�n de contrase�a
+    // Configuración de contraseña
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 6;
 
-    // Configuraci�n de lockout
+    // Configuración de lockout
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
     options.Lockout.AllowedForNewUsers = true;
@@ -71,7 +72,12 @@ builder.Services.AddTransient<IEmailSender, EmailService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<I2FAService, TwoFactorAuthService>();
 
-// 6. Configuraci�n de autenticaci�n JWT
+// 6. Registrar ThemeContext y estrategias de tema
+builder.Services.AddScoped<ThemeContext>();
+builder.Services.AddScoped<IThemeStrategy, LightThemeStrategy>();  // Por defecto, se establece el tema claro
+builder.Services.AddScoped<IThemeStrategy, DarkThemeStrategy>();   // Agregar la estrategia para modo oscuro
+
+// 7. Configuración de autenticación JWT
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -95,7 +101,7 @@ builder.Services.AddAuthentication(options => {
 
 builder.Services.Configure<AzureBlobStorageSettings>(builder.Configuration.GetSection("AzureBlobStorageSettings"));
 
-// 7. Configuraci�n de CORS para permitir el acceso desde el frontend MVC
+// 8. Configuración de CORS para permitir el acceso desde el frontend MVC
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowWeb",
         policy => policy
@@ -104,13 +110,13 @@ builder.Services.AddCors(options => {
             .AllowAnyMethod());
 });
 
-// 8. Agregar servicios adicionales
+// 9. Agregar servicios adicionales
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
-// 9. Configuraci�n del middleware
+// 10. Configuración del middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -122,7 +128,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Permitir servir archivos est�ticos (ej. wwwroot)
+// Permitir servir archivos estáticos (ej. wwwroot)
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -130,7 +136,7 @@ app.UseRouting();
 // Aplicar CORS
 app.UseCors("AllowWeb");
 
-// Autenticaci�n y autorizaci�n
+// Autenticación y autorización
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -43,12 +43,23 @@
                         </div>
                     </div>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Password" type="password" class="form-control" id="floatingPassword" placeholder="Password" />
-                        <label for="floatingPassword"><i class="fas fa-lock"></i> Password *</label>
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                        <div class="form-text">Password must be at least 6 characters long</div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Password" type="password" class="form-control" id="floatingPassword" placeholder="Password" />
+                                <label for="floatingPassword"><i class="fas fa-lock"></i> Password *</label>
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="ConfirmPassword" type="password" class="form-control" id="floatingConfirmPassword" placeholder="Confirm Password" />
+                                <label for="floatingConfirmPassword"><i class="fas fa-lock"></i> Confirm Password *</label>
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
+                    <div class="form-text mb-3">Password must be at least 6 characters long</div>
 
                     <div class="form-floating mb-3">
                         <input asp-for="Name" class="form-control" id="floatingName" placeholder="Artist Name" />
@@ -62,18 +73,6 @@
                         <label for="floatingBio"><i class="fas fa-pen"></i> Artist Bio *</label>
                         <span asp-validation-for="Bio" class="text-danger"></span>
                         <div class="form-text">Tell your fans about your music, influences, and journey</div>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <select asp-for="PlanId" class="form-select" id="floatingPlan">
-                            <option value="">Select a Plan (Optional)</option>
-                            <option value="1">Free Plan - $0/month (Basic features)</option>
-                            <option value="2">Personal Plan - $1/month (Enhanced features)</option>
-                            <option value="3">Family Plan - $3.50/month (Multiple accounts)</option>
-                            <option value="4">Business Plan - $35/month (Commercial license)</option>
-                        </select>
-                        <label for="floatingPlan"><i class="fas fa-crown"></i> Subscription Plan</label>
-                        <span asp-validation-for="PlanId" class="text-danger"></span>
                     </div>
 
                     <div class="card bg-light mb-3">

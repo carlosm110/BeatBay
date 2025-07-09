@@ -7,8 +7,111 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* Estilos para el dropdown del usuario */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.75);
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+            .user-dropdown-toggle:hover {
+                color: white;
+            }
+
+        .user-name {
+            margin-right: 8px;
+            font-weight: 500;
+        }
+
+        .user-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-width: 160px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-dropdown.show .user-dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            color: #212529;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+            .dropdown-item:hover {
+                background-color: #f8f9fa;
+            }
+
+            .dropdown-item i {
+                width: 20px;
+                margin-right: 10px;
+                text-align: center;
+            }
+
+        /* Modo Claro */
+        body.light {
+            background-color: #ffffff; /* Blanco */
+            color: #212529; /* Color de texto oscuro */
+        }
+
+        /* Modo Oscuro Ajustado */
+        body.dark {
+            background-color: #2e2e2e; /* Fondo gris oscuro suave */
+            color: #eaeaea; /* Color de texto claro */
+        }
+
+            /* Estilo adicional para los enlaces en modo oscuro */
+            body.dark a {
+                color: #4f9cff; /* Enlaces de color azul claro */
+            }
+
+                body.dark a:hover {
+                    color: #a5c6ff; /* Color más claro al pasar el ratón */
+                }
+
+            /* Ajustar colores de los botones y otros elementos interactivos en modo oscuro */
+            body.dark .btn {
+                background-color: #444444; /* Fondo de botones más suave */
+                color: #eaeaea; /* Texto en color claro */
+            }
+
+                body.dark .btn:hover {
+                    background-color: #5a5a5a; /* Cambio en el fondo de botones al pasar el ratón */
+                }
+
+            /* Ajuste para el texto en los formularios */
+            body.dark input, body.dark textarea {
+                background-color: #3b3b3b; /* Fondo de campos de texto más oscuro */
+                color: #eaeaea; /* Texto claro en los campos */
+                border: 1px solid #555555; /* Borde oscuro en campos */
+            }
+
+                body.dark input:focus, body.dark textarea:focus {
+                    border-color: #4f9cff; /* Borde azul claro en campos al hacer focus */
+                }
+    </style>
 </head>
-<body>
+<body class="@ViewBag.Theme">
+    <!-- Aplicar el tema basado en el valor de ViewBag.Theme -->
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -46,23 +149,25 @@
                             var userDataJson = Context.Session.GetString("UserData");
                             var userData = !string.IsNullOrEmpty(userDataJson) ? Newtonsoft.Json.JsonConvert.DeserializeObject<BeatBay.DTOs.UserDto>(userDataJson) : null;
 
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user"></i> @(userData?.Name ?? userData?.UserName ?? "User")
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li>
+                            <li class="nav-item user-dropdown" id="userDropdown">
+                                <button class="user-dropdown-toggle" onclick="toggleUserDropdown()">
+                                    <span class="user-name">@(userData?.Name ?? userData?.UserName ?? "User")</span>
+                                    <i class="fas fa-user-circle fa-lg"></i>
+                                </button>
+                                <div class="user-dropdown-menu">
+                                    @if (!Context.Request.Path.Value.Contains("VAuth/Profile"))
+                                    {
                                         <a class="dropdown-item" asp-controller="VAuth" asp-action="Profile">
-                                            <i class="fas fa-user-circle"></i> Profile
+                                            <i class="fas fa-user"></i> Profile
                                         </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="VAuth" asp-action="Logout">
+                                        <div class="dropdown-divider"></div>
+                                    }
+                                    <form asp-controller="VAuth" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item" style="background:none; border:none; width:100%; text-align:left;">
                                             <i class="fas fa-sign-out-alt"></i> Logout
-                                        </a>
-                                    </li>
-                                </ul>
+                                        </button>
+                                    </form>
+                                </div>
                             </li>
                         }
                         else
@@ -120,6 +225,21 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Función para mostrar/ocultar el dropdown del usuario
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Cerrar el dropdown cuando se hace clic fuera de él
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
