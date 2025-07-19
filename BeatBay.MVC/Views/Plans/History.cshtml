@@ -1,0 +1,554 @@
+﻿@model List<BeatBay.DTOs.PlanSubscriptionDto>
+@{
+    ViewData["Title"] = "Historial de Suscripciones";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">
+                <i class="fas fa-history me-2"></i>
+                Historial de Suscripciones
+            </h2>
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @ViewBag.ErrorMessage
+                </div>
+            }
+
+            <!-- Navegación -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Mis Planes</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Historial</li>
+                </ol>
+            </nav>
+
+            @if (Model.Any())
+            {
+                <!-- Estadísticas resumidas -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white stats-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+                                <h3 class="display-4">@Model.Count</h3>
+                                <p class="mb-0 text-uppercase">Suscripciones Totales</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white stats-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-check-circle fa-3x mb-3"></i>
+                                <h3 class="display-4">@Model.Count(s => s.IsActive)</h3>
+                                <p class="mb-0 text-uppercase">Activas</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white stats-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-times-circle fa-3x mb-3"></i>
+                                <h3 class="display-4">@Model.Count(s => !s.IsActive)</h3>
+                                <p class="mb-0 text-uppercase">Canceladas</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white stats-card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-dollar-sign fa-3x mb-3"></i>
+                                <h3 class="display-4">$@Model.Sum(s => s.PriceUSD).ToString("F2")</h3>
+                                <p class="mb-0 text-uppercase">Total Invertido</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de historial -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-gradient-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-table me-2"></i>
+                            Historial Detallado
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th><i class="fas fa-star me-2"></i>Plan</th>
+                                        <th><i class="fas fa-tag me-2"></i>Precio</th>
+                                        <th><i class="fas fa-users me-2"></i>Conexiones</th>
+                                        <th><i class="fas fa-calendar-alt me-2"></i>Fecha Inicio</th>
+                                        <th><i class="fas fa-calendar-times me-2"></i>Fecha Fin</th>
+                                        <th><i class="fas fa-clock me-2"></i>Duración</th>
+                                        <th><i class="fas fa-info-circle me-2"></i>Estado</th>
+                                        <th><i class="fas fa-cog me-2"></i>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var subscription in Model.OrderByDescending(s => s.StartDate))
+                                    {
+                                        <tr class="subscription-row @(subscription.IsActive ? "table-success" : "table-light")">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="plan-icon me-3">
+                                                        <i class="fas fa-crown text-warning"></i>
+                                                    </div>
+                                                    <div>
+                                                        <strong class="text-dark">@subscription.PlanName</strong>
+                                                        <br>
+                                                        <small class="text-muted">ID: #@subscription.Id</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary fs-6 px-3 py-2">
+                                                    $@subscription.PriceUSD.ToString("F2") USD
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1 me-2" style="height: 20px;">
+                                                        <div class="progress-bar bg-info"
+                                                             role="progressbar"
+                                                             style="width: @(subscription.MaxConnections > 0 ? (subscription.UsedConnections * 100 / subscription.MaxConnections) : 0)%">
+                                                        </div>
+                                                    </div>
+                                                    <span class="badge bg-info fs-6">
+                                                        @subscription.UsedConnections/@subscription.MaxConnections
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="date-info">
+                                                    <i class="fas fa-calendar me-2 text-success"></i>
+                                                    <span class="fw-bold">@subscription.StartDate.ToString("dd/MM/yyyy")</span>
+                                                    <br>
+                                                    <small class="text-muted">@subscription.StartDate.ToString("HH:mm")</small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="date-info">
+                                                    <i class="fas fa-calendar me-2 text-danger"></i>
+                                                    <span class="fw-bold">@subscription.EndDate.ToString("dd/MM/yyyy")</span>
+                                                    <br>
+                                                    <small class="text-muted">@subscription.EndDate.ToString("HH:mm")</small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @{
+                                                    var duration = subscription.EndDate - subscription.StartDate;
+                                                    var durationText = duration.Days > 0 ? $"{duration.Days} días" : "Menos de 1 día";
+                                                }
+                                                <span class="badge bg-secondary fs-6 px-3 py-2">
+                                                    <i class="fas fa-hourglass-half me-1"></i>
+                                                    @durationText
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if (subscription.IsActive)
+                                                {
+                                                    <span class="badge bg-success fs-6 px-3 py-2">
+                                                        <i class="fas fa-check me-1"></i>
+                                                        Activo
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                                                        <i class="fas fa-ban me-1"></i>
+                                                        Cancelado
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <button type="button"
+                                                            class="btn btn-outline-info btn-sm"
+                                                            onclick="showSubscriptionDetails(@subscription.Id, '@Html.Raw(Html.Encode(Newtonsoft.Json.JsonConvert.SerializeObject(subscription)))')">
+                                                        <i class="fas fa-eye me-1"></i>
+                                                        Ver Detalles
+                                                    </button>
+                                                    @if (subscription.IsActive)
+                                                    {
+                                                        <a href="@Url.Action("Index")" class="btn btn-outline-primary btn-sm">
+                                                            <i class="fas fa-cog me-1"></i>
+                                                            Gestionar
+                                                        </a>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de detalles -->
+                <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-gradient-primary text-white">
+                                <h5 class="modal-title" id="detailModalLabel">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Detalles de la Suscripción
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="info-section">
+                                            <h6 class="text-primary border-bottom pb-2">
+                                                <i class="fas fa-star me-2"></i>
+                                                Información del Plan
+                                            </h6>
+                                            <div class="info-item">
+                                                <strong>Nombre:</strong>
+                                                <span id="modal-plan-name" class="text-dark"></span>
+                                            </div>
+                                            <div class="info-item">
+                                                <strong>Precio:</strong>
+                                                <span class="badge bg-primary">$<span id="modal-price"></span> USD</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <strong>Conexiones máximas:</strong>
+                                                <span id="modal-max-connections" class="text-dark"></span>
+                                            </div>
+                                            <div class="info-item">
+                                                <strong>Conexiones utilizadas:</strong>
+                                                <span id="modal-used-connections" class="text-dark"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-section">
+                                            <h6 class="text-primary border-bottom pb-2">
+                                                <i class="fas fa-calendar me-2"></i>
+                                                Período de Vigencia
+                                            </h6>
+                                            <div class="info-item">
+                                                <strong>Fecha de inicio:</strong>
+                                                <span id="modal-start-date" class="text-dark"></span>
+                                            </div>
+                                            <div class="info-item">
+                                                <strong>Fecha de fin:</strong>
+                                                <span id="modal-end-date" class="text-dark"></span>
+                                            </div>
+                                            <div class="info-item">
+                                                <strong>Estado:</strong>
+                                                <span id="modal-status"></span>
+                                            </div>
+                                            <div class="info-item">
+                                                <strong>Duración total:</strong>
+                                                <span id="modal-duration" class="text-dark"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="my-4">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h6 class="text-primary border-bottom pb-2">
+                                            <i class="fas fa-users me-2"></i>
+                                            Usuarios Conectados
+                                        </h6>
+                                        <div id="modal-connected-users" class="connected-users-container"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- Estado vacío -->
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <div class="empty-state">
+                            <i class="fas fa-history text-muted mb-4" style="font-size: 5rem;"></i>
+                            <h3 class="text-muted mb-3">Sin historial de suscripciones</h3>
+                            <p class="text-muted mb-4">Aún no tienes suscripciones en tu historial.</p>
+                            <a href="@Url.Action("Purchase")" class="btn btn-primary btn-lg">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                Comprar tu primer plan
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Botones de navegación -->
+            <div class="row mt-4">
+                <div class="col-md-12 text-center">
+                    <div class="btn-group" role="group">
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Volver a Mis Planes
+                        </a>
+                        <a href="@Url.Action("Purchase")" class="btn btn-primary btn-lg">
+                            <i class="fas fa-plus me-2"></i>
+                            Comprar Nuevo Plan
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stats-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .subscription-row {
+        border-left: 4px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+        .subscription-row:hover {
+            background-color: #f8f9fa !important;
+            border-left-color: #007bff;
+        }
+
+        .subscription-row.table-success {
+            border-left-color: #28a745;
+        }
+
+    .plan-icon {
+        font-size: 1.5rem;
+    }
+
+    .date-info {
+        text-align: center;
+    }
+
+    .progress {
+        border-radius: 10px;
+    }
+
+    .progress-bar {
+        border-radius: 10px;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        border-radius: 25px;
+    }
+
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    }
+
+    .info-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        margin-bottom: 0.8rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+    .connected-users-container .user-card {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+        .connected-users-container .user-card:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+    .modal-header {
+        border-bottom: none;
+    }
+
+    .modal-footer {
+        border-top: none;
+    }
+
+    .empty-state {
+        padding: 3rem 0;
+    }
+
+    .btn-group .btn {
+        border-radius: 25px;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        font-size: 1.1rem;
+    }
+
+    @@media (max-width: 768px) {
+        .table-responsive
+
+    {
+        font-size: 0.9rem;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+    }
+
+    .btn-group .btn {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+    }
+
+    }
+</style>
+
+<script>
+    // Función para mostrar detalles de la suscripción
+    function showSubscriptionDetails(subscriptionId, subscriptionDataJson) {
+        try {
+            // Decodificar el JSON
+            const subscriptionData = JSON.parse(subscriptionDataJson);
+            console.log('Datos de suscripción:', subscriptionData);
+
+            // Llenar datos básicos
+            document.getElementById('modal-plan-name').textContent = subscriptionData.PlanName || 'No disponible';
+            document.getElementById('modal-price').textContent = subscriptionData.PriceUSD ? subscriptionData.PriceUSD.toFixed(2) : '0.00';
+            document.getElementById('modal-max-connections').textContent = subscriptionData.MaxConnections || '0';
+            document.getElementById('modal-used-connections').textContent = subscriptionData.UsedConnections || '0';
+
+            // Formatear fechas
+            const startDate = new Date(subscriptionData.StartDate);
+            const endDate = new Date(subscriptionData.EndDate);
+
+            document.getElementById('modal-start-date').textContent = startDate.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            document.getElementById('modal-end-date').textContent = endDate.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // Calcular duración
+            const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('modal-duration').textContent = duration > 0 ? duration + ' días' : 'Menos de 1 día';
+
+            // Estado
+            const statusElement = document.getElementById('modal-status');
+            if (subscriptionData.IsActive) {
+                statusElement.innerHTML = '<span class="badge bg-success fs-6 px-3 py-2"><i class="fas fa-check me-1"></i>Activo</span>';
+            } else {
+                statusElement.innerHTML = '<span class="badge bg-warning text-dark fs-6 px-3 py-2"><i class="fas fa-ban me-1"></i>Cancelado</span>';
+            }
+
+            // Usuarios conectados
+            const connectedUsersContainer = document.getElementById('modal-connected-users');
+            if (subscriptionData.ConnectedUsers && subscriptionData.ConnectedUsers.length > 0) {
+                let usersHtml = '';
+                subscriptionData.ConnectedUsers.forEach(user => {
+                    usersHtml += `
+                        <div class="user-card">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-user-circle text-primary" style="font-size: 2rem;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">${user.UserName}</h6>
+                                    ${user.Name ? `<p class="mb-1 text-muted">${user.Name}</p>` : ''}
+                                    ${user.Email ? `<small class="text-muted">${user.Email}</small>` : ''}
+                                </div>
+                                <div>
+                                    <span class="badge ${user.IsActive ? 'bg-success' : 'bg-secondary'}">
+                                        ${user.IsActive ? 'Activo' : 'Inactivo'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                connectedUsersContainer.innerHTML = usersHtml;
+            } else {
+                connectedUsersContainer.innerHTML = `
+                    <div class="text-center py-3">
+                        <i class="fas fa-users text-muted mb-2" style="font-size: 2rem;"></i>
+                        <p class="text-muted mb-0">No hay usuarios conectados a esta suscripción</p>
+                    </div>
+                `;
+            }
+
+            // Mostrar el modal
+            const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+            modal.show();
+
+        } catch (error) {
+            console.error('Error al procesar datos de suscripción:', error);
+            alert('Error al cargar los detalles de la suscripción. Por favor, intenta nuevamente.');
+        }
+    }
+
+    // Inicializar cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        // Agregar animaciones a las tarjetas de estadísticas
+        const statsCards = document.querySelectorAll('.stats-card');
+        statsCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            }, 100);
+        });
+
+        // Tooltip para botones
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>

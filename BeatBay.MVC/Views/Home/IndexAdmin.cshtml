@@ -1,0 +1,577 @@
+﻿@{
+    ViewData["Title"] = "Panel de Administración - BeatBay";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar bg-dark text-white p-3">
+            <h4 class="mb-4">
+                <i class="fas fa-tachometer-alt"></i> Panel Admin
+            </h4>
+            <nav class="nav flex-column">
+                <a class="nav-link text-white active" href="#dashboard" data-section="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a class="nav-link text-white" href="#songs" data-section="songs">
+                    <i class="fas fa-music"></i> Gestión de Música
+                </a>
+                <a class="nav-link text-white" href="#users" data-section="users">
+                    <i class="fas fa-users"></i> Gestión de Usuarios
+                </a>
+                <a class="nav-link text-white" href="#audio-settings" data-section="audio-settings">
+                    <i class="fas fa-cog"></i> Opciones de Audio
+                </a>
+                <a class="nav-link text-white" href="#statistics" data-section="statistics">
+                    <i class="fas fa-chart-bar"></i> Estadísticas
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-home"></i> Dashboard</h2>
+                    <span class="badge badge-primary">Panel de Control</span>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4>1,234</h4>
+                                        <p class="mb-0">Usuarios Totales</p>
+                                    </div>
+                                    <i class="fas fa-users fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4>567</h4>
+                                        <p class="mb-0">Canciones Activas</p>
+                                    </div>
+                                    <i class="fas fa-music fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4>89</h4>
+                                        <p class="mb-0">Usuarios Activos</p>
+                                    </div>
+                                    <i class="fas fa-user-check fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h4>12.5K</h4>
+                                        <p class="mb-0">Reproducciones</p>
+                                    </div>
+                                    <i class="fas fa-play fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt"></i> Acciones Rápidas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <button class="btn btn-primary btn-block" onclick="showSection('songs')">
+                                    <i class="fas fa-plus"></i> Agregar Canción
+                                </button>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <button class="btn btn-info btn-block" onclick="showSection('users')">
+                                    <i class="fas fa-user-plus"></i> Gestionar Usuarios
+                                </button>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <button class="btn btn-success btn-block" onclick="showSection('statistics')">
+                                    <i class="fas fa-chart-line"></i> Ver Estadísticas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Songs Management Section -->
+            <div id="songs" class="content-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-music"></i> Gestión de Música</h2>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#addSongModal">
+                        <i class="fas fa-plus"></i> Agregar Canción
+                    </button>
+                </div>
+
+                <!-- Songs Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Lista de Canciones</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Título</th>
+                                        <th>Artista</th>
+                                        <th>Género</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Canción de Ejemplo</td>
+                                        <td>Artista Ejemplo</td>
+                                        <td>Pop</td>
+                                        <td><span class="badge badge-success">Activa</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-warning" onclick="editSong(1)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="deactivateSong(1)">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Otra Canción</td>
+                                        <td>Otro Artista</td>
+                                        <td>Rock</td>
+                                        <td><span class="badge badge-secondary">Inactiva</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-warning" onclick="editSong(2)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-success" onclick="activateSong(2)">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Management Section -->
+            <div id="users" class="content-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-users"></i> Gestión de Usuarios</h2>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#addUserModal">
+                        <i class="fas fa-user-plus"></i> Agregar Usuario
+                    </button>
+                </div>
+
+                <!-- Users Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Lista de Usuarios</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Rol</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Juan Pérez</td>
+                                        <td>juan@example.com</td>
+                                        <td>Usuario</td>
+                                        <td><span class="badge badge-success">Activo</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-warning" onclick="editUser(1)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="deactivateUser(1)">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>María González</td>
+                                        <td>maria@example.com</td>
+                                        <td>Artista</td>
+                                        <td><span class="badge badge-secondary">Inactivo</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-warning" onclick="editUser(2)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-success" onclick="activateUser(2)">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio Settings Section -->
+            <div id="audio-settings" class="content-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-cog"></i> Opciones de Medios de Audio</h2>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Configuración de Reproducción</h5>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="form-group">
+                                        <label>Calidad de Audio por Defecto</label>
+                                        <select class="form-control">
+                                            <option>320 kbps</option>
+                                            <option>256 kbps</option>
+                                            <option>192 kbps</option>
+                                            <option>128 kbps</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Volumen por Defecto</label>
+                                        <input type="range" class="form-control-range" min="0" max="100" value="50">
+                                        <small class="form-text text-muted">50%</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" checked>
+                                            <label class="form-check-label">
+                                                Reproducción automática habilitada
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Guardar Configuración
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Formatos de Audio</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Formatos Permitidos</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">MP3</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">WAV</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" checked>
+                                        <label class="form-check-label">FLAC</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox">
+                                        <label class="form-check-label">M4A</label>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success">
+                                    <i class="fas fa-check"></i> Aplicar Cambios
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Section -->
+            <div id="statistics" class="content-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="fas fa-chart-bar"></i> Estadísticas del Sistema</h2>
+                    <button class="btn btn-secondary" onclick="refreshStats()">
+                        <i class="fas fa-sync"></i> Actualizar
+                    </button>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Canciones Más Reproducidas</h5>
+                            </div>
+                            <div class="card-body">
+                                <ol class="list-unstyled">
+                                    <li>1. Canción Popular - 1,234 reproducciones</li>
+                                    <li>2. Hit del Momento - 987 reproducciones</li>
+                                    <li>3. Clásico Atemporal - 756 reproducciones</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Usuarios Más Activos</h5>
+                            </div>
+                            <div class="card-body">
+                                <ol class="list-unstyled">
+                                    <li>1. Usuario123 - 156 reproducciones</li>
+                                    <li>2. MusicLover - 134 reproducciones</li>
+                                    <li>3. Rockstar - 98 reproducciones</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Géneros Populares</h5>
+                            </div>
+                            <div class="card-body">
+                                <ol class="list-unstyled">
+                                    <li>1. Pop - 45%</li>
+                                    <li>2. Rock - 30%</li>
+                                    <li>3. Hip-Hop - 25%</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Song Modal -->
+<div class="modal fade" id="addSongModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar Nueva Canción</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addSongForm">
+                    <div class="form-group">
+                        <label for="songTitle">Título de la Canción</label>
+                        <input type="text" class="form-control" id="songTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="artistName">Nombre del Artista</label>
+                        <input type="text" class="form-control" id="artistName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="songGenre">Género</label>
+                        <select class="form-control" id="songGenre" required>
+                            <option value="">Seleccionar género</option>
+                            <option value="Pop">Pop</option>
+                            <option value="Rock">Rock</option>
+                            <option value="Hip-Hop">Hip-Hop</option>
+                            <option value="Electronic">Electronic</option>
+                            <option value="Jazz">Jazz</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="audioFile">Archivo de Audio</label>
+                        <input type="file" class="form-control-file" id="audioFile" accept=".mp3,.wav,.flac,.m4a" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="addSong()">
+                    <i class="fas fa-plus"></i> Agregar Canción
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    // Navigation
+    function showSection(sectionId) {
+        // Hide all sections
+        const sections = document.querySelectorAll('.content-section');
+        sections.forEach(section => {
+            section.style.display = 'none';
+        });
+
+        // Show selected section
+        document.getElementById(sectionId).style.display = 'block';
+
+        // Update navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+        });
+        document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+    }
+
+    // Navigation click handlers
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const sectionId = this.getAttribute('data-section');
+            showSection(sectionId);
+        });
+    });
+
+    // Song management functions
+    function addSong() {
+        // Aquí iría la lógica para agregar una canción
+        alert('Funcionalidad para agregar canción - Pendiente de implementación');
+        $('#addSongModal').modal('hide');
+    }
+
+    function editSong(songId) {
+        // Aquí iría la lógica para editar una canción
+        alert(`Editar canción ID: ${songId} - Pendiente de implementación`);
+    }
+
+    function deactivateSong(songId) {
+        if (confirm('¿Estás seguro de que quieres desactivar esta canción?')) {
+            // Aquí iría la lógica para desactivar la canción
+            alert(`Canción ID: ${songId} desactivada - Pendiente de implementación`);
+        }
+    }
+
+    function activateSong(songId) {
+        if (confirm('¿Estás seguro de que quieres activar esta canción?')) {
+            // Aquí iría la lógica para activar la canción
+            alert(`Canción ID: ${songId} activada - Pendiente de implementación`);
+        }
+    }
+
+    // User management functions
+    function editUser(userId) {
+        // Aquí iría la lógica para editar un usuario
+        alert(`Editar usuario ID: ${userId} - Pendiente de implementación`);
+    }
+
+    function deactivateUser(userId) {
+        if (confirm('¿Estás seguro de que quieres desactivar este usuario?')) {
+            // Aquí iría la lógica para desactivar el usuario
+            alert(`Usuario ID: ${userId} desactivado - Pendiente de implementación`);
+        }
+    }
+
+    function activateUser(userId) {
+        if (confirm('¿Estás seguro de que quieres activar este usuario?')) {
+            // Aquí iría la lógica para activar el usuario
+            alert(`Usuario ID: ${userId} activado - Pendiente de implementación`);
+        }
+    }
+
+    // Statistics functions
+    function refreshStats() {
+        // Aquí iría la lógica para actualizar las estadísticas
+        alert('Estadísticas actualizadas - Pendiente de implementación');
+    }
+
+    // Initialize dashboard view
+    document.addEventListener('DOMContentLoaded', function() {
+        showSection('dashboard');
+    });
+</script>
+
+<style>
+    .sidebar {
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        padding-top: 20px;
+    }
+
+    .main-content {
+        margin-left: 16.66667%;
+        padding: 20px;
+    }
+
+    .nav-link {
+        margin-bottom: 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+    .card {
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .badge {
+        font-size: 0.8em;
+    }
+
+    .table th {
+        border-top: none;
+        background-color: #f8f9fa;
+    }
+
+    .btn-sm {
+        margin-right: 5px;
+    }
+
+  

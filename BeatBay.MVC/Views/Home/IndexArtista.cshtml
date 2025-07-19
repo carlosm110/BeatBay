@@ -1,0 +1,473 @@
+﻿@{
+    ViewData["Title"] = "Panel de Artista";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header del Panel -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="h2 mb-1">
+                                <i class="fas fa-music me-2"></i>
+                                Panel de Artista
+                            </h1>
+                            <p class="mb-0 opacity-75">Gestiona tu música y revisa tus estadísticas</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="d-flex justify-content-end align-items-center">
+                                <div class="me-3">
+                                    <small class="opacity-75">Último acceso:</small>
+                                    <div class="fw-bold">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                                <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                                    <i class="fas fa-user-music fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Principales -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-bolt text-warning me-2"></i>
+                        Acciones Rápidas
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-3 col-sm-6">
+                            <a href="@Url.Action("Create", "Songs")" class="btn btn-success btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
+                                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                <span class="fw-bold">Subir Música</span>
+                                <small class="opacity-75">Nuevo track</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <a href="@Url.Action("MySongs", "Songs")" class="btn btn-primary btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
+                                <i class="fas fa-music fa-2x mb-2"></i>
+                                <span class="fw-bold">Mis Canciones</span>
+                                <small class="opacity-75">Gestionar música</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <a href="@Url.Action("Index", "ArtistStatistics")" class="btn btn-info btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
+                                <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                <span class="fw-bold">Estadísticas</span>
+                                <small class="opacity-75">Ver métricas</small>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <a href="@Url.Action("Edit", "Auth")" class="btn btn-warning btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
+                                <i class="fas fa-user-edit fa-2x mb-2"></i>
+                                <span class="fw-bold">Mi Perfil</span>
+                                <small class="opacity-75">Editar datos</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen de Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-bar text-primary me-2"></i>
+                            Resumen de Estadísticas
+                        </h5>
+                        <a href="@Url.Action("Index", "ArtistStatistics")" class="btn btn-outline-primary btn-sm">
+                            Ver Detalle <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-music text-primary fa-2x mb-2"></i>
+                                    <h4 class="fw-bold mb-1" id="totalSongs">-</h4>
+                                    <small class="text-muted">Canciones Totales</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-play-circle text-success fa-2x mb-2"></i>
+                                    <h4 class="fw-bold mb-1" id="totalPlays">-</h4>
+                                    <small class="text-muted">Reproducciones</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-clock text-warning fa-2x mb-2"></i>
+                                    <h4 class="fw-bold mb-1" id="totalDuration">-</h4>
+                                    <small class="text-muted">Minutos Totales</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card bg-light border-0">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-trophy text-danger fa-2x mb-2"></i>
+                                    <h4 class="fw-bold mb-1" id="topSong">-</h4>
+                                    <small class="text-muted">Canción Top</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canciones Recientes -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-history text-secondary me-2"></i>
+                            Canciones Recientes
+                        </h5>
+                        <a href="@Url.Action("MySongs", "Songs")" class="btn btn-outline-secondary btn-sm">
+                            Ver Todas <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div id="recentSongs" class="list-group list-group-flush">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2 text-muted">Cargando canciones...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-star text-warning me-2"></i>
+                        Top Canciones
+                    </h5>
+                    <div id="topSongs" class="list-group list-group-flush">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-warning" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2 text-muted">Cargando top...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Herramientas Adicionales -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-tools text-dark me-2"></i>
+                        Herramientas Adicionales
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="d-grid">
+                                <a href="@Url.Action("TopSongs", "ArtistStatistics")" class="btn btn-outline-primary">
+                                    <i class="fas fa-medal me-2"></i>
+                                    Top Canciones Detallado
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-grid">
+                                <a href="@Url.Action("DownloadReport", "ArtistStatistics")" class="btn btn-outline-success">
+                                    <i class="fas fa-download me-2"></i>
+                                    Descargar Reporte
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-info" onclick="refreshStats()">
+                                    <i class="fas fa-sync-alt me-2"></i>
+                                    Actualizar Datos
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alertas -->
+@if (TempData["Success"] != null)
+{
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+    .btn-lg {
+        min-height: 100px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-lg:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+    }
+
+        .list-group-item:first-child {
+            border-top: none;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+    .spinner-border {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDashboardData();
+
+        // Auto-refresh cada 30 segundos
+        setInterval(refreshStats, 30000);
+    });
+
+    function loadDashboardData() {
+        loadStats();
+        loadRecentSongs();
+        loadTopSongs();
+    }
+
+    function loadStats() {
+        fetch('@Url.Action("GetAllSongs", "ArtistStatistics")')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    const songs = data.data;
+                    document.getElementById('totalSongs').textContent = songs.length;
+
+                    const totalPlays = songs.reduce((sum, song) => sum + (song.playCount || 0), 0);
+                    document.getElementById('totalPlays').textContent = totalPlays.toLocaleString();
+
+                    const totalDuration = songs.reduce((sum, song) => sum + (song.duration || 0), 0);
+                    document.getElementById('totalDuration').textContent = Math.round(totalDuration / 60) + ' min';
+
+                    const topSong = songs.sort((a, b) => (b.playCount || 0) - (a.playCount || 0))[0];
+                    document.getElementById('topSong').textContent = topSong ? topSong.title.substring(0, 15) + '...' : 'N/A';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading stats:', error);
+                document.getElementById('totalSongs').textContent = 'Error';
+                document.getElementById('totalPlays').textContent = 'Error';
+                document.getElementById('totalDuration').textContent = 'Error';
+                document.getElementById('topSong').textContent = 'Error';
+            });
+    }
+
+    function loadRecentSongs() {
+        fetch('@Url.Action("GetAllSongs", "ArtistStatistics")')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('recentSongs');
+
+                if (data.success && data.data && data.data.length > 0) {
+                    const songs = data.data.slice(0, 5); // Últimas 5 canciones
+
+                    container.innerHTML = songs.map(song => `
+                        <div class="list-group-item border-0 py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 text-truncate">${song.title}</h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        ${Math.floor(song.duration / 60)}:${(song.duration % 60).toString().padStart(2, '0')}
+                                        <span class="ms-2">
+                                            <i class="fas fa-play me-1"></i>
+                                            ${song.playCount || 0} reproducciones
+                                        </span>
+                                    </small>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="@Url.Action("Details", "Songs")/${song.id}">
+                                            <i class="fas fa-eye me-2"></i>Ver Detalles
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("Edit", "Songs")/${song.id}">
+                                            <i class="fas fa-edit me-2"></i>Editar
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="@Url.Action("SongDetails", "ArtistStatistics")/${song.id}">
+                                            <i class="fas fa-chart-line me-2"></i>Estadísticas
+                                        </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-music text-muted fa-3x mb-3"></i>
+                            <p class="text-muted">No tienes canciones aún</p>
+                            <a href="@Url.Action("Create", "Songs")" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Subir tu primera canción
+                            </a>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading recent songs:', error);
+                document.getElementById('recentSongs').innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle text-danger fa-2x mb-2"></i>
+                        <p class="text-muted">Error al cargar canciones</p>
+                    </div>
+                `;
+            });
+    }
+
+    function loadTopSongs() {
+        fetch('@Url.Action("GetAllSongs", "ArtistStatistics")')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('topSongs');
+
+                if (data.success && data.data && data.data.length > 0) {
+                    const topSongs = data.data
+                        .sort((a, b) => (b.playCount || 0) - (a.playCount || 0))
+                        .slice(0, 5);
+
+                    container.innerHTML = topSongs.map((song, index) => `
+                        <div class="list-group-item border-0 py-2">
+                            <div class="d-flex align-items-center">
+                                <div class="badge bg-warning text-dark me-2">${index + 1}</div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0 text-truncate">${song.title}</h6>
+                                    <small class="text-muted">${song.playCount || 0} plays</small>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-star text-muted fa-2x mb-2"></i>
+                            <p class="text-muted">No hay datos disponibles</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading top songs:', error);
+                document.getElementById('topSongs').innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle text-danger fa-2x mb-2"></i>
+                        <p class="text-muted">Error al cargar top</p>
+                    </div>
+                `;
+            });
+    }
+
+    function refreshStats() {
+        // Mostrar indicador de carga
+        const refreshBtn = document.querySelector('button[onclick="refreshStats()"]');
+        const originalContent = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Actualizando...';
+        refreshBtn.disabled = true;
+
+        // Recargar datos
+        loadDashboardData();
+
+        // Restaurar botón después de 2 segundos
+        setTimeout(() => {
+            refreshBtn.innerHTML = originalContent;
+            refreshBtn.disabled = false;
+        }, 2000);
+    }
+
+    // Auto-dismiss alerts after 5 seconds
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            if (alert.querySelector('.btn-close')) {
+                alert.querySelector('.btn-close').click();
+            }
+        });
+    }, 5000);
+</script>

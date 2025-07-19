@@ -1,0 +1,116 @@
+﻿@model IEnumerable<BeatBay.DTOs.PlaylistDto>
+
+@{
+    ViewData["Title"] = "Playlists";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>@ViewData["Title"]</h2>
+                <div>
+                    <a asp-action="Create" class="btn btn-primary me-2">
+                        <i class="fas fa-plus"></i> Nueva Playlist
+                    </a>
+                    <a asp-action="MyPlaylists" class="btn btn-outline-secondary">
+                        <i class="fas fa-user"></i> Mis Playlists
+                    </a>
+                </div>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @ViewBag.Error
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (Model.Any())
+            {
+                <div class="row">
+                    @foreach (var playlist in Model)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">@playlist.Name</h5>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            Por: @playlist.UserName<br>
+                                            Canciones: @playlist.Songs.Count
+                                        </small>
+                                    </p>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="btn-group w-100" role="group">
+                                        <a asp-action="Details" asp-route-id="@playlist.Id" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@playlist.Id" class="btn btn-outline-warning btn-sm">
+                                            <i class="fas fa-edit"></i> Editar
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@playlist.Id">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal de confirmación de eliminación -->
+                        <div class="modal fade" id="deleteModal-@playlist.Id" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirmar Eliminación</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Estás seguro de que deseas eliminar la playlist "<strong>@playlist.Name</strong>"?
+                                        <br><small class="text-muted">Esta acción no se puede deshacer.</small>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form asp-action="Delete" asp-route-id="@playlist.Id" method="post" style="display: inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-music fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No hay playlists disponibles</h4>
+                    <p class="text-muted">¡Crea tu primera playlist para comenzar!</p>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Crear Primera Playlist
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

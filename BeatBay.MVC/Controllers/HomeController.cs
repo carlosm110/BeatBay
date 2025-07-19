@@ -17,9 +17,8 @@ namespace BeatBayMVC.Controllers
             _httpClient = httpClientFactory.CreateClient();
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            // Obtener datos del usuario desde la sesión
             var userDataJson = HttpContext.Session.GetString("UserData");
             UserDto currentUser = null;
 
@@ -31,28 +30,17 @@ namespace BeatBayMVC.Controllers
             ViewBag.CurrentUser = currentUser;
             ViewBag.IsLoggedIn = currentUser != null;
 
-            // Obtener el tema desde la API
-            var theme = await GetThemeFromApiAsync();
-            ViewBag.Theme = theme;  // Pasar el tema a la vista
-
             return View();
         }
 
-        public async Task<string> GetThemeFromApiAsync()
+        public IActionResult IndexArtista()
         {
-            try
-            {
-                var response = await _httpClient.GetStringAsync($"{_apiBaseUrl}/theme");  // URL de tu API para el tema
-                return response;
-            }
-            catch (Exception ex)
-            {
-                // En caso de error, logueamos y retornamos el modo claro por defecto
-                _logger.LogError("Error al obtener el tema desde la API", ex);
-                return "light";  // Modo claro por defecto
-            }
+            return View();
         }
-
+        public IActionResult IndexAdmin()
+        {
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();

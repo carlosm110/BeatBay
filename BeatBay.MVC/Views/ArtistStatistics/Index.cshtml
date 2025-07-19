@@ -1,0 +1,243 @@
+﻿@model List<BeatBay.DTOs.SongStatsDto>
+
+@{
+    ViewData["Title"] = "Estadísticas del Artista";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-primary">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Estadísticas del Artista
+                </h2>
+                <div>
+                    <a href="@Url.Action("DownloadReport")" class="btn btn-danger btn-lg">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        Descargar Reporte PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Resumen mejorado -->
+    @if (ViewBag.Summary != null)
+    {
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h3 class="text-secondary mb-3">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Resumen General
+                </h3>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card bg-primary text-white h-100">
+                            <div class="card-body text-center">
+                                <div class="display-4 mb-2">
+                                    <i class="fas fa-music"></i>
+                                </div>
+                                <h4 class="card-title">@ViewBag.Summary.TotalSongs</h4>
+                                <p class="card-text">Total Canciones</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card bg-success text-white h-100">
+                            <div class="card-body text-center">
+                                <div class="display-4 mb-2">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <h4 class="card-title">@ViewBag.Summary.TotalPlays</h4>
+                                <p class="card-text">Total Reproducciones</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card bg-info text-white h-100">
+                            <div class="card-body text-center">
+                                <div class="display-4 mb-2">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <h4 class="card-title">@ViewBag.Summary.ActiveSongs</h4>
+                                <p class="card-text">Canciones Activas</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card bg-warning text-white h-100">
+                            <div class="card-body text-center">
+                                <div class="display-4 mb-2">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <h4 class="card-title">
+                                    @{
+                                        var totalDuration = ViewBag.Summary.TotalDurationPlayed ?? 0;
+                                        var timeSpan = TimeSpan.FromSeconds(Convert.ToDouble(totalDuration));
+                                    }
+                                    @timeSpan.ToString(@"hh\:mm\:ss")
+                                </h4>
+                                <p class="card-text">Tiempo Total Reproducido</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Top 5 Canciones mejorado -->
+    @if (ViewBag.TopSongs != null)
+    {
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card shadow">
+                    <div class="card-header bg-gradient-primary text-white">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-trophy me-2"></i>
+                            Top 5 Canciones Más Reproducidas
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            @{
+                                int position = 1;
+                            }
+                            @foreach (var song in ViewBag.TopSongs)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center border-0 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="badge bg-primary rounded-pill me-3 fs-6">@position</div>
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">@song.Title</h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-headphones me-1"></i>
+                                                @song.PlayCount reproducciones
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="btn-group">
+                                        <a href="@Url.Action("SongDetails", new { id = song.SongId })" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>
+                                            Ver Detalles
+                                        </a>
+                                    </div>
+                                </div>
+                                position++;
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Todas las canciones mejorado -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-gradient-secondary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            Todas mis Canciones
+                        </h3>
+                        <a href="@Url.Action("TopSongs")" class="btn btn-light btn-sm">
+                            <i class="fas fa-star me-1"></i>
+                            Ver Top 20
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">
+                                            <i class="fas fa-music me-2"></i>
+                                            Título
+                                        </th>
+                                        <th scope="col" class="text-center">
+                                            <i class="fas fa-play me-2"></i>
+                                            Reproducciones
+                                        </th>
+                                        <th scope="col" class="text-center">
+                                            <i class="fas fa-clock me-2"></i>
+                                            Tiempo Total
+                                        </th>
+                                        <th scope="col" class="text-center">
+                                            <i class="fas fa-cog me-2"></i>
+                                            Acciones
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var song in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="fw-bold">@song.Title</div>
+                                                <small class="text-muted">@song.ArtistName</small>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-success fs-6">@song.PlayCount</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-info fs-6">
+                                                    @(TimeSpan.FromSeconds(song.TotalDurationPlayed).ToString(@"hh\:mm\:ss"))
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="@Url.Action("SongDetails", new { id = song.SongId })" 
+                                                   class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-chart-bar me-1"></i>
+                                                    Ver Detalles
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center">
+                            <div class="display-1 text-muted mb-3">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <h4>No tienes canciones aún</h4>
+                            <p class="mb-3">¡Comienza tu carrera musical subiendo tu primera canción!</p>
+                            <a href="@Url.Action("Create", "Songs")" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus me-2"></i>
+                                Crear Primera Canción
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

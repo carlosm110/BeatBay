@@ -1,0 +1,410 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor BeatBay</title>
+    <style>
+        .music-player {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 400px;
+            margin: 20px auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .song-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .song-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .artist-name {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .play-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+            .play-btn:hover {
+                background: #0056b3;
+            }
+
+        .loop-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 40px;
+            height: 40px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background 0.3s ease;
+        }
+
+            .loop-btn:hover {
+                background: #5a6268;
+            }
+
+            .loop-btn.active {
+                background: #28a745;
+            }
+
+        .progress-container {
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #007bff;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8em;
+            margin-top: 8px;
+            color: #666;
+        }
+
+        .play-count {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 4px;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="music-player">
+        <div class="song-info">
+            <div class="song-title" id="songTitle">Título de la canción</div>
+            <div class="artist-name" id="artistName">Artista</div>
+        </div>
+
+        <div class="controls">
+            <button class="play-btn" id="playBtn">▶️</button>
+            <button class="loop-btn" id="loopBtn" title="Repetir canción">🔁</button>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="totalTime">0:00</span>
+            </div>
+        </div>
+
+        <div class="volume-container">
+            <span>🔊</span>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.1" value="0.7">
+        </div>
+
+        <div class="play-count" id="playCount">Reproducciones: 0</div>
+        <div class="status" id="status"></div>
+    </div>
+
+    <audio id="audioElement" preload="metadata"></audio>
+
+    <script>
+        class BeatBayPlayer {
+            constructor() {
+                this.audio = document.getElementById('audioElement');
+                this.currentSong = null;
+                this.isPlaying = false;
+                this.hasStartedPlaying = false;
+                this.isLooping = false;
+                this.playStartTime = 0;
+                this.totalPlayedTime = 0;
+                this.lastRecordedTime = 0;
+
+                this.initializeElements();
+                this.attachEventListeners();
+            }
+
+            initializeElements() {
+                this.playBtn = document.getElementById('playBtn');
+                this.loopBtn = document.getElementById('loopBtn');
+                this.progressBar = document.getElementById('progressBar');
+                this.progressFill = document.getElementById('progressFill');
+                this.currentTimeEl = document.getElementById('currentTime');
+                this.totalTimeEl = document.getElementById('totalTime');
+                this.volumeSlider = document.getElementById('volumeSlider');
+                this.songTitleEl = document.getElementById('songTitle');
+                this.artistNameEl = document.getElementById('artistName');
+                this.playCountEl = document.getElementById('playCount');
+                this.statusEl = document.getElementById('status');
+            }
+
+            attachEventListeners() {
+                this.playBtn.addEventListener('click', () => this.togglePlay());
+                this.loopBtn.addEventListener('click', () => this.toggleLoop());
+                this.progressBar.addEventListener('click', (e) => this.seekTo(e));
+                this.volumeSlider.addEventListener('input', (e) => {
+                    this.audio.volume = e.target.value;
+                });
+
+                this.audio.addEventListener('loadedmetadata', () => this.updateDuration());
+                this.audio.addEventListener('timeupdate', () => this.updateProgress());
+                this.audio.addEventListener('ended', () => this.onSongEnd());
+                this.audio.addEventListener('play', () => this.onPlay());
+                this.audio.addEventListener('pause', () => this.onPause());
+                this.audio.addEventListener('error', (e) => this.onError(e));
+
+                // Registrar tiempo cada 10 segundos mientras se reproduce
+                setInterval(() => {
+                    if (this.isPlaying && this.currentSong) {
+                        this.recordPlayTime();
+                    }
+                }, 10000);
+
+                // Registrar tiempo al cambiar de pestaña o cerrar
+                window.addEventListener('beforeunload', () => {
+                    if (this.isPlaying && this.currentSong) {
+                        this.recordPlayTime();
+                    }
+                });
+
+                // Registrar tiempo al salir de la página
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden && this.isPlaying && this.currentSong) {
+                        this.recordPlayTime();
+                    }
+                });
+            }
+
+            loadSong(songData) {
+                // Registrar tiempo de la canción anterior si estaba reproduciéndose
+                if (this.isPlaying && this.currentSong) {
+                    this.recordPlayTime();
+                }
+
+                this.currentSong = songData;
+                this.audio.src = songData.streamingUrl;
+                this.songTitleEl.textContent = songData.title;
+                this.artistNameEl.textContent = songData.artistName;
+                this.playCountEl.textContent = `Reproducciones: ${songData.playCount}`;
+                this.hasStartedPlaying = false;
+                this.totalPlayedTime = 0;
+                this.lastRecordedTime = 0;
+                this.statusEl.textContent = '';
+
+                // Establecer volumen inicial
+                this.audio.volume = this.volumeSlider.value;
+            }
+
+            async togglePlay() {
+                if (this.isPlaying) {
+                    this.audio.pause();
+                } else {
+                    try {
+                        await this.audio.play();
+                    } catch (error) {
+                        console.error('Error al reproducir:', error);
+                        alert('Error al reproducir la canción');
+                    }
+                }
+            }
+
+            toggleLoop() {
+                this.isLooping = !this.isLooping;
+                this.audio.loop = this.isLooping;
+
+                if (this.isLooping) {
+                    this.loopBtn.classList.add('active');
+                    this.loopBtn.title = 'Desactivar repetición';
+                } else {
+                    this.loopBtn.classList.remove('active');
+                    this.loopBtn.title = 'Repetir canción';
+                }
+            }
+
+            async recordPlayTime() {
+                if (!this.currentSong || !this.isPlaying) return;
+
+                const currentTime = Math.floor(this.audio.currentTime);
+                const playedSinceLastRecord = currentTime - this.lastRecordedTime;
+
+                if (playedSinceLastRecord <= 0) return;
+
+                try {
+                    const response = await fetch(`/Songs/RecordPlay/${this.currentSong.id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        },
+                        body: JSON.stringify({
+                            DurationPlayedSeconds: playedSinceLastRecord
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            this.lastRecordedTime = currentTime;
+                            this.totalPlayedTime += playedSinceLastRecord;
+                            this.statusEl.textContent = `Tiempo registrado: ${this.formatTime(this.totalPlayedTime)}`;
+                            console.log(`Registrados ${playedSinceLastRecord} segundos de reproducción`);
+                        }
+                    } else {
+                        console.error('Error al registrar reproducción:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Error al registrar reproducción:', error);
+                }
+            }
+
+            seekTo(event) {
+                if (!this.audio.duration) return;
+
+                const rect = this.progressBar.getBoundingClientRect();
+                const percent = (event.clientX - rect.left) / rect.width;
+                const newTime = percent * this.audio.duration;
+
+                // Registrar tiempo hasta el punto actual antes del seek
+                if (this.isPlaying) {
+                    this.recordPlayTime();
+                }
+
+                this.audio.currentTime = newTime;
+                this.lastRecordedTime = Math.floor(newTime);
+            }
+
+            updateProgress() {
+                if (this.audio.duration) {
+                    const percent = (this.audio.currentTime / this.audio.duration) * 100;
+                    this.progressFill.style.width = percent + '%';
+                    this.currentTimeEl.textContent = this.formatTime(this.audio.currentTime);
+                }
+            }
+
+            updateDuration() {
+                if (this.audio.duration) {
+                    this.totalTimeEl.textContent = this.formatTime(this.audio.duration);
+                }
+            }
+
+            formatTime(seconds) {
+                if (!seconds || isNaN(seconds)) return '0:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            onPlay() {
+                this.isPlaying = true;
+                this.playBtn.textContent = '⏸️';
+                this.playStartTime = Date.now();
+                this.lastRecordedTime = Math.floor(this.audio.currentTime);
+
+                if (!this.hasStartedPlaying && this.currentSong) {
+                    this.hasStartedPlaying = true;
+                    this.statusEl.textContent = 'Reproduciendo...';
+                }
+            }
+
+            onPause() {
+                this.isPlaying = false;
+                this.playBtn.textContent = '▶️';
+
+                // Registrar tiempo reproducido hasta el momento de pausar
+                if (this.currentSong) {
+                    this.recordPlayTime();
+                }
+            }
+
+            onSongEnd() {
+                // Registrar tiempo al terminar la canción
+                if (this.currentSong) {
+                    this.recordPlayTime();
+                }
+
+                if (!this.isLooping) {
+                    this.isPlaying = false;
+                    this.playBtn.textContent = '▶️';
+                    this.progressFill.style.width = '0%';
+                    this.currentTimeEl.textContent = '0:00';
+                    this.lastRecordedTime = 0;
+                    this.statusEl.textContent = 'Canción terminada';
+                } else {
+                    // Si está en loop, reiniciar el contador
+                    this.lastRecordedTime = 0;
+                }
+            }
+
+            onError(error) {
+                console.error('Error en el reproductor:', error);
+                this.isPlaying = false;
+                this.playBtn.textContent = '▶️';
+                this.statusEl.textContent = 'Error al cargar la canción';
+                alert('Error al cargar la canción');
+            }
+        }
+
+        // Inicializar el reproductor
+        const player = new BeatBayPlayer();
+
+        // Exponer métodos globales
+        window.BeatBayPlayer = {
+            loadSong: (songData) => player.loadSong(songData)
+        };
+    </script>
+</body>
+</html>

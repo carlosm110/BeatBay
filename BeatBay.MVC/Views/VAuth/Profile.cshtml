@@ -138,7 +138,7 @@
                 <!-- Success message will be inserted here -->
             </div>
         </div>
-
+        
         <div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header bg-danger text-white">
                 <i class="fas fa-exclamation-circle me-2"></i>
@@ -223,7 +223,7 @@
                         </div>
                         <div class="status-indicator">
                             <i class="fas fa-circle text-danger" id="2faStatusIcon"></i>
-                            <span id="2faStatus">Disabled</span>
+                            <span id="2faStatus">Checking...</span>
                         </div>
                     </div>
 
@@ -318,6 +318,31 @@
                 </div>
             </div>
         </div>
+
+        <div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-shield-alt"></i> Security Settings
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">Two-Factor Authentication</h6>
+                        <p class="text-muted small mb-0">Add an extra layer of security to your account</p>
+                    </div>
+                    <div>
+                        <div id="twoFactorStatus">
+                            <!-- Status will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     </div>
 
     <!-- Edit Profile Modal -->
@@ -339,6 +364,13 @@
                         <div class="mb-3">
                             <label for="Bio" class="form-label">Bio</label>
                             <textarea class="form-control" id="Bio" name="Bio" rows="3">@Model?.Bio</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="PlanId" class="form-label">Plan</label>
+                            <select class="form-select" id="PlanId" name="PlanId">
+                                <option value="0" selected="@(Model?.PlanId == 0)">Free Plan</option>
+                                <option value="1" selected="@(Model?.PlanId == 1)">Premium Plan</option>
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -428,15 +460,15 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             check2FAStatus();
-
+            
             // Mostrar mensajes de TempData si existen
             @if (TempData["Success"] != null)
             {
-                        <text>showToast('success', '@TempData["Success"]');</text>
+                <text>showToast('success', '@TempData["Success"]');</text>
             }
             @if (TempData["Error"] != null)
             {
-                        <text>showToast('error', '@TempData["Error"]');</text>
+                <text>showToast('error', '@TempData["Error"]');</text>
             }
         });
 
@@ -444,7 +476,7 @@
         function showToast(type, message) {
             const toastId = type === 'success' ? 'successToast' : 'errorToast';
             const messageId = type === 'success' ? 'successMessage' : 'errorMessage';
-
+            
             document.getElementById(messageId).textContent = message;
             const toast = new bootstrap.Toast(document.getElementById(toastId));
             toast.show();
@@ -628,6 +660,28 @@
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+    check2FAStatus();
+});
+
+function check2FAStatus() {
+    fetch('/VAuth/Get2FAStatus')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const statusHtml = data.is2FAEnabled ? 
+                    `<button type="button" class="btn btn-danger" onclick="window.location.href='/VAuth/TwoFactorSettings'">
+                        <i class="fas fa-shield-alt"></i> Manage 2FA
+                    </button>` :
+                    `<button type="button" class="btn btn-primary" onclick="window.location.href='/VAuth/TwoFactorSettings'">
+                        <i class="fas fa-shield-alt"></i> Enable 2FA
+                    </button>`;
+                document.getElementById('twoFactorStatus').innerHTML = statusHtml;
+            }
+        })
+        .catch(error => console.error('Error checking 2FA status:', error));
+}
     </script>
 </body>
 </html>

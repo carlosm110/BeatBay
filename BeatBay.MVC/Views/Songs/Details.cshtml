@@ -1,6 +1,7 @@
 ﻿@model BeatBay.DTOs.SongDto
-
+@Html.AntiForgeryToken()
 <h2>Detalles de la Canción</h2>
+
 <div>
     <h4>@Model.Title</h4>
     <p><strong>Duración:</strong> @Model.Duration</p>
@@ -8,38 +9,23 @@
     <p><strong>Artista:</strong> @Model.ArtistName</p>
     <p><strong>Estado:</strong> @(Model.IsActive ? "Activa" : "Inactiva")</p>
     <p><strong>Fecha de subida:</strong> @Model.UploadedAt.ToLocalTime().ToString("g")</p>
-    <p><strong>Reproducciones:</strong> @Model.PlayCount</p>
 
-    <div>
-        <audio controls id="audioPlayer">
-            <source src="@Model.StreamingUrl" />
-            Tu navegador no soporta reproducción de audio.
-        </audio>
-        <br><br>
-        <button id="loopBtn" onclick="toggleLoop()">🔁 Loop: OFF</button>
-    </div>
+    <!-- REPRODUCTOR PERSONALIZADO (reemplaza el audio controls) -->
+    @Html.Partial("_PlayerPartial")
 </div>
 
 <a asp-action="Index" class="btn btn-secondary mt-3">Volver al listado</a>
 
 <script>
-    let isLooping = false;
-
-    function toggleLoop() {
-        const audio = document.getElementById('audioPlayer');
-        const loopBtn = document.getElementById('loopBtn');
-
-        isLooping = !isLooping;
-        audio.loop = isLooping;
-
-        if (isLooping) {
-            loopBtn.innerHTML = '🔁 Loop: ON';
-            loopBtn.style.backgroundColor = '#28a745';
-            loopBtn.style.color = 'white';
-        } else {
-            loopBtn.innerHTML = '🔁 Loop: OFF';
-            loopBtn.style.backgroundColor = '';
-            loopBtn.style.color = '';
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.BeatBayPlayer) {
+            window.BeatBayPlayer.loadSong({
+                id: @Model.Id,
+                title: '@Html.Raw(Model.Title.Replace("'", "\\'"))',
+                artistName: '@Html.Raw(Model.ArtistName.Replace("'", "\\'"))',
+                streamingUrl: '@Model.StreamingUrl',
+                playCount: @Model.PlayCount
+            });
         }
-    }
+    });
 </script>

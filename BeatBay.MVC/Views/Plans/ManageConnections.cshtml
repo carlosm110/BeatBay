@@ -1,0 +1,373 @@
+﻿@model BeatBay.DTOs.UserPlanStatusDto
+@{
+    ViewData["Title"] = "Gestionar Conexiones";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">
+                <i class="fas fa-users me-2"></i>
+                Gestionar Conexiones
+            </h2>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Navegación -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Mis Planes</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Gestionar Conexiones</li>
+                </ol>
+            </nav>
+
+            <!-- Información del plan actual -->
+            @if (Model.CurrentSubscription != null)
+            {
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Estado de tu Plan
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <h5 class="mb-0">@Model.CurrentSubscription.PlanName</h5>
+                                <p class="text-muted mb-0">Plan actual</p>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="connection-status">
+                                    <h4 class="mb-0">
+                                        <span class="badge bg-info fs-6">
+                                            @Model.CurrentSubscription.UsedConnections/@Model.CurrentSubscription.MaxConnections
+                                        </span>
+                                    </h4>
+                                    <p class="text-muted mb-0">Conexiones utilizadas</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar"
+                                         style="width: @(((double)Model.CurrentSubscription.UsedConnections / Model.CurrentSubscription.MaxConnections) * 100)%">
+                                    </div>
+                                </div>
+                                <small class="text-muted">Uso de conexiones</small>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                @{
+                                    var availableConnections = Model.CurrentSubscription.MaxConnections - Model.CurrentSubscription.UsedConnections;
+                                }
+                                <h5 class="mb-0 text-success">@availableConnections</h5>
+                                <p class="text-muted mb-0">Disponibles</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="row">
+                <!-- Usuarios conectados -->
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-check me-2"></i>
+                                Usuarios Conectados
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.CurrentSubscription.ConnectedUsers.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Usuario</th>
+                                                <th>Nombre</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var user in Model.CurrentSubscription.ConnectedUsers)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fas fa-user-circle me-2 text-primary"></i>
+                                                            <strong>@user.UserName</strong>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        @if (!string.IsNullOrEmpty(user.Name))
+                                                        {
+                                                            <span>@user.Name</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="text-muted">No especificado</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-success">
+                                                            <i class="fas fa-check me-1"></i>
+                                                            Conectado
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <form method="post" action="@Url.Action("RemoveConnection")" class="d-inline remove-form">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="childUserId" value="@user.Id" />
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                <i class="fas fa-user-times me-1"></i>
+                                                                Remover
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-4">
+                                    <i class="fas fa-user-slash text-muted fa-3x mb-3"></i>
+                                    <h6 class="text-muted">No hay usuarios conectados</h6>
+                                    <p class="text-muted">Agrega usuarios para compartir tu plan</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agregar nueva conexión -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-plus me-2"></i>
+                                Agregar Usuario
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @{
+                                var canAddMore = Model.CurrentSubscription.UsedConnections < Model.CurrentSubscription.MaxConnections;
+                            }
+
+                            @if (canAddMore)
+                            {
+                                <form method="post" action="@Url.Action("AddConnection")" id="addConnectionForm">
+                                    @Html.AntiForgeryToken()
+                                    <div class="mb-3">
+                                        <label for="childUserId" class="form-label">ID del Usuario</label>
+                                        <input type="number" class="form-control" id="childUserId" name="childUserId"
+                                               placeholder="Ingresa el ID del usuario" required>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            El usuario debe estar registrado en BeatBay
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fas fa-plus me-2"></i>
+                                        Agregar Usuario
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="text-center">
+                                    <i class="fas fa-exclamation-triangle text-warning fa-2x mb-3"></i>
+                                    <h6 class="text-muted">Límite alcanzado</h6>
+                                    <p class="text-muted">Has alcanzado el máximo de conexiones permitidas</p>
+                                    <hr>
+                                    <a href="@Url.Action("Change")" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-arrow-up me-1"></i>
+                                        Actualizar Plan
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Información útil -->
+                    <div class="card mt-3">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                Consejos
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    <small>Los usuarios agregados pueden acceder inmediatamente</small>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-shield-alt text-primary me-2"></i>
+                                    <small>Puedes remover usuarios en cualquier momento</small>
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-users text-info me-2"></i>
+                                    <small>Cada usuario mantiene su biblioteca personal</small>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="card mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>
+                        Preguntas Frecuentes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-user-friends text-primary me-2"></i>¿Cómo funcionan las conexiones?</h6>
+                            <p class="text-muted">Las conexiones permiten que otros usuarios accedan a tu plan. Cada usuario mantiene su perfil independiente.</p>
+
+                            <h6><i class="fas fa-key text-success me-2"></i>¿Cómo obtener el ID de usuario?</h6>
+                            <p class="text-muted">El usuario debe ir a su perfil y compartir contigo su ID único de usuario.</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-times-circle text-danger me-2"></i>¿Qué pasa al remover un usuario?</h6>
+                            <p class="text-muted">El usuario pierde acceso inmediatamente pero conserva su biblioteca personal.</p>
+
+                            <h6><i class="fas fa-chart-line text-warning me-2"></i>¿Puedo ver el uso de cada conexión?</h6>
+                            <p class="text-muted">Actualmente solo puedes ver qué usuarios están conectados, no su actividad individual.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de navegación -->
+            <div class="row mt-4">
+                <div class="col-md-12 text-center">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Volver a Mis Planes
+                    </a>
+                    <a href="@Url.Action("Change")" class="btn btn-outline-primary">
+                        <i class="fas fa-exchange-alt me-2"></i>
+                        Cambiar Plan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .connection-status {
+        text-align: center;
+    }
+
+    .progress {
+        height: 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        background-color: #007bff;
+        transition: width 0.6s ease;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .remove-form {
+        display: inline-block;
+    }
+
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .badge {
+        font-size: 0.875em;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-outline-danger:hover {
+        color: #fff;
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    .text-primary {
+        color: #007bff !important;
+    }
+
+    .text-warning {
+        color: #ffc107 !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    .text-info {
+        color: #17a2b8 !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Confirmación antes de remover usuario
+        document.querySelectorAll('.remove-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const userName = this.closest('tr').querySelector('strong').textContent;
+                const confirmed = confirm(`¿Estás seguro de que quieres remover a ${userName} de tu plan?`);
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Validación del formulario de agregar usuario
+        document.getElementById('addConnectionForm')?.addEventListener('submit', function(e) {
+            const userId = document.getElementById('childUserId').value;
+            if (!userId || userId <= 0) {
+                e.preventDefault();
+                alert('Por favor, ingresa un ID de usuario válido');
+            }
+        });
+    });
+</script>

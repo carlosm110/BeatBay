@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BeatBay.APIConsumer;
 using BeatBay.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Text;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 
 namespace BeatBayMVC.Controllers
 {
@@ -17,6 +15,16 @@ namespace BeatBayMVC.Controllers
         {
             _httpClient = httpClientFactory.CreateClient();
             _apiBaseUrl = configuration.GetValue<string>("ApiSettings:BaseUrl") ?? "https://localhost:7037/api";
+
+            // Configurar el endpoint del CRUD genérico
+            Crud<SongDto>.EndPoint = $"{_apiBaseUrl}/songs";
+        }
+
+        private void ConfigureCrudAuth()
+        {
+            var token = HttpContext.Session.GetString("JwtToken");
+            Crud<SongDto>.AuthToken = token;
+            Crud<UpdateSongDto>.AuthToken = token;
         }
 
         private void AddAuthHeader()
@@ -107,12 +115,11 @@ namespace BeatBayMVC.Controllers
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/songs");
-                if (!response.IsSuccessStatusCode)
-                    return View(new List<SongDto>());
+                // Configurar autenticación para el CRUD
+                ConfigureCrudAuth();
 
-                var json = await response.Content.ReadAsStringAsync();
-                var songs = JsonConvert.DeserializeObject<List<SongDto>>(json);
+                // Usar el CRUD genérico para obtener todas las canciones
+                var songs = Crud<SongDto>.GetAll();
 
                 // Verificar si el usuario está logueado para mostrar opciones adicionales
                 ViewBag.IsLoggedIn = await IsUserLoggedInAsync();
@@ -132,12 +139,14 @@ namespace BeatBayMVC.Controllers
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/songs/{id}");
-                if (!response.IsSuccessStatusCode)
-                    return NotFound();
+                // Configurar autenticación para el CRUD
+                ConfigureCrudAuth();
 
-                var json = await response.Content.ReadAsStringAsync();
-                var song = JsonConvert.DeserializeObject<SongDto>(json);
+                // Usar el CRUD genérico para obtener la canción por ID
+                var song = Crud<SongDto>.GetById(id);
+
+                if (song == null)
+                    return NotFound();
 
                 // Verificar permisos para editar/eliminar
                 var currentUser = await GetCurrentUserAsync();
@@ -266,12 +275,14 @@ namespace BeatBayMVC.Controllers
 
             try
             {
-                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/songs/{id}");
-                if (!response.IsSuccessStatusCode)
-                    return NotFound();
+                // Configurar autenticación para el CRUD
+                ConfigureCrudAuth();
 
-                var json = await response.Content.ReadAsStringAsync();
-                var song = JsonConvert.DeserializeObject<SongDto>(json);
+                // Usar el CRUD genérico para obtener la canción
+                var song = Crud<SongDto>.GetById(id);
+
+                if (song == null)
+                    return NotFound();
 
                 // Verificar permisos
                 var currentUser = await GetCurrentUserAsync();
@@ -302,7 +313,6 @@ namespace BeatBayMVC.Controllers
                 return NotFound();
             }
         }
-
         // POST: Songs/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -328,22 +338,47 @@ namespace BeatBayMVC.Controllers
 
             try
             {
+                // Primero verificar que la canción existe y que el usuario tiene permisos
+                ConfigureCrudAuth();
+                var existingSong = Crud<SongDto>.GetById(id);
+
+                if (existingSong == null)
+                {
+                    TempData["Error"] = "La canción no existe.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Verificar permisos
+                var currentUser = await GetCurrentUserAsync();
+                var isAdmin = await UserHasRoleAsync("Admin");
+                var isOwner = currentUser != null && existingSong.ArtistId == currentUser.Id;
+
+                if (!isAdmin && !isOwner)
+                {
+                    TempData["Error"] = "No tienes permisos para editar esta canción.";
+                    return RedirectToAction(nameof(Details), new { id });
+                }
+
+                // Usar HttpClient directamente para mayor control
                 AddAuthHeader();
 
                 var json = JsonConvert.SerializeObject(dto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var response = await _httpClient.PutAsync($"{_apiBaseUrl}/songs/{id}", content);
+
                 if (response.IsSuccessStatusCode)
                 {
                     TempData["Success"] = "Canción actualizada exitosamente.";
                     return RedirectToAction(nameof(Details), new { id });
                 }
-
-                var error = await response.Content.ReadAsStringAsync();
-                ModelState.AddModelError("", $"Error al actualizar la canción: {error}");
-                ViewBag.SongId = id;
-                return View(dto);
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    ModelState.AddModelError("", $"Error al actualizar la canción: {response.StatusCode} - {errorContent}");
+                    ViewBag.SongId = id;
+                    return View(dto);
+                }
             }
             catch (Exception ex)
             {
@@ -370,12 +405,14 @@ namespace BeatBayMVC.Controllers
 
             try
             {
-                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/songs/{id}");
-                if (!response.IsSuccessStatusCode)
-                    return NotFound();
+                // Configurar autenticación para el CRUD
+                ConfigureCrudAuth();
 
-                var json = await response.Content.ReadAsStringAsync();
-                var song = JsonConvert.DeserializeObject<SongDto>(json);
+                // Usar el CRUD genérico para obtener la canción
+                var song = Crud<SongDto>.GetById(id);
+
+                if (song == null)
+                    return NotFound();
 
                 // Verificar permisos
                 var currentUser = await GetCurrentUserAsync();
@@ -395,9 +432,47 @@ namespace BeatBayMVC.Controllers
                 return NotFound();
             }
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RecordPlay(int id, [FromBody] RecordPlayRequest request)
+        {
+            if (!await IsUserLoggedInAsync())
+                return Json(new { success = false, message = "No autorizado" });
 
-        // POST: Songs/Delete/5
-        [HttpPost, ActionName("Delete")]
+            try
+            {
+                AddAuthHeader();
+
+                var requestData = new { DurationPlayedSeconds = request.DurationPlayedSeconds };
+                var json = JsonConvert.SerializeObject(requestData);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/songs/{id}/play", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var result = JsonConvert.DeserializeObject<dynamic>(responseContent);
+                    return Json(new { success = true, message = "Reproducción registrada" });
+                }
+
+                return Json(new { success = false, message = "Error al registrar reproducción" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        public class RecordPlayRequest
+        {
+            public int DurationPlayedSeconds { get; set; }
+        }
+
+
+
+            // POST: Songs/Delete/5
+            [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -415,17 +490,19 @@ namespace BeatBayMVC.Controllers
 
             try
             {
-                AddAuthHeader();
+                // Configurar autenticación para el CRUD
+                ConfigureCrudAuth();
 
-                var response = await _httpClient.DeleteAsync($"{_apiBaseUrl}/songs/{id}");
-                if (response.IsSuccessStatusCode)
+                // Usar el CRUD genérico para eliminar la canción
+                var success = Crud<SongDto>.Delete(id);
+
+                if (success)
                 {
                     TempData["Success"] = "Canción eliminada correctamente.";
                 }
                 else
                 {
-                    var error = await response.Content.ReadAsStringAsync();
-                    TempData["Error"] = $"Error al eliminar la canción: {error}";
+                    TempData["Error"] = "Error al eliminar la canción.";
                 }
             }
             catch (Exception ex)
@@ -453,16 +530,51 @@ namespace BeatBayMVC.Controllers
 
             try
             {
-                AddAuthHeader();
-                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/songs/my-songs");
+                // Configurar autenticación para el CRUD
+                ConfigureCrudAuth();
 
-                if (!response.IsSuccessStatusCode)
-                    return View(new List<SongDto>());
+                // Configurar endpoint específico para las canciones del usuario
+                var currentUser = await GetCurrentUserAsync();
+                if (currentUser == null)
+                {
+                    TempData["Error"] = "No se pudo obtener la información del usuario.";
+                    return RedirectToAction(nameof(Index));
+                }
 
-                var json = await response.Content.ReadAsStringAsync();
-                var songs = JsonConvert.DeserializeObject<List<SongDto>>(json);
+                // Usar el CRUD genérico con el endpoint de mis canciones
+                var originalEndpoint = Crud<SongDto>.EndPoint;
+                Crud<SongDto>.EndPoint = $"{_apiBaseUrl}/songs/my-songs";
+
+                var songs = Crud<SongDto>.GetAll();
+
+                // Restaurar el endpoint original
+                Crud<SongDto>.EndPoint = originalEndpoint;
 
                 ViewBag.IsMysongsPage = true;
+                return View("Index", songs);
+            }
+            catch
+            {
+                return View("Index", new List<SongDto>());
+            }
+        }
+
+        // GET: Songs/Artist/5 (Para obtener canciones de un artista específico)
+        public async Task<IActionResult> ByArtist(int artistId)
+        {
+            try
+            {
+                // Configurar autenticación para el CRUD
+                ConfigureCrudAuth();
+
+                // Usar el CRUD genérico para obtener canciones por artista
+                var songs = Crud<SongDto>.GetBy("artist", artistId);
+
+                ViewBag.IsLoggedIn = await IsUserLoggedInAsync();
+                ViewBag.IsArtist = await UserHasRoleAsync("Artist");
+                ViewBag.IsAdmin = await UserHasRoleAsync("Admin");
+                ViewBag.ArtistId = artistId;
+
                 return View("Index", songs);
             }
             catch

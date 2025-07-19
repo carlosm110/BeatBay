@@ -1,0 +1,186 @@
+﻿@model BeatBay.DTOs.UserPlanStatusDto
+@{
+    ViewData["Title"] = "Comprar Plan";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">
+                <i class="fas fa-shopping-cart me-2"></i>
+                Comprar Plan
+            </h2>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Navegación -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Mis Planes</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Comprar Plan</li>
+                </ol>
+            </nav>
+
+            <!-- Planes disponibles para comprar -->
+            @if (Model.AvailablePlans.Any())
+            {
+                <div class="row">
+                    @foreach (var plan in Model.AvailablePlans)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 plan-card">
+                                <div class="card-header text-center bg-primary text-white">
+                                    <h4 class="mb-0">@plan.Name</h4>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="price-section mb-3">
+                                        <h2 class="text-primary mb-0">$@plan.PriceUSD</h2>
+                                        <p class="text-muted">USD/mes</p>
+                                    </div>
+
+                                    <div class="features-section mb-4">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-2">
+                                                <i class="fas fa-users text-success me-2"></i>
+                                                <strong>@plan.MaxConnections</strong> conexión@(plan.MaxConnections > 1 ? "es" : "")
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-music text-success me-2"></i>
+                                                Acceso completo a la biblioteca
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-download text-success me-2"></i>
+                                                Descargas ilimitadas
+                                            </li>
+                                            <li class="mb-2">
+                                                <i class="fas fa-mobile-alt text-success me-2"></i>
+                                                Sincronización multi-dispositivo
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="stats-section mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-chart-line me-1"></i>
+                                            @plan.UserCount usuarios activos
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <form method="post" action="@Url.Action("Purchase")">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="planId" value="@plan.Id" />
+                                        <button type="submit" class="btn btn-primary btn-lg w-100 purchase-btn">
+                                            <i class="fas fa-credit-card me-2"></i>
+                                            Comprar Ahora
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No hay planes disponibles para comprar en este momento.
+                </div>
+            }
+
+            <!-- Información adicional -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Información Importante
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-shield-alt text-success me-2"></i>Garantía</h6>
+                                    <p class="text-muted">30 días de garantía de devolución de dinero</p>
+
+                                    <h6><i class="fas fa-sync text-primary me-2"></i>Facturación</h6>
+                                    <p class="text-muted">Renovación automática mensual</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-headset text-warning me-2"></i>Soporte</h6>
+                                    <p class="text-muted">Soporte técnico 24/7 disponible</p>
+
+                                    <h6><i class="fas fa-times text-danger me-2"></i>Cancelación</h6>
+                                    <p class="text-muted">Cancela en cualquier momento sin penalización</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de navegación -->
+            <div class="row mt-4">
+                <div class="col-md-12 text-center">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Volver a Mis Planes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .plan-card {
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+        .plan-card:hover {
+            border-color: #007bff;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15);
+        }
+
+    .price-section {
+        padding: 1rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .features-section {
+        padding: 1rem 0;
+    }
+
+    .purchase-btn {
+        transition: all 0.3s ease;
+    }
+
+        .purchase-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+    .stats-section {
+        padding-top: 1rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .card-header h4 {
+        font-weight: 600;
+    }
+
+    .features-section ul li {
+        padding: 0.25rem 0;
+    }
+</style>

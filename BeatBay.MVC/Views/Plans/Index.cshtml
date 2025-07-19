@@ -1,0 +1,790 @@
+﻿@model BeatBay.DTOs.UserPlanStatusDto
+@{
+    ViewData["Title"] = "Mis Planes";
+}
+
+<div class="container-fluid px-4 py-4">
+    <!-- Header con gradient -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="header-card">
+                <div class="d-flex align-items-center">
+                    <div class="icon-wrapper me-3">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div>
+                        <h1 class="mb-1">Gestión de Planes</h1>
+                        <p class="text-muted mb-0">Administra tu suscripción y conexiones</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes de estado -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-modern fade show" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle me-2"></i>
+                <span>@TempData["SuccessMessage"]</span>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-modern fade show" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span>@TempData["ErrorMessage"]</span>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-warning alert-modern">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span>@ViewBag.ErrorMessage</span>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Estado actual del plan -->
+        <div class="col-lg-8 mb-4">
+            <div class="card modern-card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon me-3">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h5 class="mb-0">Estado Actual</h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if (Model.HasPlan && Model.CurrentSubscription != null)
+                    {
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h6 class="section-title">Plan Actual</h6>
+                                    <div class="plan-info">
+                                        <h4 class="plan-name">@Model.CurrentSubscription.PlanName</h4>
+                                        <div class="price-tag">
+                                            <span class="price">$@Model.CurrentSubscription.PriceUSD</span>
+                                            <span class="currency">USD</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="info-section mt-4">
+                                    <h6 class="section-title">Conexiones</h6>
+                                    <div class="connections-info">
+                                        <div class="progress-circle">
+                                            <div class="progress-text">
+                                                <span class="used">@Model.CurrentSubscription.UsedConnections</span>
+                                                <span class="separator">/</span>
+                                                <span class="total">@Model.CurrentSubscription.MaxConnections</span>
+                                            </div>
+                                        </div>
+                                        <p class="usage-text">conexiones utilizadas</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-section">
+                                    <h6 class="section-title">Vigencia</h6>
+                                    <div class="date-info">
+                                        <div class="date-item">
+                                            <i class="fas fa-play-circle me-2 text-success"></i>
+                                            <span class="date-label">Inicio:</span>
+                                            <span class="date-value">@Model.CurrentSubscription.StartDate.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                        <div class="date-item">
+                                            <i class="fas fa-stop-circle me-2 text-warning"></i>
+                                            <span class="date-label">Vencimiento:</span>
+                                            <span class="date-value">@Model.CurrentSubscription.EndDate.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                        <div class="status-badge">
+                                            <span class="badge badge-modern @(Model.CurrentSubscription.IsActive ? "badge-success" : "badge-danger")">
+                                                <i class="fas fa-circle me-1"></i>
+                                                @(Model.CurrentSubscription.IsActive ? "Activo" : "Inactivo")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model.CurrentSubscription.ConnectedUsers.Any())
+                        {
+                            <div class="divider"></div>
+                            <div class="info-section">
+                                <h6 class="section-title">Usuarios Conectados</h6>
+                                <div class="users-grid">
+                                    @foreach (var user in Model.CurrentSubscription.ConnectedUsers)
+                                    {
+                                        <div class="user-card">
+                                            <div class="user-avatar">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div class="user-info">
+                                                <div class="user-name">@user.UserName</div>
+                                                @if (!string.IsNullOrEmpty(user.Name))
+                                                {
+                                                    <div class="user-fullname">@user.Name</div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <h5 class="empty-title">No tienes un plan activo</h5>
+                            <p class="empty-description">Adquiere un plan para disfrutar de todas las funcionalidades</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de acciones -->
+        <div class="col-lg-4 mb-4">
+            <div class="card modern-card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon me-3">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h5 class="mb-0">Acciones</h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="actions-list">
+                        @if (Model.CanPurchasePlan)
+                        {
+                            <a href="@Url.Action("Purchase")" class="action-btn btn-primary">
+                                <div class="btn-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <span>Comprar Plan</span>
+                            </a>
+                        }
+
+                        @if (Model.HasPlan && Model.CurrentSubscription != null)
+                        {
+                            <a href="@Url.Action("Change")" class="action-btn btn-warning">
+                                <div class="btn-icon">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <span>Cambiar Plan</span>
+                            </a>
+
+                            @if (Model.CurrentSubscription.MaxConnections > 1)
+                            {
+                                <a href="@Url.Action("ManageConnections")" class="action-btn btn-info">
+                                    <div class="btn-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <span>Gestionar Conexiones</span>
+                                </a>
+                            }
+
+                            <div class="action-divider"></div>
+
+                            <form method="post" action="@Url.Action("Cancel")"
+                                  onsubmit="return confirm('¿Estás seguro de que quieres cancelar tu suscripción?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="action-btn btn-danger">
+                                    <div class="btn-icon">
+                                        <i class="fas fa-times"></i>
+                                    </div>
+                                    <span>Cancelar Suscripción</span>
+                                </button>
+                            </form>
+                        }
+
+                        <div class="action-divider"></div>
+
+                        <a href="@Url.Action("History")" class="action-btn btn-outline">
+                            <div class="btn-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <span>Ver Historial</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Planes disponibles -->
+    @if (Model.AvailablePlans.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card modern-card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon me-3">
+                                <i class="fas fa-th-large"></i>
+                            </div>
+                            <h5 class="mb-0">Planes Disponibles</h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="plans-grid">
+                            @foreach (var plan in Model.AvailablePlans)
+                            {
+                                <div class="plan-card @(Model.CurrentSubscription?.PlanId == plan.Id ? "current-plan" : "")">
+                                    @if (Model.CurrentSubscription?.PlanId == plan.Id)
+                                    {
+                                        <div class="plan-badge">
+                                            <i class="fas fa-crown me-1"></i>
+                                            Plan Actual
+                                        </div>
+                                    }
+                                    <div class="plan-header">
+                                        <h5 class="plan-title">@plan.Name</h5>
+                                        <div class="plan-price">
+                                            <span class="price">$@plan.PriceUSD</span>
+                                            <span class="period">USD/mes</span>
+                                        </div>
+                                    </div>
+                                    <div class="plan-features">
+                                        <div class="feature-item">
+                                            <i class="fas fa-users me-2"></i>
+                                            <span>@plan.MaxConnections conexión@(plan.MaxConnections > 1 ? "es" : "")</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-user-check me-2"></i>
+                                            <span>@plan.UserCount usuarios activos</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    /* Variables CSS */
+    :root {
+        --primary-color: #4f46e5;
+        --primary-light: #6366f1;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --info-color: #3b82f6;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --text-muted: #9ca3af;
+        --border-color: #e5e7eb;
+        --bg-light: #f8fafc;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --radius-sm: 0.375rem;
+        --radius-md: 0.5rem;
+        --radius-lg: 0.75rem;
+    }
+
+    /* Header */
+    .header-card {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        color: white;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .icon-wrapper {
+        background: rgba(255, 255, 255, 0.2);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .header-card h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    /* Cards modernas */
+    .modern-card {
+        border: none;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .modern-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modern-card .card-header {
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+            font-weight: 600;
+        }
+
+    .card-icon {
+        background: var(--primary-color);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    /* Alertas modernas */
+    .alert-modern {
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+        .alert-modern .btn-close {
+            background: none;
+            border: none;
+            opacity: 0.7;
+        }
+
+    /* Secciones de información */
+    .info-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+    }
+
+    .plan-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .plan-name {
+        color: var(--text-primary);
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .price-tag {
+        background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+    }
+
+    .price {
+        font-size: 1.1rem;
+    }
+
+    .currency {
+        font-size: 0.875rem;
+        opacity: 0.9;
+    }
+
+    /* Información de conexiones */
+    .connections-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .progress-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--info-color), #60a5fa);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .progress-text {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .separator {
+        opacity: 0.7;
+    }
+
+    .usage-text {
+        color: var(--text-secondary);
+        margin: 0;
+        font-size: 0.875rem;
+    }
+
+    /* Información de fechas */
+    .date-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .date-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .date-label {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        min-width: 80px;
+    }
+
+    .date-value {
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    .status-badge {
+        margin-top: 0.5rem;
+    }
+
+    /* Badges modernos */
+    .badge-modern {
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .badge-success {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .badge-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    /* Divisor */
+    .divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 2rem 0;
+    }
+
+    /* Grid de usuarios */
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .user-card {
+        background: var(--bg-light);
+        padding: 1rem;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .user-name {
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .user-fullname {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+    }
+
+    /* Estado vacío */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+
+    .empty-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-description {
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    /* Lista de acciones */
+    .actions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        border: none;
+        border-radius: var(--radius-md);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+            text-decoration: none;
+        }
+
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+        .btn-primary .btn-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+    .btn-warning {
+        background: var(--warning-color);
+        color: white;
+    }
+
+        .btn-warning .btn-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+    .btn-info {
+        background: var(--info-color);
+        color: white;
+    }
+
+        .btn-info .btn-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+    .btn-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+
+        .btn-danger .btn-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+    .btn-outline {
+        background: white;
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+        .btn-outline .btn-icon {
+            background: var(--bg-light);
+            color: var(--text-secondary);
+        }
+
+    .action-divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 0.5rem 0;
+    }
+
+    /* Grid de planes */
+    .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .plan-card {
+        background: white;
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        position: relative;
+        transition: all 0.2s ease;
+    }
+
+        .plan-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .plan-card.current-plan {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(99, 102, 241, 0.05));
+        }
+
+    .plan-badge {
+        position: absolute;
+        top: -10px;
+        right: 1rem;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .plan-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .plan-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .plan-price {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+        .plan-price .price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .plan-price .period {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+    .plan-features {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+        .feature-item i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .container-fluid
+
+    {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .header-card {
+        padding: 1.5rem;
+    }
+
+        .header-card h1 {
+            font-size: 1.5rem;
+        }
+
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .users-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .plan-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .connections-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    }
+</style>

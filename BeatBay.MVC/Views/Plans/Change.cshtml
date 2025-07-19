@@ -1,0 +1,306 @@
+﻿@model BeatBay.DTOs.UserPlanStatusDto
+@{
+    ViewData["Title"] = "Cambiar Plan";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">
+                <i class="fas fa-exchange-alt me-2"></i>
+                Cambiar Plan
+            </h2>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Navegación -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Mis Planes</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Cambiar Plan</li>
+                </ol>
+            </nav>
+
+            <!-- Plan actual -->
+            @if (Model.CurrentSubscription != null)
+            {
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-star me-2"></i>
+                            Tu Plan Actual
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <h4 class="mb-0">@Model.CurrentSubscription.PlanName</h4>
+                                <p class="text-muted mb-0">Plan actual</p>
+                            </div>
+                            <div class="col-md-3">
+                                <h5 class="text-primary mb-0">$@Model.CurrentSubscription.PriceUSD USD</h5>
+                                <p class="text-muted mb-0">por mes</p>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="badge bg-info fs-6">
+                                    @Model.CurrentSubscription.MaxConnections conexión@(Model.CurrentSubscription.MaxConnections > 1 ? "es" : "")
+                                </span>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="badge @(Model.CurrentSubscription.IsActive ? "bg-success" : "bg-danger") fs-6">
+                                    @(Model.CurrentSubscription.IsActive ? "Activo" : "Inactivo")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Planes disponibles -->
+            @if (Model.AvailablePlans.Any())
+            {
+                <div class="card mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-th-large me-2"></i>
+                            Planes Disponibles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach (var plan in Model.AvailablePlans)
+                            {
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100 plan-option @(Model.CurrentSubscription?.PlanId == plan.Id ? "current-plan" : "")">
+                                        @if (Model.CurrentSubscription?.PlanId == plan.Id)
+                                        {
+                                            <div class="current-plan-badge">
+                                                <span class="badge bg-primary">Plan Actual</span>
+                                            </div>
+                                        }
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title">@plan.Name</h5>
+                                            <div class="price-display mb-3">
+                                                <h3 class="text-primary mb-0">$@plan.PriceUSD</h3>
+                                                <p class="text-muted">USD/mes</p>
+                                            </div>
+
+                                            <div class="plan-features mb-3">
+                                                <p class="mb-2">
+                                                    <i class="fas fa-users me-2 text-success"></i>
+                                                    @plan.MaxConnections conexión@(plan.MaxConnections > 1 ? "es" : "")
+                                                </p>
+                                                <p class="mb-2">
+                                                    <i class="fas fa-chart-line me-2 text-info"></i>
+                                                    @plan.UserCount usuarios activos
+                                                </p>
+                                            </div>
+
+                                            @if (Model.CurrentSubscription?.PlanId == plan.Id)
+                                            {
+                                                <button class="btn btn-outline-primary btn-block" disabled>
+                                                    <i class="fas fa-check me-2"></i>
+                                                    Plan Actual
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <!-- Comparación con plan actual -->
+                                                @if (Model.CurrentSubscription != null)
+                                                {
+                                                    <div class="comparison-section mb-3">
+                                                        @if (plan.PriceUSD > Model.CurrentSubscription.PriceUSD)
+                                                        {
+                                                            <div class="price-diff upgrade">
+                                                                <i class="fas fa-arrow-up text-success me-1"></i>
+                                                                <span class="text-success">
+                                                                    +$@((plan.PriceUSD - Model.CurrentSubscription.PriceUSD).ToString("F2")) USD
+                                                                </span>
+                                                            </div>
+                                                        }
+                                                        else if (plan.PriceUSD < Model.CurrentSubscription.PriceUSD)
+                                                        {
+                                                            <div class="price-diff downgrade">
+                                                                <i class="fas fa-arrow-down text-primary me-1"></i>
+                                                                <span class="text-primary">
+                                                                    -$@((Model.CurrentSubscription.PriceUSD - plan.PriceUSD).ToString("F2")) USD
+                                                                </span>
+                                                            </div>
+                                                        }
+
+                                                        @if (plan.MaxConnections > Model.CurrentSubscription.MaxConnections)
+                                                        {
+                                                            <div class="connections-diff">
+                                                                <i class="fas fa-plus-circle text-success me-1"></i>
+                                                                <span class="text-success">
+                                                                    +@(plan.MaxConnections - Model.CurrentSubscription.MaxConnections) conexiones
+                                                                </span>
+                                                            </div>
+                                                        }
+                                                        else if (plan.MaxConnections < Model.CurrentSubscription.MaxConnections)
+                                                        {
+                                                            <div class="connections-diff">
+                                                                <i class="fas fa-minus-circle text-warning me-1"></i>
+                                                                <span class="text-warning">
+                                                                    @(Model.CurrentSubscription.MaxConnections - plan.MaxConnections) conexiones menos
+                                                                </span>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+
+                                                <form method="post" action="@Url.Action("Change")" class="change-form">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="newPlanId" value="@plan.Id" />
+                                                    <button type="submit" class="btn btn-success btn-block change-btn">
+                                                        <i class="fas fa-exchange-alt me-2"></i>
+                                                        Cambiar a este Plan
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Información importante -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Información Importante sobre Cambios de Plan
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calendar-alt text-primary me-2"></i>Vigencia</h6>
+                            <p class="text-muted">Los cambios de plan son efectivos inmediatamente</p>
+
+                            <h6><i class="fas fa-dollar-sign text-success me-2"></i>Facturación</h6>
+                            <p class="text-muted">Se prorrateará el costo según los días restantes</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-users text-info me-2"></i>Conexiones</h6>
+                            <p class="text-muted">Al reducir conexiones, se mantendrán las existentes hasta el límite</p>
+
+                            <h6><i class="fas fa-undo text-warning me-2"></i>Reversión</h6>
+                            <p class="text-muted">Puedes cambiar de plan nuevamente en cualquier momento</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de navegación -->
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Volver a Mis Planes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .plan-option {
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .plan-option:hover {
+            border-color: #007bff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.15);
+        }
+
+    .current-plan {
+        border-color: #007bff;
+        background-color: #f8f9ff;
+    }
+
+    .current-plan-badge {
+        position: absolute;
+        top: -10px;
+        right: 15px;
+        z-index: 10;
+    }
+
+    .price-display {
+        padding: 1rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .plan-features {
+        padding: 1rem 0;
+    }
+
+    .comparison-section {
+        padding: 0.75rem;
+        background-color: #f8f9fa;
+        border-radius: 0.375rem;
+        margin-bottom: 1rem;
+    }
+
+    .price-diff, .connections-diff {
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .change-btn {
+        transition: all 0.3s ease;
+    }
+
+        .change-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+    .btn-block {
+        width: 100%;
+    }
+
+    .change-form {
+        margin-top: auto;
+    }
+
+    .upgrade {
+        border-left: 3px solid #28a745;
+        padding-left: 0.5rem;
+    }
+
+    .downgrade {
+        border-left: 3px solid #007bff;
+        padding-left: 0.5rem;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Confirmación antes de cambiar plan
+        document.querySelectorAll('.change-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const planName = this.closest('.card').querySelector('.card-title').textContent;
+                const confirmed = confirm(`¿Estás seguro de que quieres cambiar a ${planName}?`);
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>

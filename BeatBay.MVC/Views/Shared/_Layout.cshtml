@@ -66,52 +66,9 @@
                 margin-right: 10px;
                 text-align: center;
             }
-
-        /* Modo Claro */
-        body.light {
-            background-color: #ffffff; /* Blanco */
-            color: #212529; /* Color de texto oscuro */
-        }
-
-        /* Modo Oscuro Ajustado */
-        body.dark {
-            background-color: #2e2e2e; /* Fondo gris oscuro suave */
-            color: #eaeaea; /* Color de texto claro */
-        }
-
-            /* Estilo adicional para los enlaces en modo oscuro */
-            body.dark a {
-                color: #4f9cff; /* Enlaces de color azul claro */
-            }
-
-                body.dark a:hover {
-                    color: #a5c6ff; /* Color más claro al pasar el ratón */
-                }
-
-            /* Ajustar colores de los botones y otros elementos interactivos en modo oscuro */
-            body.dark .btn {
-                background-color: #444444; /* Fondo de botones más suave */
-                color: #eaeaea; /* Texto en color claro */
-            }
-
-                body.dark .btn:hover {
-                    background-color: #5a5a5a; /* Cambio en el fondo de botones al pasar el ratón */
-                }
-
-            /* Ajuste para el texto en los formularios */
-            body.dark input, body.dark textarea {
-                background-color: #3b3b3b; /* Fondo de campos de texto más oscuro */
-                color: #eaeaea; /* Texto claro en los campos */
-                border: 1px solid #555555; /* Borde oscuro en campos */
-            }
-
-                body.dark input:focus, body.dark textarea:focus {
-                    border-color: #4f9cff; /* Borde azul claro en campos al hacer focus */
-                }
     </style>
 </head>
-<body class="@ViewBag.Theme">
-    <!-- Aplicar el tema basado en el valor de ViewBag.Theme -->
+<body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -139,6 +96,11 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="Playlists" asp-action="Index">
                                     <i class="fas fa-list"></i> Playlists
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="ArtistStatistics" asp-action="Index">
+                                    <i class="fas fa-chart-line"></i> Estadísticas Artista
                                 </a>
                             </li>
                         }

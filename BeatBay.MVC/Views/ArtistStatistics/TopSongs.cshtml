@@ -1,0 +1,52 @@
+﻿@model List<BeatBay.DTOs.SongStatsDto>
+
+@{
+    ViewData["Title"] = "Top 20 Canciones";
+}
+
+<h2>Top 20 Canciones</h2>
+
+<div class="mb-3">
+    <a href="@Url.Action("Index")" class="btn btn-secondary">Volver a Estadísticas</a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Título</th>
+                    <th>Reproducciones</th>
+                    <th>Tiempo Total Reproducido</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int position = 1;
+                }
+                @foreach (var song in Model)
+                {
+                    <tr>
+                        <td>@position</td>
+                        <td>@song.Title</td>
+                        <td>@song.PlayCount</td>
+                        <td>@(TimeSpan.FromSeconds(song.TotalDurationPlayed).ToString(@"hh\:mm\:ss"))</td>
+                        <td>
+                            <a href="@Url.Action("SongDetails", new { id = song.SongId })" class="btn btn-sm btn-primary">Ver Detalles</a>
+                        </td>
+                    </tr>
+                    position++;
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        No tienes canciones aún. <a href="@Url.Action("Create", "Songs")">Crea tu primera canción</a>
+    </div>
+}

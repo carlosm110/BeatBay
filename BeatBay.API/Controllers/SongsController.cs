@@ -32,22 +32,9 @@ namespace BeatBay.API.Controllers
             _context = context;
             _blobSettings = blobSettings.Value;
             _userManager = userManager;
-
-            // Crear BlobContainerClient usando la configuración del JSON
             _blobContainerClient = new BlobContainerClient(new Uri(_blobSettings.ContainerUrl));
         }
 
-        // Método helper para verificar roles usando Identity
-        private async Task<bool> IsUserInRoleAsync(int userId, string role)
-        {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null || !user.IsActive)
-                return false;
-
-            return await _userManager.IsInRoleAsync(user, role);
-        }
-
-        // Método helper para obtener el usuario actual
         private async Task<User?> GetCurrentUserAsync()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -57,16 +44,22 @@ namespace BeatBay.API.Controllers
             return await _userManager.FindByIdAsync(userId.ToString());
         }
 
-        // GET: api/songs?isActive=true
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<SongDto>>> GetSongs([FromQuery] bool? isActive = null)
+        private async Task<bool> IsUserInRoleAsync(int userId, string role)
         {
-            var query = _context.Songs.Include(s => s.Artist).AsQueryable();
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null || !user.IsActive)
+                return false;
 
-            if (isActive.HasValue)
-                query = query.Where(s => s.IsActive == isActive.Value);
+            return await _userManager.IsInRoleAsync(user, role);
+        }
 
-            var songs = await query
+        // GET: api/songs
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<SongDto>>> GetSongs()
+        {
+            var songs = await _context.Songs
+                .Include(s => s.Artist)
+                .Where(s => s.IsActive)
                 .Select(s => new SongDto
                 {
                     Id = s.Id,
@@ -78,7 +71,9 @@ namespace BeatBay.API.Controllers
                     ArtistName = s.Artist.Name ?? s.Artist.UserName,
                     IsActive = s.IsActive,
                     UploadedAt = s.UploadedAt,
-                    PlayCount = s.PlaybackStatistics.Sum(ps => ps.PlayCount)
+                    PlayCount = _context.PlaybackStatistics
+                        .Where(ps => ps.EntityType == EntityType.Song && ps.EntityId == s.Id)
+                        .Sum(ps => ps.PlayCount)
                 })
                 .ToListAsync();
 
@@ -91,7 +86,6 @@ namespace BeatBay.API.Controllers
         {
             var song = await _context.Songs
                 .Include(s => s.Artist)
-                .Include(s => s.PlaybackStatistics)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (song == null)
@@ -108,7 +102,9 @@ namespace BeatBay.API.Controllers
                 ArtistName = song.Artist.Name ?? song.Artist.UserName,
                 IsActive = song.IsActive,
                 UploadedAt = song.UploadedAt,
-                PlayCount = song.PlaybackStatistics.Sum(ps => ps.PlayCount)
+                PlayCount = _context.PlaybackStatistics
+                    .Where(ps => ps.EntityType == EntityType.Song && ps.EntityId == id)
+                    .Sum(ps => ps.PlayCount)
             };
 
             return Ok(songDto);
@@ -121,41 +117,37 @@ namespace BeatBay.API.Controllers
         {
             var currentUser = await GetCurrentUserAsync();
             if (currentUser == null)
-                return Unauthorized("Usuario no encontrado.");
+                return Unauthorized();
 
-            // Verificar si el usuario es Artist o Admin usando Identity
             var isArtist = await IsUserInRoleAsync(currentUser.Id, "Artist");
             var isAdmin = await IsUserInRoleAsync(currentUser.Id, "Admin");
 
             if (!isArtist && !isAdmin)
-                return Forbid("Debes ser artista o administrador para crear canciones.");
+                return Forbid();
 
             if (audioFile == null || audioFile.Length == 0)
-                return BadRequest("No se ha seleccionado un archivo de audio.");
+                return BadRequest("Archivo de audio requerido");
 
             var allowedExtensions = new[] { ".mp3", ".wav", ".flac", ".m4a" };
             var fileExtension = Path.GetExtension(audioFile.FileName).ToLower();
 
             if (!allowedExtensions.Contains(fileExtension))
-                return BadRequest("Formato de archivo no soportado. Solo se permiten: mp3, wav, flac, m4a");
+                return BadRequest("Formato no soportado");
 
             var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
 
             try
             {
-                // Subir archivo a Azure Blob Storage
                 var blobClient = _blobContainerClient.GetBlobClient(uniqueFileName);
                 using var stream = audioFile.OpenReadStream();
                 await blobClient.UploadAsync(stream, overwrite: true);
-
-                var streamingUrl = blobClient.Uri.ToString();
 
                 var song = new Song
                 {
                     Title = dto.Title,
                     Duration = dto.Duration,
                     Genre = dto.Genre,
-                    StreamingUrl = streamingUrl,
+                    StreamingUrl = blobClient.Uri.ToString(),
                     ArtistId = currentUser.Id,
                     IsActive = true,
                     UploadedAt = DateTime.UtcNow
@@ -182,7 +174,7 @@ namespace BeatBay.API.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error al subir el archivo: {ex.Message}");
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -197,18 +189,12 @@ namespace BeatBay.API.Controllers
 
             var currentUser = await GetCurrentUserAsync();
             if (currentUser == null)
-                return Unauthorized("Usuario no encontrado.");
+                return Unauthorized();
 
             var isAdmin = await IsUserInRoleAsync(currentUser.Id, "Admin");
-            var isArtist = await IsUserInRoleAsync(currentUser.Id, "Artist");
 
-            // Verificar si el usuario tiene permisos para editar
-            if (!isArtist && !isAdmin)
-                return Forbid("Debes ser artista o administrador para editar canciones.");
-
-            // Solo el artista dueño de la canción o un admin puede editarla
             if (song.ArtistId != currentUser.Id && !isAdmin)
-                return Forbid("No tienes permisos para editar esta canción.");
+                return Forbid();
 
             if (!string.IsNullOrWhiteSpace(dto.Title))
                 song.Title = dto.Title;
@@ -219,28 +205,12 @@ namespace BeatBay.API.Controllers
             if (!string.IsNullOrWhiteSpace(dto.Genre))
                 song.Genre = dto.Genre;
 
-            if (!string.IsNullOrWhiteSpace(dto.StreamingUrl))
-                song.StreamingUrl = dto.StreamingUrl;
-
             if (dto.IsActive.HasValue)
                 song.IsActive = dto.IsActive.Value;
 
             await _context.SaveChangesAsync();
 
-            // Log si es un admin editando canción de otro usuario
-            if (isAdmin && song.ArtistId != currentUser.Id)
-            {
-                var log = new AdminActionLog
-                {
-                    AdminUserId = currentUser.Id,
-                    ActionType = "Edit Song",
-                    Description = $"Edited song: {song.Title} (ID: {song.Id})"
-                };
-                _context.AdminActionLogs.Add(log);
-                await _context.SaveChangesAsync();
-            }
-
-            return Ok(new { message = "Canción actualizada correctamente" });
+            return Ok();
         }
 
         // DELETE: api/songs/5
@@ -254,57 +224,36 @@ namespace BeatBay.API.Controllers
 
             var currentUser = await GetCurrentUserAsync();
             if (currentUser == null)
-                return Unauthorized("Usuario no encontrado.");
+                return Unauthorized();
 
             var isAdmin = await IsUserInRoleAsync(currentUser.Id, "Admin");
-            var isArtist = await IsUserInRoleAsync(currentUser.Id, "Artist");
 
-            // Verificar si el usuario tiene permisos para eliminar
-            if (!isArtist && !isAdmin)
-                return Forbid("Debes ser artista o administrador para eliminar canciones.");
-
-            // Solo el artista dueño de la canción o un admin puede eliminarla
             if (song.ArtistId != currentUser.Id && !isAdmin)
-                return Forbid("No tienes permisos para eliminar esta canción.");
+                return Forbid();
 
             song.IsActive = false;
             await _context.SaveChangesAsync();
 
-            // Log si es un admin eliminando canción de otro usuario
-            if (isAdmin && song.ArtistId != currentUser.Id)
-            {
-                var log = new AdminActionLog
-                {
-                    AdminUserId = currentUser.Id,
-                    ActionType = "Delete Song",
-                    Description = $"Deactivated song: {song.Title} (ID: {song.Id})"
-                };
-                _context.AdminActionLogs.Add(log);
-                await _context.SaveChangesAsync();
-            }
-
-            return Ok(new { message = "Canción desactivada correctamente" });
+            return Ok();
         }
 
-        // GET: api/songs/my-songs (Para artistas ver sus propias canciones)
+        // GET: api/songs/my-songs
         [HttpGet("my-songs")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<SongDto>>> GetMySongs()
         {
             var currentUser = await GetCurrentUserAsync();
             if (currentUser == null)
-                return Unauthorized("Usuario no encontrado.");
+                return Unauthorized();
 
-            // Verificar si el usuario es Artist o Admin usando Identity
             var isArtist = await IsUserInRoleAsync(currentUser.Id, "Artist");
             var isAdmin = await IsUserInRoleAsync(currentUser.Id, "Admin");
 
             if (!isArtist && !isAdmin)
-                return Forbid("Debes ser artista o administrador para ver tus canciones.");
+                return Forbid();
 
             var songs = await _context.Songs
                 .Include(s => s.Artist)
-                .Include(s => s.PlaybackStatistics)
                 .Where(s => s.ArtistId == currentUser.Id)
                 .Select(s => new SongDto
                 {
@@ -317,24 +266,77 @@ namespace BeatBay.API.Controllers
                     ArtistName = s.Artist.Name ?? s.Artist.UserName,
                     IsActive = s.IsActive,
                     UploadedAt = s.UploadedAt,
-                    PlayCount = s.PlaybackStatistics.Sum(ps => ps.PlayCount)
+                    PlayCount = _context.PlaybackStatistics
+                        .Where(ps => ps.EntityType == EntityType.Song && ps.EntityId == s.Id)
+                        .Sum(ps => ps.PlayCount)
                 })
                 .ToListAsync();
 
             return Ok(songs);
         }
 
-        // GET: api/songs/user-roles (Para que el MVC pueda obtener los roles del usuario)
-        [HttpGet("user-roles")]
+        // POST: api/songs/5/play
+        [HttpPost("{id}/play")]
         [Authorize]
-        public async Task<ActionResult<List<string>>> GetUserRoles()
+        public async Task<IActionResult> RecordPlay(int id, [FromBody] RecordPlayRequest request)
         {
+            var song = await _context.Songs.FindAsync(id);
+            if (song == null)
+                return NotFound();
+
             var currentUser = await GetCurrentUserAsync();
             if (currentUser == null)
-                return Unauthorized("Usuario no encontrado.");
+                return Unauthorized();
 
-            var roles = await _userManager.GetRolesAsync(currentUser);
-            return Ok(roles.ToList());
+            if (request.DurationPlayedSeconds <= 0)
+                return BadRequest("La duración reproducida debe ser mayor a 0");
+
+            var today = DateTime.UtcNow.Date;
+            var stat = await _context.PlaybackStatistics
+                .FirstOrDefaultAsync(ps =>
+                    ps.EntityType == EntityType.Song &&
+                    ps.EntityId == id &&
+                    ps.UserId == currentUser.Id &&
+                    ps.PlaybackDate.Date == today);
+
+            if (stat == null)
+            {
+                // Nuevo registro
+                int playCount = request.DurationPlayedSeconds >= 30 ? request.DurationPlayedSeconds / 30 : 0;
+                stat = new PlaybackStatistic
+                {
+                    EntityType = EntityType.Song,
+                    EntityId = id,
+                    SongId = id,
+                    UserId = currentUser.Id,
+                    PlaybackDate = DateTime.UtcNow,
+                    DurationPlayedSeconds = request.DurationPlayedSeconds,
+                    PlayCount = playCount
+                };
+                _context.PlaybackStatistics.Add(stat);
+            }
+            else
+            {
+                // Actualizar registro existente
+                int prevDuration = stat.DurationPlayedSeconds;
+                stat.DurationPlayedSeconds += request.DurationPlayedSeconds;
+                stat.PlaybackDate = DateTime.UtcNow;
+
+                // Calcular cuántos múltiplos de 30 segundos se cruzaron en total
+                int prevPlays = prevDuration / 30;
+                int newPlays = stat.DurationPlayedSeconds / 30;
+                stat.PlayCount += (newPlays - prevPlays);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Reproducción registrada exitosamente" });
         }
-    }
+
+        // Clase para el request
+        public class RecordPlayRequest
+        {
+            public int DurationPlayedSeconds { get; set; }
+        }
+    } 
 }

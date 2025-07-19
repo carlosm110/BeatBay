@@ -137,6 +137,44 @@ namespace BeatBay.API.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BeatBay.Model.PlanSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AmountPaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PlanId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlanId");
+
+                    b.HasIndex("UserId", "IsActive");
+
+                    b.ToTable("PlanSubscriptions");
+                });
+
             modelBuilder.Entity("BeatBay.Model.PlaybackStatistic", b =>
                 {
                     b.Property<int>("Id")
@@ -387,6 +425,36 @@ namespace BeatBay.API.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("BeatBay.Model.UserConnection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ChildUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("ConnectedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ParentSubscriptionId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChildUserId");
+
+                    b.HasIndex("ParentSubscriptionId", "ChildUserId")
+                        .IsUnique();
+
+                    b.ToTable("UserConnections");
+                });
+
             modelBuilder.Entity("BeatBay.Model.UserRole", b =>
                 {
                     b.Property<int>("UserId")
@@ -520,6 +588,25 @@ namespace BeatBay.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BeatBay.Model.PlanSubscription", b =>
+                {
+                    b.HasOne("BeatBay.Model.Plan", "Plan")
+                        .WithMany()
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BeatBay.Model.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BeatBay.Model.PlaybackStatistic", b =>
                 {
                     b.HasOne("BeatBay.Model.Song", "Song")
@@ -588,6 +675,25 @@ namespace BeatBay.API.Migrations
                     b.Navigation("Plan");
                 });
 
+            modelBuilder.Entity("BeatBay.Model.UserConnection", b =>
+                {
+                    b.HasOne("BeatBay.Model.User", "ChildUser")
+                        .WithMany()
+                        .HasForeignKey("ChildUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BeatBay.Model.PlanSubscription", "ParentSubscription")
+                        .WithMany("UserConnections")
+                        .HasForeignKey("ParentSubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChildUser");
+
+                    b.Navigation("ParentSubscription");
+                });
+
             modelBuilder.Entity("BeatBay.Model.UserRole", b =>
                 {
                     b.HasOne("BeatBay.Model.Role", "Role")
@@ -648,6 +754,11 @@ namespace BeatBay.API.Migrations
                     b.Navigation("Payments");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("BeatBay.Model.PlanSubscription", b =>
+                {
+                    b.Navigation("UserConnections");
                 });
 
             modelBuilder.Entity("BeatBay.Model.Playlist", b =>

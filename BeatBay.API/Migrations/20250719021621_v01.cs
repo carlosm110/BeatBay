@@ -239,6 +239,37 @@ namespace BeatBay.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PlanSubscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    PlanId = table.Column<int>(type: "integer", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    AmountPaid = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PlanSubscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PlanSubscriptions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PlanSubscriptions_Plans_PlanId",
+                        column: x => x.PlanId,
+                        principalTable: "Plans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Playlists",
                 columns: table => new
                 {
@@ -279,6 +310,34 @@ namespace BeatBay.API.Migrations
                         name: "FK_Songs_AspNetUsers_ArtistId",
                         column: x => x.ArtistId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserConnections",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ParentSubscriptionId = table.Column<int>(type: "integer", nullable: false),
+                    ChildUserId = table.Column<int>(type: "integer", nullable: false),
+                    ConnectedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserConnections", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserConnections_AspNetUsers_ChildUserId",
+                        column: x => x.ChildUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserConnections_PlanSubscriptions_ParentSubscriptionId",
+                        column: x => x.ParentSubscriptionId,
+                        principalTable: "PlanSubscriptions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -417,6 +476,16 @@ namespace BeatBay.API.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PlanSubscriptions_PlanId",
+                table: "PlanSubscriptions",
+                column: "PlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanSubscriptions_UserId_IsActive",
+                table: "PlanSubscriptions",
+                columns: new[] { "UserId", "IsActive" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PlaybackStatistics_SongId",
                 table: "PlaybackStatistics",
                 column: "SongId");
@@ -440,6 +509,17 @@ namespace BeatBay.API.Migrations
                 name: "IX_Songs_ArtistId",
                 table: "Songs",
                 column: "ArtistId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserConnections_ChildUserId",
+                table: "UserConnections",
+                column: "ChildUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserConnections_ParentSubscriptionId_ChildUserId",
+                table: "UserConnections",
+                columns: new[] { "ParentSubscriptionId", "ChildUserId" },
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -473,6 +553,9 @@ namespace BeatBay.API.Migrations
                 name: "PlaylistSongs");
 
             migrationBuilder.DropTable(
+                name: "UserConnections");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -480,6 +563,9 @@ namespace BeatBay.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Songs");
+
+            migrationBuilder.DropTable(
+                name: "PlanSubscriptions");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

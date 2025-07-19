@@ -1,0 +1,45 @@
+﻿@model List<BeatBay.DTOs.PlaybackStatisticDto>
+
+@{
+    ViewData["Title"] = "Detalles de la Canción";
+}
+
+<h2>Detalles de Reproducciones</h2>
+<h4>@ViewBag.SongTitle</h4>
+
+<div class="mb-3">
+    <a href="@Url.Action("Index")" class="btn btn-secondary">Volver a Estadísticas</a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Fecha</th>
+                    <th>Reproducciones</th>
+                    <th>Duración Reproducida</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var stat in Model)
+                {
+                    <tr>
+                        <td>@stat.UserName</td>
+                        <td>@stat.PlaybackDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@stat.PlayCount</td>
+                        <td>@(TimeSpan.FromSeconds(stat.DurationPlayedSeconds).ToString(@"mm\:ss"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        Esta canción no tiene reproducciones aún.
+    </div>
+}

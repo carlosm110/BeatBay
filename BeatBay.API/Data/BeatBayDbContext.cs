@@ -22,7 +22,8 @@ namespace BeatBay.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<PlaybackStatistic> PlaybackStatistics { get; set; }
         public DbSet<AdminActionLog> AdminActionLogs { get; set; }
-
+        public DbSet<PlanSubscription> PlanSubscriptions { get; set; }
+        public DbSet<UserConnection> UserConnections { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -105,6 +106,41 @@ namespace BeatBay.Data
                 .HasOne(ur => ur.Role)
                 .WithMany(r => r.UserRoles)
                 .HasForeignKey(ur => ur.RoleId);
+
+            // Configuración de PlanSubscription
+            builder.Entity<PlanSubscription>()
+                .HasOne(ps => ps.User)
+                .WithMany()
+                .HasForeignKey(ps => ps.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PlanSubscription>()
+                .HasOne(ps => ps.Plan)
+                .WithMany()
+                .HasForeignKey(ps => ps.PlanId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configuración de UserConnection
+            builder.Entity<UserConnection>()
+                .HasOne(uc => uc.ParentSubscription)
+                .WithMany(ps => ps.UserConnections)
+                .HasForeignKey(uc => uc.ParentSubscriptionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<UserConnection>()
+                .HasOne(uc => uc.ChildUser)
+                .WithMany()
+                .HasForeignKey(uc => uc.ChildUserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Índice único para evitar duplicados
+            builder.Entity<UserConnection>()
+                .HasIndex(uc => new { uc.ParentSubscriptionId, uc.ChildUserId })
+                .IsUnique();
+
+            // Índice para buscar suscripciones activas
+            builder.Entity<PlanSubscription>()
+                .HasIndex(ps => new { ps.UserId, ps.IsActive });
 
             // Datos iniciales
             SeedData(builder);

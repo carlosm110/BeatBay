@@ -1,0 +1,51 @@
+﻿@model BeatBay.DTOs.PlaylistDto
+@{
+    ViewData["Title"] = "Eliminar Playlist";
+}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-trash"></i> Eliminar Playlist
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>¿Estás seguro?</strong> Esta acción no se puede deshacer.
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Playlist:</strong> @Model.Name
+                    </div>
+                    <div class="mb-3">
+                        <strong>Creada por:</strong> @Model.UserName
+                    </div>
+                    <div class="mb-3">
+                        <strong>Canciones:</strong> @Model.Songs.Count
+                    </div>
+                    
+                    <p class="text-muted">
+                        Al eliminar esta playlist, se removerán todas las canciones asociadas. 
+                        Las canciones originales no se verán afectadas.
+                    </p>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="MyPlaylists" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                        <!-- CORRECCIÓN: Cambiar asp-action a "DeleteConfirmed" -->
+                        <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post" style="display: inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Eliminar Playlist
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

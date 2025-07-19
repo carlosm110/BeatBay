@@ -1,0 +1,199 @@
+﻿@model BeatBay.DTOs.PlaylistDto
+
+@{
+    ViewData["Title"] = "Detalles de Playlist";
+    var availableSongs = ViewBag.AvailableSongs as List<BeatBay.DTOs.SongDto> ?? new List<BeatBay.DTOs.SongDto>();
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>@Model.Name</h2>
+                    <p class="text-muted mb-0">Por: @Model.UserName | @Model.Songs.Count canción(es)</p>
+                </div>
+                <div>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @ViewBag.Error
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <!-- Sección para agregar canciones -->
+            @if (availableSongs.Any())
+            {
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus"></i> Agregar Canción
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="AddSong" asp-route-id="@Model.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <select name="SongId" class="form-select" required>
+                                        <option value="">Selecciona una canción...</option>
+                                        @foreach (var song in availableSongs)
+                                        {
+                                            <option value="@song.Id">@song.Title - @song.ArtistName (@song.Duration)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus"></i> Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+
+            <!-- Lista de canciones en la playlist -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-music"></i> Canciones en la Playlist
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Songs.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Título</th>
+                                        <th>Artista</th>
+                                        <th>Duración</th>
+                                        <th>Género</th>
+                                        <th>Reproducciones</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Songs.Count; i++)
+                                    {
+                                        var song = Model.Songs[i];
+                                        <tr>
+                                            <td>@(i + 1)</td>
+                                            <td>
+                                                <strong>@song.Title</strong>
+                                                @if (!song.IsActive)
+                                                {
+                                                    <span class="badge bg-warning ms-2">Inactiva</span>
+                                                }
+                                            </td>
+                                            <td>@song.ArtistName</td>
+                                            <td>@song.Duration</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(song.Genre))
+                                                {
+                                                    <span class="badge bg-secondary">@song.Genre</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>@song.PlayCount</td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                   @if (song.IsActive)
+{
+    <audio controls style="max-width: 150px;">
+        <source src="@song.StreamingUrl" type="audio/mpeg">
+        Tu navegador no soporta la reproducción de audio.
+    </audio>
+}
+
+                                                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#removeSongModal-@song.Id"
+                                                            title="Remover de playlist">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Modal para confirmar eliminación de canción -->
+                                        <div class="modal fade" id="removeSongModal-@song.Id" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Remover Canción</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        ¿Estás seguro de que deseas remover "<strong>@song.Title</strong>" de esta playlist?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <form asp-action="RemoveSong" asp-route-id="@Model.Id" asp-route-songId="@song.Id" method="post" style="display: inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-danger">Remover</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-music fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Esta playlist está vacía</h5>
+                            <p class="text-muted">Agrega algunas canciones para comenzar a disfrutar tu música.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-ocultar alertas después de 5 segundos
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+}
