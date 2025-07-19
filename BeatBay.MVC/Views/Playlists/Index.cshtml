@@ -4,113 +4,179 @@
     ViewData["Title"] = "Playlists";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>@ViewData["Title"]</h2>
-                <div>
-                    <a asp-action="Create" class="btn btn-primary me-2">
-                        <i class="fas fa-plus"></i> Nueva Playlist
-                    </a>
-                    <a asp-action="MyPlaylists" class="btn btn-outline-secondary">
-                        <i class="fas fa-user"></i> Mis Playlists
-                    </a>
-                </div>
+<div class="playlists-container" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: white;">
+    <div class="container-fluid py-4">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h1 class="fw-bold" style="color: white;">@ViewData["Title"]</h1>
+            <div>
+                <a asp-action="Create" class="btn btn-primary me-2" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 20px; padding: 8px 20px;">
+                    <i class="fas fa-plus me-1"></i> Nueva Playlist
+                </a>
+                <a asp-action="MyPlaylists" class="btn btn-outline-light" style="border-radius: 20px; padding: 8px 20px;">
+                    <i class="fas fa-user me-1"></i> Mis Playlists
+                </a>
             </div>
-
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @ViewBag.Error
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
-
-            @if (Model.Any())
-            {
-                <div class="row">
-                    @foreach (var playlist in Model)
-                    {
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">@playlist.Name</h5>
-                                    <p class="card-text">
-                                        <small class="text-muted">
-                                            Por: @playlist.UserName<br>
-                                            Canciones: @playlist.Songs.Count
-                                        </small>
-                                    </p>
-                                </div>
-                                <div class="card-footer bg-transparent">
-                                    <div class="btn-group w-100" role="group">
-                                        <a asp-action="Details" asp-route-id="@playlist.Id" class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-eye"></i> Ver
-                                        </a>
-                                        <a asp-action="Edit" asp-route-id="@playlist.Id" class="btn btn-outline-warning btn-sm">
-                                            <i class="fas fa-edit"></i> Editar
-                                        </a>
-                                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@playlist.Id">
-                                            <i class="fas fa-trash"></i> Eliminar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Modal de confirmación de eliminación -->
-                        <div class="modal fade" id="deleteModal-@playlist.Id" tabindex="-1">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Confirmar Eliminación</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        ¿Estás seguro de que deseas eliminar la playlist "<strong>@playlist.Name</strong>"?
-                                        <br><small class="text-muted">Esta acción no se puede deshacer.</small>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                        <form asp-action="Delete" asp-route-id="@playlist.Id" method="post" style="display: inline;">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="text-center py-5">
-                    <i class="fas fa-music fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">No hay playlists disponibles</h4>
-                    <p class="text-muted">¡Crea tu primera playlist para comenzar!</p>
-                    <a asp-action="Create" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Crear Primera Playlist
-                    </a>
-                </div>
-            }
         </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; background: rgba(239, 68, 68, 0.2); border: none;">
+                @ViewBag.Error
+                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+            </div>
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px; background: rgba(16, 185, 129, 0.2); border: none;">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; background: rgba(239, 68, 68, 0.2); border: none;">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+            </div>
+        }
+
+        @if (Model.Any())
+        {
+            <div class="row">
+                @foreach (var playlist in Model)
+                {
+                    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                        <div class="playlist-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden; transition: all 0.3s ease; cursor: pointer; height: 100%;">
+                            <div class="position-relative">
+                                <div class="playlist-image" style="height: 200px; background: linear-gradient(135deg, @GetRandomGradient()); display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-music" style="font-size: 3rem; color: rgba(255, 255, 255, 0.2);"></i>
+                                </div>
+                                <button class="play-button btn btn-success rounded-circle position-absolute" style="width: 50px; height: 50px; bottom: -25px; right: 20px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                            </div>
+                            <div class="p-3 pt-4">
+                                <h5 class="mb-1" style="font-weight: 600;">@playlist.Name</h5>
+                                <p class="text-muted mb-2" style="font-size: 0.85rem;">
+                                    Por: @playlist.UserName • @playlist.Songs.Count canciones
+                                </p>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <a asp-action="Details" asp-route-id="@playlist.Id" class="btn btn-sm btn-outline-light" style="border-radius: 15px;">
+                                        <i class="fas fa-eye me-1"></i> Ver
+                                    </a>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light rounded-circle" style="width: 32px; height: 32px;" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" style="background: #2d3748; border: none;">
+                                            <li><a class="dropdown-item text-white" asp-action="Edit" asp-route-id="@playlist.Id"><i class="fas fa-edit me-2"></i>Editar</a></li>
+                                            <li><hr class="dropdown-divider" style="border-color: #4a5568;"></li>
+                                            <li><button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@playlist.Id"><i class="fas fa-trash me-2"></i>Eliminar</button></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal de confirmación de eliminación -->
+                    <div class="modal fade" id="deleteModal-@playlist.Id" tabindex="-1" style="background: rgba(0, 0, 0, 0.7);">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" style="background: #1a1a2e; border: none;">
+                                <div class="modal-header" style="border-bottom: 1px solid #2d3748;">
+                                    <h5 class="modal-title" style="color: white;">Confirmar Eliminación</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(1);"></button>
+                                </div>
+                                <div class="modal-body" style="color: #a0aec0;">
+                                    ¿Estás seguro de que deseas eliminar la playlist "<strong style="color: white;">@playlist.Name</strong>"?
+                                    <br><small>Esta acción no se puede deshacer.</small>
+                                </div>
+                                <div class="modal-footer" style="border-top: 1px solid #2d3748;">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 20px; background: #2d3748; border: none;">Cancelar</button>
+                                    <form asp-action="Delete" asp-route-id="@playlist.Id" method="post" style="display: inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-danger" style="border-radius: 20px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none;">Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5" style="margin-top: 100px;">
+                <div class="empty-state-icon" style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-music fa-3x" style="color: rgba(255, 255, 255, 0.2);"></i>
+                </div>
+                <h4 class="mb-3" style="color: white;">No hay playlists disponibles</h4>
+                <p class="text-muted mb-4">¡Crea tu primera playlist para comenzar!</p>
+                <a asp-action="Create" class="btn btn-primary" style="border-radius: 20px; padding: 8px 25px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none;">
+                    <i class="fas fa-plus me-2"></i> Crear Primera Playlist
+                </a>
+            </div>
+        }
     </div>
 </div>
+
+@functions {
+    private string GetRandomGradient()
+    {
+        var gradients = new List<string>
+        {
+            "#6366f1, #8b5cf6",
+            "#10b981, #059669",
+            "#f59e0b, #d97706",
+            "#ef4444, #dc2626",
+            "#3b82f6, #2563eb",
+            "#8b5cf6, #7c3aed"
+        };
+        
+        var random = new Random();
+        return gradients[random.Next(gradients.Count)];
+    }
+}
+
+<style>
+    .playlist-card:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .play-button {
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
+    
+    .playlist-card:hover .play-button {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .dropdown-menu {
+        border-radius: 10px !important;
+        padding: 0.5rem 0;
+    }
+    
+    .dropdown-item {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .dropdown-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn-outline-light {
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+</style>

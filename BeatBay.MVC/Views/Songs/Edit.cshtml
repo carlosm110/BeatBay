@@ -3,44 +3,115 @@
     ViewData["Title"] = "Editar Canción";
 }
 
-<h2>Editar Canción: @ViewBag.SongTitle</h2>
+<div class="edit-song-container" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: white; padding-top: 2rem;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Tarjeta de edición -->
+                <div class="song-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+                    <!-- Header con icono y título -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="song-icon" style="width: 60px; height: 60px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                            <i class="fas fa-music" style="color: white; font-size: 1.5rem;"></i>
+                        </div>
+                        <div>
+                            <h2 style="font-weight: 700; color: white; margin-bottom: 0.25rem;">@ViewData["Title"]</h2>
+                            <p style="color: #a0aec0; margin-bottom: 0;">@ViewBag.SongTitle</p>
+                        </div>
+                    </div>
 
-@if (ViewBag.Error != null)
-{
-    <div class="alert alert-danger">@ViewBag.Error</div>
-}
+                    <!-- Alertas -->
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger mb-4" style="border-radius: 10px; background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5;">
+                            <i class="fas fa-exclamation-circle me-2"></i> @ViewBag.Error
+                        </div>
+                    }
 
-<form asp-action="Edit" asp-route-id="@ViewBag.SongId" method="post">
-    <div class="form-group">
-        <label asp-for="Title">Título</label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+                    <!-- Formulario de edición -->
+                    <form asp-action="Edit" asp-route-id="@ViewBag.SongId" method="post">
+                        <div class="mb-4">
+                            <label asp-for="Title" style="font-weight: 600; color: #a0aec0; margin-bottom: 0.5rem; display: block;">TÍTULO</label>
+                            <input asp-for="Title" class="form-control bg-transparent text-white"
+                                   style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; height: 50px;" />
+                            <span asp-validation-for="Title" class="text-danger small mt-1"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Duration" style="font-weight: 600; color: #a0aec0; margin-bottom: 0.5rem; display: block;">DURACIÓN</label>
+                            <input asp-for="Duration" class="form-control bg-transparent text-white"
+                                   style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; height: 50px;" type="time" step="1" />
+                            <span asp-validation-for="Duration" class="text-danger small mt-1"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Genre" style="font-weight: 600; color: #a0aec0; margin-bottom: 0.5rem; display: block;">GÉNERO</label>
+                            <input asp-for="Genre" class="form-control bg-transparent text-white"
+                                   style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; height: 50px;" />
+                            <span asp-validation-for="Genre" class="text-danger small mt-1"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="IsActive" style="font-weight: 600; color: #a0aec0; margin-bottom: 0.5rem; display: block;">ESTADO</label>
+                            <select asp-for="IsActive" class="form-select bg-transparent text-white"
+                                    style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; height: 50px;">
+                                <option value="true" style="background: #1a1a2e;">Activa</option>
+                                <option value="false" style="background: #1a1a2e;">Inactiva</option>
+                            </select>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-end mt-5">
+                            <a asp-action="Details" asp-route-id="@ViewBag.SongId" class="btn btn-outline-light me-3" style="border-radius: 25px; padding: 10px 25px; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                <i class="fas fa-times me-2"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success" style="border-radius: 25px; padding: 10px 25px; background: linear-gradient(135deg, #10b981, #059669); border: none;">
+                                <i class="fas fa-save me-2"></i> Actualizar Canción
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Duration">Duración</label>
-        <input asp-for="Duration" class="form-control" type="time" step="1" />
-        <span asp-validation-for="Duration" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Genre">Género</label>
-        <input asp-for="Genre" class="form-control" />
-        <span asp-validation-for="Genre" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="IsActive">Estado</label>
-        <select asp-for="IsActive" class="form-control">
-            <option value="true">Activa</option>
-            <option value="false">Inactiva</option>
-        </select>
-    </div>
-
-    <button type="submit" class="btn btn-success">Actualizar Canción</button>
-    <a asp-action="Details" asp-route-id="@ViewBag.SongId" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+<style>
+    .edit-song-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .form-control, .form-select {
+        color: white !important;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25) !important;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #0f9e78, #047857) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .song-icon {
+        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+    }
+</style>

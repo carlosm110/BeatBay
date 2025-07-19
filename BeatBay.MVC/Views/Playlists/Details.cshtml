@@ -5,189 +5,262 @@
     var availableSongs = ViewBag.AvailableSongs as List<BeatBay.DTOs.SongDto> ?? new List<BeatBay.DTOs.SongDto>();
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2>@Model.Name</h2>
-                    <p class="text-muted mb-0">Por: @Model.UserName | @Model.Songs.Count canción(es)</p>
-                </div>
-                <div>
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">
-                        <i class="fas fa-edit"></i> Editar
-                    </a>
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Volver
-                    </a>
-                </div>
+<div class="playlist-detail-container" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: white;">
+    <div class="container-fluid py-4">
+        <!-- Header con información de la playlist -->
+        <div class="d-flex justify-content-between align-items-center mb-4 px-3">
+            <div>
+                <h1 class="fw-bold mb-1" style="font-size: 2.5rem;">@Model.Name</h1>
+                <p class="text-muted mb-0" style="font-size: 0.9rem;">Por: @Model.UserName | @Model.Songs.Count canción(es)</p>
             </div>
+            <div class="d-flex">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2" style="border-radius: 20px; padding: 8px 20px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none;">
+                    <i class="fas fa-edit me-1"></i> Editar
+                </a>
+                <a asp-action="Index" class="btn btn-outline-light" style="border-radius: 20px; padding: 8px 20px;">
+                    <i class="fas fa-arrow-left me-1"></i> Volver
+                </a>
+            </div>
+        </div>
 
-            @if (ViewBag.Error != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @ViewBag.Error
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
+        <!-- Alertas -->
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mx-3" role="alert" style="border-radius: 10px; background: rgba(239, 68, 68, 0.2); border: none;">
+                <i class="fas fa-exclamation-circle me-2"></i> @ViewBag.Error
+                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+            </div>
+        }
 
-            @if (TempData["Success"] != null)
-            {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    @TempData["Success"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mx-3" role="alert" style="border-radius: 10px; background: rgba(16, 185, 129, 0.2); border: none;">
+                <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+            </div>
+        }
 
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    @TempData["Error"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show mx-3" role="alert" style="border-radius: 10px; background: rgba(239, 68, 68, 0.2); border: none;">
+                <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+            </div>
+        }
 
-            <!-- Sección para agregar canciones -->
-            @if (availableSongs.Any())
-            {
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-plus"></i> Agregar Canción
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <form asp-action="AddSong" asp-route-id="@Model.Id" method="post">
-                            @Html.AntiForgeryToken()
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <select name="SongId" class="form-select" required>
-                                        <option value="">Selecciona una canción...</option>
-                                        @foreach (var song in availableSongs)
-                                        {
-                                            <option value="@song.Id">@song.Title - @song.ArtistName (@song.Duration)</option>
-                                        }
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <button type="submit" class="btn btn-primary w-100">
-                                        <i class="fas fa-plus"></i> Agregar
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            }
-
-            <!-- Lista de canciones en la playlist -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-music"></i> Canciones en la Playlist
+        <!-- Sección para agregar canciones -->
+        @if (availableSongs.Any())
+        {
+            <div class="card mb-4 mx-3" style="background: rgba(255, 255, 255, 0.05); border: none; border-radius: 10px;">
+                <div class="card-header" style="background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                    <h5 class="mb-0" style="font-weight: 600;">
+                        <i class="fas fa-plus me-2"></i> Agregar Canción
                     </h5>
                 </div>
                 <div class="card-body">
-                    @if (Model.Songs.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Título</th>
-                                        <th>Artista</th>
-                                        <th>Duración</th>
-                                        <th>Género</th>
-                                        <th>Reproducciones</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (int i = 0; i < Model.Songs.Count; i++)
+                    <form asp-action="AddSong" asp-route-id="@Model.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="row g-2">
+                            <div class="col-md-8">
+                                <select name="SongId" class="form-select bg-dark text-white" style="border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; height: 45px;" required>
+                                    <option value="">Selecciona una canción...</option>
+                                    @foreach (var song in availableSongs)
                                     {
-                                        var song = Model.Songs[i];
-                                        <tr>
-                                            <td>@(i + 1)</td>
-                                            <td>
-                                                <strong>@song.Title</strong>
-                                                @if (!song.IsActive)
-                                                {
-                                                    <span class="badge bg-warning ms-2">Inactiva</span>
-                                                }
-                                            </td>
-                                            <td>@song.ArtistName</td>
-                                            <td>@song.Duration</td>
-                                            <td>
-                                                @if (!string.IsNullOrEmpty(song.Genre))
-                                                {
-                                                    <span class="badge bg-secondary">@song.Genre</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-muted">-</span>
-                                                }
-                                            </td>
-                                            <td>@song.PlayCount</td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                   @if (song.IsActive)
-{
-    <audio controls style="max-width: 150px;">
-        <source src="@song.StreamingUrl" type="audio/mpeg">
-        Tu navegador no soporta la reproducción de audio.
-    </audio>
-}
+                                        <option value="@song.Id">@song.Title - @song.ArtistName (@song.Duration)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary w-100 h-100" style="border-radius: 10px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none;">
+                                    <i class="fas fa-plus me-1"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
 
-                                                    <button type="button" class="btn btn-outline-danger btn-sm" 
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#removeSongModal-@song.Id"
-                                                            title="Remover de playlist">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
+        <!-- Lista de canciones en la playlist -->
+        <div class="card mx-3" style="background: rgba(255, 255, 255, 0.05); border: none; border-radius: 10px;">
+            <div class="card-header" style="background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                <h5 class="mb-0" style="font-weight: 600;">
+                    <i class="fas fa-music me-2"></i> Canciones en la Playlist
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.Songs.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0" style="background: transparent; border-collapse: separate; border-spacing: 0;">
+                            <thead style="background: rgba(255, 255, 255, 0.05);">
+                                <tr>
+                                    <th style="border: none; padding: 15px; color: #a0aec0; font-weight: 500; border-top-left-radius: 10px;">#</th>
+                                    <th style="border: none; padding: 15px; color: #a0aec0; font-weight: 500;">Título</th>
+                                    <th style="border: none; padding: 15px; color: #a0aec0; font-weight: 500;">Artista</th>
+                                    <th style="border: none; padding: 15px; color: #a0aec0; font-weight: 500;">Duración</th>
+                                    <th style="border: none; padding: 15px; color: #a0aec0; font-weight: 500;">Género</th>
+                                    <th style="border: none; padding: 15px; color: #a0aec0; font-weight: 500;">Reproducciones</th>
+                                    <th style="border: none; padding: 15px; color: #a0aec0; font-weight: 500; border-top-right-radius: 10px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Songs.Count; i++)
+                                {
+                                    var song = Model.Songs[i];
+                                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                                        <td style="border: none; padding: 15px; vertical-align: middle;">@(i + 1)</td>
+                                        <td style="border: none; padding: 15px; vertical-align: middle;">
+                                            <div class="d-flex align-items-center">
+                                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, @GetRandomGradient()); border-radius: 5px; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                                                    <i class="fas fa-music" style="color: rgba(255, 255, 255, 0.3);"></i>
                                                 </div>
-                                            </td>
-                                        </tr>
+                                                <div>
+                                                    <strong style="display: block;">@song.Title</strong>
+                                                    @if (!song.IsActive)
+                                                    {
+                                                        <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; font-size: 0.7rem; font-weight: 500;">Inactiva</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="border: none; padding: 15px; vertical-align: middle;">@song.ArtistName</td>
+                                        <td style="border: none; padding: 15px; vertical-align: middle;">@song.Duration</td>
+                                        <td style="border: none; padding: 15px; vertical-align: middle;">
+                                            @if (!string.IsNullOrEmpty(song.Genre))
+                                            {
+                                                <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8; font-weight: 500;">@song.Genre</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                        <td style="border: none; padding: 15px; vertical-align: middle;">@song.PlayCount</td>
+                                        <td style="border: none; padding: 15px; vertical-align: middle;">
+                                            <div class="d-flex align-items-center">
+                                                @if (song.IsActive)
+                                                {
+                                                    <audio controls style="max-width: 150px; height: 40px; margin-right: 10px;">
+                                                        <source src="@song.StreamingUrl" type="audio/mpeg">
+                                                        Tu navegador no soporta la reproducción de audio.
+                                                    </audio>
+                                                }
+                                                
+                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-circle" 
+                                                        style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#removeSongModal-@song.Id"
+                                                        title="Remover de playlist">
+                                                    <i class="fas fa-trash" style="font-size: 0.8rem;"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
 
-                                        <!-- Modal para confirmar eliminación de canción -->
-                                        <div class="modal fade" id="removeSongModal-@song.Id" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Remover Canción</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        ¿Estás seguro de que deseas remover "<strong>@song.Title</strong>" de esta playlist?
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                        <form asp-action="RemoveSong" asp-route-id="@Model.Id" asp-route-songId="@song.Id" method="post" style="display: inline;">
-                                                            @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-danger">Remover</button>
-                                                        </form>
-                                                    </div>
+                                    <!-- Modal para confirmar eliminación de canción -->
+                                    <div class="modal fade" id="removeSongModal-@song.Id" tabindex="-1" style="background: rgba(0, 0, 0, 0.7);">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content" style="background: #1a1a2e; border: none;">
+                                                <div class="modal-header" style="border-bottom: 1px solid #2d3748;">
+                                                    <h5 class="modal-title" style="color: white;">Remover Canción</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(1);"></button>
+                                                </div>
+                                                <div class="modal-body" style="color: #a0aec0;">
+                                                    ¿Estás seguro de que deseas remover "<strong style="color: white;">@song.Title</strong>" de esta playlist?
+                                                </div>
+                                                <div class="modal-footer" style="border-top: 1px solid #2d3748;">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 20px; background: #2d3748; border: none;">Cancelar</button>
+                                                    <form asp-action="RemoveSong" asp-route-id="@Model.Id" asp-route-songId="@song.Id" method="post" style="display: inline;">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-danger" style="border-radius: 20px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none;">Remover</button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
-                                    }
-                                </tbody>
-                            </table>
+                                    </div>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <div style="width: 100px; height: 100px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                            <i class="fas fa-music fa-2x" style="color: rgba(255, 255, 255, 0.2);"></i>
                         </div>
-                    }
-                    else
-                    {
-                        <div class="text-center py-4">
-                            <i class="fas fa-music fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">Esta playlist está vacía</h5>
-                            <p class="text-muted">Agrega algunas canciones para comenzar a disfrutar tu música.</p>
-                        </div>
-                    }
-                </div>
+                        <h5 style="color: white; margin-bottom: 10px;">Esta playlist está vacía</h5>
+                        <p style="color: #a0aec0; margin-bottom: 20px;">Agrega algunas canciones para comenzar a disfrutar tu música.</p>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
+
+@functions {
+    private string GetRandomGradient()
+    {
+        var gradients = new List<string>
+        {
+            "#6366f1, #8b5cf6",
+            "#10b981, #059669",
+            "#f59e0b, #d97706",
+            "#ef4444, #dc2626",
+            "#3b82f6, #2563eb",
+            "#8b5cf6, #7c3aed"
+        };
+        
+        var random = new Random();
+        return gradients[random.Next(gradients.Count)];
+    }
+}
+
+<style>
+    .playlist-detail-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .table-hover tbody tr:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    audio {
+        filter: invert(1) brightness(0.8);
+        height: 32px;
+    }
+    
+    audio::-webkit-media-controls-panel {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+    }
+    
+    audio::-webkit-media-controls-play-button,
+    audio::-webkit-media-controls-mute-button {
+        filter: invert(1);
+    }
+    
+    .form-select {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .form-select:focus {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25) !important;
+    }
+    
+    .btn-outline-danger {
+        border-color: rgba(239, 68, 68, 0.5);
+        color: #ef4444;
+    }
+    
+    .btn-outline-danger:hover {
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+</style>
 
 @section Scripts {
     <script>

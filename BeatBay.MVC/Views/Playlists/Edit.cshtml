@@ -5,39 +5,49 @@
     var playlistId = ViewBag.PlaylistId ?? 0;
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-edit"></i> @ViewData["Title"]
-                    </h3>
-                </div>
-                <div class="card-body">
+<div class="edit-playlist-container" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: white;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <!-- Tarjeta de edición -->
+                <div class="playlist-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+                    <!-- Header con icono y título -->
+                    <div class="text-center mb-4">
+                        <div class="edit-icon-container" style="width: 80px; height: 80px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                            <i class="fas fa-edit fa-2x" style="color: white;"></i>
+                        </div>
+                        <h2 style="font-weight: 700; color: white;">@ViewData["Title"]</h2>
+                    </div>
+
+                    <!-- Alertas -->
                     @if (ViewBag.Error != null)
                     {
-                        <div class="alert alert-danger">
-                            @ViewBag.Error
+                        <div class="alert alert-danger mb-4" style="border-radius: 10px; background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5;">
+                            <i class="fas fa-exclamation-circle me-2"></i> @ViewBag.Error
                         </div>
                     }
 
+                    <!-- Formulario de edición -->
                     <form asp-action="Edit" asp-route-id="@playlistId" method="post">
                         @Html.AntiForgeryToken()
 
-                        <div class="mb-3">
-                            <label asp-for="Name" class="form-label">Nombre de la Playlist *</label>
-                            <input asp-for="Name" class="form-control" placeholder="Ingresa el nuevo nombre" maxlength="150" required />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label" style="font-weight: 600; color: #a0aec0; margin-bottom: 0.5rem;">NOMBRE DE LA PLAYLIST</label>
+                            <input asp-for="Name" class="form-control bg-transparent text-white"
+                                   style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; height: 50px;"
+                                   placeholder="Mi playlist increíble" maxlength="150" required />
+                            <span asp-validation-for="Name" class="text-danger small mt-1"></span>
                         </div>
 
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a asp-action="Index" class="btn btn-secondary me-md-2">
-                                <i class="fas fa-arrow-left"></i> Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Guardar Cambios
+                        <!-- Botones de acción -->
+                        <div class="d-grid gap-3 mt-5">
+                            <button type="submit" class="btn btn-primary py-3" style="border-radius: 25px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; font-weight: 600; letter-spacing: 0.5px;">
+                                <i class="fas fa-save me-2"></i> GUARDAR CAMBIOS
                             </button>
+
+                            <a asp-action="Index" class="btn btn-outline-light py-3" style="border-radius: 25px; border: 2px solid rgba(255, 255, 255, 0.2); font-weight: 600;">
+                                <i class="fas fa-times me-2"></i> CANCELAR
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -47,5 +57,47 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
+
+<style>
+    .edit-playlist-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .form-control {
+        color: white !important;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25) !important;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #5856eb, #7c3aed) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3) !important;
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .playlist-card {
+        transition: all 0.3s ease;
+    }
+
+    .edit-icon-container {
+        box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+    }
+</style>

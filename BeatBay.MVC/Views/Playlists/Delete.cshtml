@@ -2,50 +2,99 @@
 @{
     ViewData["Title"] = "Eliminar Playlist";
 }
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card border-danger">
-                <div class="card-header bg-danger text-white">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-trash"></i> Eliminar Playlist
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <strong>¿Estás seguro?</strong> Esta acción no se puede deshacer.
+
+<div class="delete-playlist-container" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: white;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <!-- Tarjeta de eliminación -->
+                <div class="delete-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); border-left: 5px solid #ef4444;">
+                    <!-- Header -->
+                    <div class="delete-header" style="background: rgba(239, 68, 68, 0.2); padding: 1.5rem; border-bottom: 1px solid rgba(239, 68, 68, 0.3);">
+                        <div class="d-flex align-items-center">
+                            <div class="delete-icon" style="width: 50px; height: 50px; background: linear-gradient(135deg, #ef4444, #dc2626); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                <i class="fas fa-trash" style="color: white; font-size: 1.2rem;"></i>
+                            </div>
+                            <h3 style="font-weight: 700; margin: 0; color: white;">@ViewData["Title"]</h3>
+                        </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <strong>Playlist:</strong> @Model.Name
-                    </div>
-                    <div class="mb-3">
-                        <strong>Creada por:</strong> @Model.UserName
-                    </div>
-                    <div class="mb-3">
-                        <strong>Canciones:</strong> @Model.Songs.Count
-                    </div>
-                    
-                    <p class="text-muted">
-                        Al eliminar esta playlist, se removerán todas las canciones asociadas. 
-                        Las canciones originales no se verán afectadas.
-                    </p>
-                    
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a asp-action="MyPlaylists" class="btn btn-secondary me-md-2">
-                            <i class="fas fa-arrow-left"></i> Cancelar
-                        </a>
-                        <!-- CORRECCIÓN: Cambiar asp-action a "DeleteConfirmed" -->
-                        <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post" style="display: inline;">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fas fa-trash"></i> Eliminar Playlist
-                            </button>
-                        </form>
+
+                    <!-- Cuerpo -->
+                    <div class="delete-body" style="padding: 2rem;">
+                        <!-- Alerta de advertencia -->
+                        <div class="warning-alert" style="background: rgba(245, 158, 11, 0.2); border-left: 4px solid #f59e0b; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 1.5rem; margin-right: 10px;"></i>
+                                <div>
+                                    <h5 style="font-weight: 600; color: white; margin-bottom: 0.25rem;">¿Estás seguro?</h5>
+                                    <p style="color: #fcd34d; margin-bottom: 0;">Esta acción no se puede deshacer.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detalles de la playlist -->
+                        <div class="playlist-details" style="margin-bottom: 1.5rem;">
+                            <div class="detail-item" style="display: flex; margin-bottom: 1rem;">
+                                <div style="width: 120px; color: #a0aec0; font-weight: 500;">Playlist:</div>
+                                <div style="color: white;">@Model.Name</div>
+                            </div>
+                            <div class="detail-item" style="display: flex; margin-bottom: 1rem;">
+                                <div style="width: 120px; color: #a0aec0; font-weight: 500;">Creada por:</div>
+                                <div style="color: white;">@Model.UserName</div>
+                            </div>
+                            <div class="detail-item" style="display: flex; margin-bottom: 1rem;">
+                                <div style="width: 120px; color: #a0aec0; font-weight: 500;">Canciones:</div>
+                                <div style="color: white;">@Model.Songs.Count</div>
+                            </div>
+                        </div>
+
+                        <!-- Nota informativa -->
+                        <div class="info-note" style="background: rgba(99, 102, 241, 0.1); border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
+                            <p style="color: #a0aec0; margin-bottom: 0;">
+                                <i class="fas fa-info-circle" style="color: #6366f1; margin-right: 8px;"></i>
+                                Al eliminar esta playlist, se removerán todas las canciones asociadas. Las canciones originales no se verán afectadas.
+                            </p>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-end">
+                            <a asp-action="MyPlaylists" class="btn btn-outline-light me-3" style="border-radius: 25px; padding: 10px 25px; border: 2px solid rgba(255, 255, 255, 0.2);">
+                                <i class="fas fa-arrow-left me-2"></i> Cancelar
+                            </a>
+                            <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post" style="display: inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger" style="border-radius: 25px; padding: 10px 25px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none;">
+                                    <i class="fas fa-trash me-2"></i> Eliminar Playlist
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .delete-playlist-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .delete-card {
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .delete-icon {
+        box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+    }
+</style>

@@ -125,7 +125,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Permitir servir archivos est�ticos (ej. wwwroot)
+// Permitir servir archivos estáticos (ej. wwwroot)
 app.UseStaticFiles();
 
 app.UseRouting();

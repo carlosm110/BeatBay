@@ -1,20 +1,70 @@
 ﻿@model BeatBay.DTOs.SongDto
 @Html.AntiForgeryToken()
-<h2>Detalles de la Canción</h2>
 
-<div>
-    <h4>@Model.Title</h4>
-    <p><strong>Duración:</strong> @Model.Duration</p>
-    <p><strong>Género:</strong> @Model.Genre</p>
-    <p><strong>Artista:</strong> @Model.ArtistName</p>
-    <p><strong>Estado:</strong> @(Model.IsActive ? "Activa" : "Inactiva")</p>
-    <p><strong>Fecha de subida:</strong> @Model.UploadedAt.ToLocalTime().ToString("g")</p>
+<div class="song-detail-container">
+    <div class="container">
+        <div class="row">
+            <!-- Columna izquierda - Portada e información -->
+            <div class="col-md-5">
+                <div class="song-cover-container">
+                    <div class="song-cover">
+                        <i class="fas fa-music"></i>
+                    </div>
+                </div>
 
-    <!-- REPRODUCTOR PERSONALIZADO (reemplaza el audio controls) -->
-    @Html.Partial("_PlayerPartial")
+                <div class="song-info">
+                    <h2 class="song-title">@Model.Title</h2>
+                    <p class="song-artist">@Model.ArtistName</p>
+
+                    <div class="song-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Duración: @Model.Duration</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-headphones"></i>
+                            <span>Reproducciones: @Model.PlayCount</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Subida: @Model.UploadedAt.ToLocalTime().ToString("g")</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-tag"></i>
+                            <span>Género: @Model.Genre</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-circle status-@(Model.IsActive ? "active" : "inactive")"></i>
+                            <span>Estado: @(Model.IsActive ? "Activa" : "Inactiva")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna derecha - Reproductor -->
+            <div class="col-md-7">
+                <div class="player-container">
+                    @Html.Partial("_PlayerPartial")
+
+                    <div class="player-actions">
+                        <button class="btn-action">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <button class="btn-action">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-button">
+            <a asp-action="Index" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Volver al listado
+            </a>
+        </div>
+    </div>
 </div>
-
-<a asp-action="Index" class="btn btn-secondary mt-3">Volver al listado</a>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -29,3 +79,149 @@
         }
     });
 </script>
+
+<style>
+    /* Paleta de colores basada en tu código */
+    :root {
+        --primary-color: #6366f1;
+        --primary-hover: #8b5cf6;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --light-bg: #f8fafc;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --border-color: #e5e7eb;
+        --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: white;
+    }
+
+    .song-detail-container {
+        padding: 2rem 0;
+    }
+
+    .song-cover-container {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1.5rem;
+    }
+
+    .song-cover {
+        width: 280px;
+        height: 280px;
+        background-color: var(--light-bg);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+        .song-cover i {
+            font-size: 80px;
+            color: var(--text-secondary);
+        }
+
+    .song-info {
+        padding: 0 1rem;
+    }
+
+    .song-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: white;
+    }
+
+    .song-artist {
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 1.5rem;
+    }
+
+    .song-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+        .meta-item i {
+            margin-right: 0.8rem;
+            width: 20px;
+            text-align: center;
+        }
+
+    .status-active {
+        color: var(--success-color);
+        font-size: 0.7rem;
+    }
+
+    .status-inactive {
+        color: var(--text-secondary);
+        font-size: 0.7rem;
+    }
+
+    .player-container {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        height: 100%;
+        box-shadow: var(--card-shadow);
+    }
+
+    .player-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .btn-action {
+        background: transparent;
+        border: none;
+        color: var(--primary-color);
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+        .btn-action:hover {
+            color: var(--primary-hover);
+            transform: scale(1.1);
+        }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1.5rem;
+        border: 2px solid white;
+        border-radius: 12px;
+        transition: all 0.2s;
+        font-weight: 600;
+    }
+
+        .btn-back:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+    .back-button {
+        margin-top: 2rem;
+        text-align: center;
+    }
+</style>
