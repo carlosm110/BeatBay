@@ -1,10 +1,42 @@
-﻿@{
-    ViewData["Title"] = "Panel de Artista";
+﻿<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProfileModalLabel">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="profileForm" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="Name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="Name" name="Name" value="@Model?.Name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="Bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="Bio" name="Bio" rows="3">@Model?.Bio</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@{
+    ViewData["Title"] = "Artist Panel";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container-fluid py-4">
-    <!-- Header del Panel -->
+    <!-- Panel Header -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm bg-gradient-primary text-white">
@@ -13,15 +45,15 @@
                         <div class="col-md-8">
                             <h1 class="h2 mb-1">
                                 <i class="fas fa-music me-2"></i>
-                                Panel de Artista
+                                Artist Panel
                             </h1>
-                            <p class="mb-0 opacity-75">Gestiona tu música y revisa tus estadísticas</p>
+                            <p class="mb-0 opacity-75">Manage your music and review your statistics</p>
                         </div>
                         <div class="col-md-4 text-end">
                             <div class="d-flex justify-content-end align-items-center">
                                 <div class="me-3">
-                                    <small class="opacity-75">Último acceso:</small>
-                                    <div class="fw-bold">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</div>
+                                    <small class="opacity-75">Last access:</small>
+                                    <div class="fw-bold">@DateTime.Now.ToString("MM/dd/yyyy HH:mm")</div>
                                 </div>
                                 <div class="bg-white bg-opacity-20 rounded-circle p-3">
                                     <i class="fas fa-user-music fa-2x"></i>
@@ -34,43 +66,43 @@
         </div>
     </div>
 
-    <!-- Acciones Principales -->
+    <!-- Quick Actions -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
                         <i class="fas fa-bolt text-warning me-2"></i>
-                        Acciones Rápidas
+                        Quick Actions
                     </h5>
                     <div class="row g-3">
                         <div class="col-md-3 col-sm-6">
                             <a href="@Url.Action("Create", "Songs")" class="btn btn-success btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
                                 <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
-                                <span class="fw-bold">Subir Música</span>
-                                <small class="opacity-75">Nuevo track</small>
+                                <span class="fw-bold">Upload Music</span>
+                                <small class="opacity-75">New track</small>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6">
                             <a href="@Url.Action("MySongs", "Songs")" class="btn btn-primary btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
                                 <i class="fas fa-music fa-2x mb-2"></i>
-                                <span class="fw-bold">Mis Canciones</span>
-                                <small class="opacity-75">Gestionar música</small>
+                                <span class="fw-bold">My Songs</span>
+                                <small class="opacity-75">Manage music</small>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6">
                             <a href="@Url.Action("Index", "ArtistStatistics")" class="btn btn-info btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
                                 <i class="fas fa-chart-line fa-2x mb-2"></i>
-                                <span class="fw-bold">Estadísticas</span>
-                                <small class="opacity-75">Ver métricas</small>
+                                <span class="fw-bold">Statistics</span>
+                                <small class="opacity-75">View metrics</small>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6">
-                            <a href="@Url.Action("Edit", "Auth")" class="btn btn-warning btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
+                            <button class="btn btn-warning btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                                 <i class="fas fa-user-edit fa-2x mb-2"></i>
-                                <span class="fw-bold">Mi Perfil</span>
-                                <small class="opacity-75">Editar datos</small>
-                            </a>
+                                <span class="fw-bold">My Profile</span>
+                                <small class="opacity-75">Edit data</small>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -78,7 +110,10 @@
         </div>
     </div>
 
-    <!-- Resumen de Estadísticas -->
+    <!-- Alert Container -->
+    <div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
+
+    <!-- Statistics Summary -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
@@ -86,10 +121,10 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">
                             <i class="fas fa-chart-bar text-primary me-2"></i>
-                            Resumen de Estadísticas
+                            Statistics Summary
                         </h5>
                         <a href="@Url.Action("Index", "ArtistStatistics")" class="btn btn-outline-primary btn-sm">
-                            Ver Detalle <i class="fas fa-arrow-right ms-1"></i>
+                            View Details <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
                     <div class="row g-3">
@@ -98,7 +133,7 @@
                                 <div class="card-body text-center">
                                     <i class="fas fa-music text-primary fa-2x mb-2"></i>
                                     <h4 class="fw-bold mb-1" id="totalSongs">-</h4>
-                                    <small class="text-muted">Canciones Totales</small>
+                                    <small class="text-muted">Total Songs</small>
                                 </div>
                             </div>
                         </div>
@@ -107,7 +142,7 @@
                                 <div class="card-body text-center">
                                     <i class="fas fa-play-circle text-success fa-2x mb-2"></i>
                                     <h4 class="fw-bold mb-1" id="totalPlays">-</h4>
-                                    <small class="text-muted">Reproducciones</small>
+                                    <small class="text-muted">Total Plays</small>
                                 </div>
                             </div>
                         </div>
@@ -116,7 +151,7 @@
                                 <div class="card-body text-center">
                                     <i class="fas fa-clock text-warning fa-2x mb-2"></i>
                                     <h4 class="fw-bold mb-1" id="totalDuration">-</h4>
-                                    <small class="text-muted">Minutos Totales</small>
+                                    <small class="text-muted">Total Minutes</small>
                                 </div>
                             </div>
                         </div>
@@ -125,7 +160,7 @@
                                 <div class="card-body text-center">
                                     <i class="fas fa-trophy text-danger fa-2x mb-2"></i>
                                     <h4 class="fw-bold mb-1" id="topSong">-</h4>
-                                    <small class="text-muted">Canción Top</small>
+                                    <small class="text-muted">Top Song</small>
                                 </div>
                             </div>
                         </div>
@@ -135,7 +170,7 @@
         </div>
     </div>
 
-    <!-- Canciones Recientes -->
+    <!-- Recent Songs -->
     <div class="row mb-4">
         <div class="col-md-8">
             <div class="card border-0 shadow-sm">
@@ -143,18 +178,18 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">
                             <i class="fas fa-history text-secondary me-2"></i>
-                            Canciones Recientes
+                            Recent Songs
                         </h5>
                         <a href="@Url.Action("MySongs", "Songs")" class="btn btn-outline-secondary btn-sm">
-                            Ver Todas <i class="fas fa-arrow-right ms-1"></i>
+                            View All <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
                     <div id="recentSongs" class="list-group list-group-flush">
                         <div class="text-center py-4">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Cargando...</span>
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                            <p class="mt-2 text-muted">Cargando canciones...</p>
+                            <p class="mt-2 text-muted">Loading songs...</p>
                         </div>
                     </div>
                 </div>
@@ -165,14 +200,14 @@
                 <div class="card-body">
                     <h5 class="card-title mb-3">
                         <i class="fas fa-star text-warning me-2"></i>
-                        Top Canciones
+                        Top Songs
                     </h5>
                     <div id="topSongs" class="list-group list-group-flush">
                         <div class="text-center py-4">
                             <div class="spinner-border text-warning" role="status">
-                                <span class="visually-hidden">Cargando...</span>
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                            <p class="mt-2 text-muted">Cargando top...</p>
+                            <p class="mt-2 text-muted">Loading top songs...</p>
                         </div>
                     </div>
                 </div>
@@ -180,21 +215,21 @@
         </div>
     </div>
 
-    <!-- Herramientas Adicionales -->
+    <!-- Additional Tools -->
     <div class="row">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
                         <i class="fas fa-tools text-dark me-2"></i>
-                        Herramientas Adicionales
+                        Additional Tools
                     </h5>
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="d-grid">
                                 <a href="@Url.Action("TopSongs", "ArtistStatistics")" class="btn btn-outline-primary">
                                     <i class="fas fa-medal me-2"></i>
-                                    Top Canciones Detallado
+                                    Detailed Top Songs
                                 </a>
                             </div>
                         </div>
@@ -202,7 +237,7 @@
                             <div class="d-grid">
                                 <a href="@Url.Action("DownloadReport", "ArtistStatistics")" class="btn btn-outline-success">
                                     <i class="fas fa-download me-2"></i>
-                                    Descargar Reporte
+                                    Download Report
                                 </a>
                             </div>
                         </div>
@@ -210,7 +245,7 @@
                             <div class="d-grid">
                                 <button class="btn btn-outline-info" onclick="refreshStats()">
                                     <i class="fas fa-sync-alt me-2"></i>
-                                    Actualizar Datos
+                                    Refresh Data
                                 </button>
                             </div>
                         </div>
@@ -221,7 +256,7 @@
     </div>
 </div>
 
-<!-- Alertas -->
+<!-- Alerts -->
 @if (TempData["Success"] != null)
 {
     <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
@@ -298,11 +333,78 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        loadDashboardData();
+        // Handle profile form submission
+        const profileForm = document.getElementById('profileForm');
+        if (profileForm) {
+            profileForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
 
-        // Auto-refresh cada 30 segundos
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                try {
+                    const formData = new FormData(this);
+                    formData.append('redirect', 'false'); // Ensure we don't redirect
+
+                    const response = await fetch('@Url.Action("UpdateProfile", "VAuth")', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Hide the modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+                        if (modal) modal.hide();
+
+                        // Show success message
+                        showAlert(data.message || 'Profile updated successfully!', 'success');
+                    } else {
+                        showAlert(data.message || 'Error updating profile', 'danger');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showAlert('An error occurred while updating your profile', 'danger');
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonText;
+                }
+            });
+        }
+
+        loadDashboardData();
         setInterval(refreshStats, 30000);
     });
+
+    function showAlert(message, type) {
+        const alertContainer = document.getElementById('alertContainer');
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.role = 'alert';
+        alert.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+
+        alertContainer.appendChild(alert);
+
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    }
 
     function loadDashboardData() {
         loadStats();
@@ -344,7 +446,7 @@
                 const container = document.getElementById('recentSongs');
 
                 if (data.success && data.data && data.data.length > 0) {
-                    const songs = data.data.slice(0, 5); // Últimas 5 canciones
+                    const songs = data.data.slice(0, 5);
 
                     container.innerHTML = songs.map(song => `
                         <div class="list-group-item border-0 py-3">
@@ -356,7 +458,7 @@
                                         ${Math.floor(song.duration / 60)}:${(song.duration % 60).toString().padStart(2, '0')}
                                         <span class="ms-2">
                                             <i class="fas fa-play me-1"></i>
-                                            ${song.playCount || 0} reproducciones
+                                            ${song.playCount || 0} plays
                                         </span>
                                     </small>
                                 </div>
@@ -366,13 +468,13 @@
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" href="@Url.Action("Details", "Songs")/${song.id}">
-                                            <i class="fas fa-eye me-2"></i>Ver Detalles
+                                            <i class="fas fa-eye me-2"></i>View Details
                                         </a></li>
                                         <li><a class="dropdown-item" href="@Url.Action("Edit", "Songs")/${song.id}">
-                                            <i class="fas fa-edit me-2"></i>Editar
+                                            <i class="fas fa-edit me-2"></i>Edit
                                         </a></li>
                                         <li><a class="dropdown-item" href="@Url.Action("SongDetails", "ArtistStatistics")/${song.id}">
-                                            <i class="fas fa-chart-line me-2"></i>Estadísticas
+                                            <i class="fas fa-chart-line me-2"></i>Statistics
                                         </a></li>
                                     </ul>
                                 </div>
@@ -383,9 +485,9 @@
                     container.innerHTML = `
                         <div class="text-center py-4">
                             <i class="fas fa-music text-muted fa-3x mb-3"></i>
-                            <p class="text-muted">No tienes canciones aún</p>
+                            <p class="text-muted">You don't have any songs yet</p>
                             <a href="@Url.Action("Create", "Songs")" class="btn btn-primary">
-                                <i class="fas fa-plus me-2"></i>Subir tu primera canción
+                                <i class="fas fa-plus me-2"></i>Upload your first song
                             </a>
                         </div>
                     `;
@@ -396,7 +498,7 @@
                 document.getElementById('recentSongs').innerHTML = `
                     <div class="text-center py-4">
                         <i class="fas fa-exclamation-triangle text-danger fa-2x mb-2"></i>
-                        <p class="text-muted">Error al cargar canciones</p>
+                        <p class="text-muted">Error loading songs</p>
                     </div>
                 `;
             });
@@ -428,7 +530,7 @@
                     container.innerHTML = `
                         <div class="text-center py-4">
                             <i class="fas fa-star text-muted fa-2x mb-2"></i>
-                            <p class="text-muted">No hay datos disponibles</p>
+                            <p class="text-muted">No data available</p>
                         </div>
                     `;
                 }
@@ -438,30 +540,26 @@
                 document.getElementById('topSongs').innerHTML = `
                     <div class="text-center py-4">
                         <i class="fas fa-exclamation-triangle text-danger fa-2x mb-2"></i>
-                        <p class="text-muted">Error al cargar top</p>
+                        <p class="text-muted">Error loading top songs</p>
                     </div>
                 `;
             });
     }
 
     function refreshStats() {
-        // Mostrar indicador de carga
         const refreshBtn = document.querySelector('button[onclick="refreshStats()"]');
         const originalContent = refreshBtn.innerHTML;
-        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Actualizando...';
+        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
         refreshBtn.disabled = true;
 
-        // Recargar datos
         loadDashboardData();
 
-        // Restaurar botón después de 2 segundos
         setTimeout(() => {
             refreshBtn.innerHTML = originalContent;
             refreshBtn.disabled = false;
         }, 2000);
     }
 
-    // Auto-dismiss alerts after 5 seconds
     setTimeout(() => {
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {

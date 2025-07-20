@@ -252,7 +252,7 @@
                             </button>
                             @if (!isPremium)
                             {
-                                <button class="btn-upgrade btn btn-rounded">
+                                <button class="btn-upgrade btn btn-rounded" onclick="window.location.href='https://localhost:7194/Plans'">
                                     <i class="fas fa-crown me-2"></i> Upgrade Plan
                                 </button>
                             }
@@ -420,6 +420,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form method="post" action="@Url.Action("UpdateProfile", "VAuth")">
+                    @Html.AntiForgeryToken()
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="Name" class="form-label">Name</label>

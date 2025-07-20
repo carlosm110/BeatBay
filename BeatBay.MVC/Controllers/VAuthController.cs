@@ -392,7 +392,7 @@ namespace BeatBayMVC.Controllers
 
         // POST: Update Profile
         [HttpPost]
-        public async Task<IActionResult> UpdateProfile(UpdateUserDto model)
+        public async Task<IActionResult> UpdateProfile(UpdateUserDto model, bool redirect = true)
         {
             var token = HttpContext.Session.GetString("JwtToken");
             if (string.IsNullOrEmpty(token))
@@ -406,8 +406,10 @@ namespace BeatBayMVC.Controllers
 
             if (!ModelState.IsValid)
             {
-                // Recargar el perfil para mostrar errores
-                return await Profile();
+                if (redirect)
+                    return await Profile();
+                else
+                    return Json(new { success = false, message = "Validation failed" });
             }
 
             try
@@ -422,28 +424,52 @@ namespace BeatBayMVC.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["Success"] = "Profile updated successfully!";
-
                     // Actualizar datos en sesión
                     userData.Name = model.Name ?? userData.Name;
                     userData.Bio = model.Bio ?? userData.Bio;
                     userData.PlanId = model.PlanId ?? userData.PlanId;
 
                     HttpContext.Session.SetString("UserData", JsonConvert.SerializeObject(userData));
+
+                    if (redirect)
+                    {
+                        TempData["Success"] = "Profile updated successfully!";
+                        return RedirectToAction("Profile");
+                    }
+                    else
+                    {
+                        return Json(new { success = true, message = "Profile updated successfully!" });
+                    }
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
                     var errorResponse = JsonConvert.DeserializeObject<dynamic>(errorContent);
-                    TempData["Error"] = errorResponse?.message?.ToString() ?? "Profile update failed";
+                    string errorMessage = errorResponse?.message?.ToString() ?? "Profile update failed";
+
+                    if (redirect)
+                    {
+                        TempData["Error"] = errorMessage;
+                        return RedirectToAction("Profile");
+                    }
+                    else
+                    {
+                        return Json(new { success = false, message = errorMessage });
+                    }
                 }
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error: {ex.Message}";
+                if (redirect)
+                {
+                    TempData["Error"] = $"Error: {ex.Message}";
+                    return RedirectToAction("Profile");
+                }
+                else
+                {
+                    return Json(new { success = false, message = $"Error: {ex.Message}" });
+                }
             }
-
-            return RedirectToAction("Profile");
         }
 
         // Logout
