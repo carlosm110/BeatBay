@@ -4,22 +4,115 @@
     ViewData["Title"] = "Crear Playlist";
 }
 
-<div class="create-playlist-container" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: white;">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-6 col-md-8">
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+    }
+
+    .navbar {
+        margin-bottom: 0 !important;
+        height: 80px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .create-playlist-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: calc(100vh - 80px);
+        color: white;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+
+    .playlist-input:focus {
+        background-color: rgba(255, 255, 255, 0.15) !important;
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.3) !important;
+        color: white !important;
+        transform: translateY(-1px);
+    }
+
+    .playlist-input::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    .create-btn:hover {
+        background: linear-gradient(135deg, #5856eb, #7c3aed) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(99, 102, 241, 0.5) !important;
+    }
+
+    .create-btn:active {
+        transform: translateY(-1px);
+    }
+
+    .cancel-btn:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-outline-light.rounded-circle:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        transform: scale(1.05);
+    }
+
+    .playlist-cover {
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .playlist-card {
+        transition: all 0.3s ease;
+    }
+
+        .playlist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+    /* Animaciones suaves para todos los elementos interactivos */
+    * {
+        transition: all 0.3s ease;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .create-playlist-container {
+            padding: 1rem;
+        }
+
+        .playlist-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .playlist-cover {
+            height: 180px;
+        }
+    }
+</style>
+
+<div class="create-playlist-container">
+    <div class="container-fluid h-100 py-4">
+        <div class="row justify-content-center h-100">
+            <div class="col-lg-6 col-md-8 col-sm-10">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <a asp-action="Index" class="btn btn-outline-light rounded-circle" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <a asp-action="Index" class="btn btn-outline-light rounded-circle" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease;">
                         <i class="fas fa-arrow-left"></i>
                     </a>
-                    <h2 class="text-center mb-0" style="color: white; font-weight: 700;">@ViewData["Title"]</h2>
-                    <div style="width: 40px;"></div> <!-- Espaciador para alinear -->
+                    <h2 class="text-center mb-0" style="color: white; font-weight: 700; font-size: 1.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">@ViewData["Title"]</h2>
+                    <div style="width: 45px;"></div> <!-- Espaciador para alinear -->
                 </div>
 
-                <div class="playlist-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+                <div class="playlist-card" style="background: rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 2.5rem; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
                     @if (ViewBag.Error != null)
                     {
-                        <div class="alert alert-danger mb-4" style="border-radius: 10px; background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5;">
+                        <div class="alert alert-danger mb-4" style="border-radius: 12px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; backdrop-filter: blur(5px);">
                             <i class="fas fa-exclamation-circle me-2"></i> @ViewBag.Error
                         </div>
                     }
@@ -28,22 +121,22 @@
                         @Html.AntiForgeryToken()
 
                         <div class="mb-4">
-                            <div class="playlist-cover mb-4" style="height: 200px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-music" style="font-size: 3rem; color: rgba(255, 255, 255, 0.3);"></i>
+                            <div class="playlist-cover mb-4" style="height: 220px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3); transition: all 0.5s ease;">
+                                <i class="fas fa-music" style="font-size: 3.5rem; color: rgba(255, 255, 255, 0.4);"></i>
                             </div>
 
-                            <label asp-for="Name" class="form-label" style="font-weight: 600; color: #a0aec0;">NOMBRE DE LA PLAYLIST</label>
-                            <input asp-for="Name" class="form-control bg-transparent text-white" style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; height: 50px;"
+                            <label asp-for="Name" class="form-label" style="font-weight: 600; color: rgba(255, 255, 255, 0.8); font-size: 0.95rem; letter-spacing: 0.5px; margin-bottom: 12px;">NOMBRE DE LA PLAYLIST</label>
+                            <input asp-for="Name" class="form-control bg-transparent text-white playlist-input" style="border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 15px 20px; height: 55px; font-size: 1.1rem; transition: all 0.3s ease;"
                                    placeholder="Mi playlist increíble" maxlength="150" required />
-                            <span asp-validation-for="Name" class="text-danger small mt-1"></span>
+                            <span asp-validation-for="Name" class="text-danger small mt-2 d-block"></span>
                         </div>
 
                         <div class="d-grid gap-3 mt-5">
-                            <button type="submit" class="btn btn-primary py-3" style="border-radius: 25px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; font-weight: 600; letter-spacing: 0.5px;">
+                            <button type="submit" class="btn btn-primary py-3 create-btn" style="border-radius: 30px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; font-weight: 600; letter-spacing: 0.8px; font-size: 1.1rem; height: 55px; box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); transition: all 0.3s ease;">
                                 <i class="fas fa-plus-circle me-2"></i> CREAR PLAYLIST
                             </button>
 
-                            <a asp-action="Index" class="btn btn-outline-light py-3" style="border-radius: 25px; border: 2px solid rgba(255, 255, 255, 0.2); font-weight: 600;">
+                            <a asp-action="Index" class="btn btn-outline-light py-3 cancel-btn" style="border-radius: 30px; border: 2px solid rgba(255, 255, 255, 0.3); font-weight: 600; height: 55px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
                                 <i class="fas fa-times me-2"></i> CANCELAR
                             </a>
                         </div>
@@ -51,8 +144,8 @@
                 </div>
 
                 <div class="text-center mt-4">
-                    <p class="text-muted" style="font-size: 0.9rem;">
-                        <i class="fas fa-info-circle me-1"></i> Puedes agregar canciones después de crear la playlist
+                    <p class="text-light" style="font-size: 0.95rem; opacity: 0.8;">
+                        <i class="fas fa-info-circle me-2"></i> Puedes agregar canciones después de crear la playlist
                     </p>
                 </div>
             </div>
@@ -70,13 +163,14 @@
         const cover = document.querySelector('.playlist-cover');
         const nameInput = document.querySelector('#Name');
 
-        // Gradientes aleatorios
+        // Gradientes con la nueva paleta de colores
         const gradients = [
-            'linear-gradient(135deg, #6366f1, #8b5cf6)',
-            'linear-gradient(135deg, #10b981, #059669)',
-            'linear-gradient(135deg, #f59e0b, #d97706)',
-            'linear-gradient(135deg, #ef4444, #dc2626)',
-            'linear-gradient(135deg, #3b82f6, #2563eb)'
+            'linear-gradient(135deg, #6366f1, #8b5cf6)', // Primary
+            'linear-gradient(135deg, #10b981, #059669)', // Success
+            'linear-gradient(135deg, #f59e0b, #fbbf24)', // Warning
+            'linear-gradient(135deg, #ef4444, #dc2626)', // Danger
+            'linear-gradient(135deg, #667eea, #764ba2)', // Background colors
+            'linear-gradient(135deg, #8b5cf6, #6366f1)'  // Primary reversed
         ];
 
         // Cambiar gradiente cuando el usuario escribe
@@ -89,39 +183,24 @@
 
                 const gradientIndex = Math.abs(hash) % gradients.length;
                 cover.style.background = gradients[gradientIndex];
+
+                // Añadir un efecto de escala sutil
+                cover.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    cover.style.transform = 'scale(1)';
+                }, 200);
+            } else {
+                cover.style.background = gradients[0]; // Volver al gradiente por defecto
             }
+        });
+
+        // Efecto de enfoque en el input
+        nameInput.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'translateY(-2px)';
+        });
+
+        nameInput.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'translateY(0)';
         });
     </script>
 }
-
-<style>
-    .create-playlist-container {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .form-control:focus {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        border-color: #6366f1 !important;
-        box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25) !important;
-        color: white !important;
-    }
-
-    .form-control::placeholder {
-        color: rgba(255, 255, 255, 0.4) !important;
-    }
-
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #5856eb, #7c3aed) !important;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3) !important;
-    }
-
-    .btn-outline-light:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border-color: rgba(255, 255, 255, 0.3) !important;
-    }
-
-    .playlist-cover {
-        transition: all 0.5s ease;
-    }
-</style>

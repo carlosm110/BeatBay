@@ -3,69 +3,59 @@
     ViewData["Title"] = "Editar Canción";
 }
 
-<div class="edit-song-container" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: white; padding-top: 2rem;">
+<div class="edit-song-container">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <!-- Tarjeta de edición -->
-                <div class="song-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 15px; padding: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+                <div class="song-card">
                     <!-- Header con icono y título -->
                     <div class="d-flex align-items-center mb-4">
-                        <div class="song-icon" style="width: 60px; height: 60px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
-                            <i class="fas fa-music" style="color: white; font-size: 1.5rem;"></i>
+                        <div class="song-icon">
+                            <i class="fas fa-music"></i>
                         </div>
                         <div>
-                            <h2 style="font-weight: 700; color: white; margin-bottom: 0.25rem;">@ViewData["Title"]</h2>
-                            <p style="color: #a0aec0; margin-bottom: 0;">@ViewBag.SongTitle</p>
+                            <h2 class="song-title">@ViewData["Title"]</h2>
+                            <p class="song-subtitle">@ViewBag.SongTitle</p>
                         </div>
                     </div>
 
                     <!-- Alertas -->
                     @if (ViewBag.Error != null)
                     {
-                        <div class="alert alert-danger mb-4" style="border-radius: 10px; background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5;">
+                        <div class="alert alert-danger mb-4 custom-alert">
                             <i class="fas fa-exclamation-circle me-2"></i> @ViewBag.Error
                         </div>
                     }
 
                     <!-- Formulario de edición -->
                     <form asp-action="Edit" asp-route-id="@ViewBag.SongId" method="post">
-                        <div class="mb-4">
-                            <label asp-for="Title" style="font-weight: 600; color: #a0aec0; margin-bottom: 0.5rem; display: block;">TÍTULO</label>
-                            <input asp-for="Title" class="form-control bg-transparent text-white"
-                                   style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; height: 50px;" />
-                            <span asp-validation-for="Title" class="text-danger small mt-1"></span>
+                        <div class="form-group">
+                            <label asp-for="Title" class="form-label">TÍTULO</label>
+                            <input asp-for="Title" class="form-control custom-input" placeholder="Ingresa el título de la canción" />
+                            <span asp-validation-for="Title" class="text-danger validation-error"></span>
                         </div>
 
-                        <div class="mb-4">
-                            <label asp-for="Duration" style="font-weight: 600; color: #a0aec0; margin-bottom: 0.5rem; display: block;">DURACIÓN</label>
-                            <input asp-for="Duration" class="form-control bg-transparent text-white"
-                                   style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; height: 50px;" type="time" step="1" />
-                            <span asp-validation-for="Duration" class="text-danger small mt-1"></span>
+                        <div class="form-group">
+                            <label asp-for="Genre" class="form-label">GÉNERO</label>
+                            <input asp-for="Genre" class="form-control custom-input" placeholder="Ej: Pop, Rock, Jazz, Electrónica" />
+                            <span asp-validation-for="Genre" class="text-danger validation-error"></span>
                         </div>
 
-                        <div class="mb-4">
-                            <label asp-for="Genre" style="font-weight: 600; color: #a0aec0; margin-bottom: 0.5rem; display: block;">GÉNERO</label>
-                            <input asp-for="Genre" class="form-control bg-transparent text-white"
-                                   style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; height: 50px;" />
-                            <span asp-validation-for="Genre" class="text-danger small mt-1"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="IsActive" style="font-weight: 600; color: #a0aec0; margin-bottom: 0.5rem; display: block;">ESTADO</label>
-                            <select asp-for="IsActive" class="form-select bg-transparent text-white"
-                                    style="border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px 15px; height: 50px;">
-                                <option value="true" style="background: #1a1a2e;">Activa</option>
-                                <option value="false" style="background: #1a1a2e;">Inactiva</option>
+                        <div class="form-group">
+                            <label asp-for="IsActive" class="form-label">ESTADO</label>
+                            <select asp-for="IsActive" class="form-select custom-select">
+                                <option value="true">Activa</option>
+                                <option value="false">Inactiva</option>
                             </select>
                         </div>
 
                         <!-- Botones de acción -->
-                        <div class="d-flex justify-content-end mt-5">
-                            <a asp-action="Details" asp-route-id="@ViewBag.SongId" class="btn btn-outline-light me-3" style="border-radius: 25px; padding: 10px 25px; border: 2px solid rgba(255, 255, 255, 0.2);">
+                        <div class="action-buttons">
+                            <a asp-action="Details" asp-route-id="@ViewBag.SongId" class="btn btn-outline-light cancel-btn">
                                 <i class="fas fa-times me-2"></i> Cancelar
                             </a>
-                            <button type="submit" class="btn btn-success" style="border-radius: 25px; padding: 10px 25px; background: linear-gradient(135deg, #10b981, #059669); border: none;">
+                            <button type="submit" class="btn btn-success save-btn">
                                 <i class="fas fa-save me-2"></i> Actualizar Canción
                             </button>
                         </div>
@@ -81,37 +71,302 @@
 }
 
 <style>
-    .edit-song-container {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Estilos base */
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
     }
 
-    .form-control, .form-select {
-        color: white !important;
+    .edit-song-container {
+        background: transparent;
+        min-height: calc(100vh - 80px);
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding-top: 2rem;
+        position: relative;
+    }
+
+    /* Tarjeta principal */
+    .song-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 2.5rem;
+        backdrop-filter: blur(15px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
     }
 
-        .form-control:focus, .form-select:focus {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-            border-color: #6366f1 !important;
-            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25) !important;
+        .song-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
         }
 
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.4) !important;
-        }
-
-    .btn-success:hover {
-        background: linear-gradient(135deg, #0f9e78, #047857) !important;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    /* Header del formulario */
+    .song-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        transition: all 0.3s ease;
     }
 
-    .btn-outline-light:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border-color: rgba(255, 255, 255, 0.3) !important;
+        .song-icon:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.5);
+        }
+
+        .song-icon i {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+    .song-title {
+        font-weight: 700;
+        color: #f8fafc;
+        margin-bottom: 0.25rem;
+        font-size: 1.8rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .song-subtitle {
+        color: rgba(248, 250, 252, 0.7);
+        margin-bottom: 0;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    /* Alertas */
+    .custom-alert {
+        border-radius: 12px;
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fecaca;
+        backdrop-filter: blur(5px);
+        animation: slideInDown 0.3s ease;
+    }
+
+    /* Grupos de formulario */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: rgba(248, 250, 252, 0.9);
+        margin-bottom: 0.75rem;
+        display: block;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    /* Inputs personalizados */
+    .custom-input, .custom-select {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 15px 18px;
+        height: 55px;
+        color: white !important;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+
+        .custom-input:focus, .custom-select:focus {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25) !important;
+            transform: translateY(-1px);
+        }
+
+        .custom-input:hover, .custom-select:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .custom-input::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+            font-weight: 400;
+        }
+
+        /* Select personalizado */
+        .custom-select option {
+            background: #1f2937;
+            color: white;
+            padding: 10px;
+        }
+
+    /* Errores de validación */
+    .validation-error {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: block;
+        color: #fca5a5;
+        font-weight: 500;
+    }
+
+    /* Botones de acción */
+    .action-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .cancel-btn {
+        border-radius: 25px;
+        padding: 12px 28px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        color: #f8fafc;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        background: transparent;
+        text-decoration: none;
+    }
+
+        .cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            color: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+        }
+
+    .save-btn {
+        border-radius: 25px;
+        padding: 12px 28px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border: none;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+        .save-btn:hover {
+            background: linear-gradient(135deg, #0f9e78, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+
+        .save-btn:active {
+            transform: translateY(0);
+        }
+
+    /* Animaciones */
+    @@keyframes slideInDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    .song-card {
+        animation: fadeIn 0.6s ease;
+    }
+
+    /* Responsividad */
+    @@media (max-width: 768px) {
+        .edit-song-container
+
+    {
+        padding-top: 1rem;
+    }
+
+    .song-card {
+        padding: 1.5rem;
+        margin: 0 1rem;
+    }
+
+    .song-title {
+        font-size: 1.5rem;
+    }
+
+    .action-buttons {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+    }
+
+    .cancel-btn, .save-btn {
+        width: 100%;
+        justify-content: center;
     }
 
     .song-icon {
-        box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        width: 50px;
+        height: 50px;
+    }
+
+        .song-icon i {
+            font-size: 1.2rem;
+        }
+
+    }
+
+    @@media (max-width: 480px) {
+        .custom-input, .custom-select
+
+    {
+        height: 50px;
+        padding: 12px 15px;
+    }
+
+    .form-label {
+        font-size: 0.8rem;
+    }
+
+    }
+
+    /* Estados adicionales */
+    .form-group:focus-within .form-label {
+        color: #6366f1;
+        transition: color 0.3s ease;
+    }
+
+    /* Mejoras de accesibilidad */
+    .custom-input:focus,
+    .custom-select:focus {
+        outline: none;
+    }
+
+    .btn:focus {
+        outline: 2px solid rgba(99, 102, 241, 0.5);
+        outline-offset: 2px;
     }
 </style>

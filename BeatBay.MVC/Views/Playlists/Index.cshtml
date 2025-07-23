@@ -4,121 +4,124 @@
     ViewData["Title"] = "Playlists";
 }
 
-<div class="playlists-container" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: white;">
-    <div class="container-fluid py-4">
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <h1 class="fw-bold" style="color: white;">@ViewData["Title"]</h1>
-            <div>
-                <a asp-action="Create" class="btn btn-primary me-2" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 20px; padding: 8px 20px;">
-                    <i class="fas fa-plus me-1"></i> Nueva Playlist
-                </a>
-                <a asp-action="MyPlaylists" class="btn btn-outline-light" style="border-radius: 20px; padding: 8px 20px;">
-                    <i class="fas fa-user me-1"></i> Mis Playlists
-                </a>
+<div class="playlists-container" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; color: white; overflow-y: auto;">
+    <div class="content-wrapper" style="padding-top: 70px; min-height: 100vh; position: relative; z-index: 1;">
+        <div class="container-fluid px-4">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <h1 class="fw-bold" style="color: #f8fafc; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); font-size: 2.5rem;">@ViewData["Title"]</h1>
+                <div>
+                    <a asp-action="Create" class="btn btn-primary me-3" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 25px; padding: 12px 28px; box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); font-weight: 500; transition: all 0.3s ease;">
+                        <i class="fas fa-plus me-2"></i> Nueva Playlist
+                    </a>
+                    <a asp-action="MyPlaylists" class="btn btn-outline-light" style="border-radius: 25px; padding: 12px 28px; border-color: rgba(248, 250, 252, 0.4); backdrop-filter: blur(10px); background: rgba(248, 250, 252, 0.1); color: #f8fafc; font-weight: 500; transition: all 0.3s ease;">
+                        <i class="fas fa-user me-2"></i> Mis Playlists
+                    </a>
+                </div>
             </div>
-        </div>
 
-        @if (ViewBag.Error != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; background: rgba(239, 68, 68, 0.2); border: none;">
-                @ViewBag.Error
-                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
-            </div>
-        }
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 15px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); color: #f8fafc;">
+                    @ViewBag.Error
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+                </div>
+            }
 
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px; background: rgba(16, 185, 129, 0.2); border: none;">
-                @TempData["Success"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
-            </div>
-        }
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 15px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); color: #f8fafc;">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+                </div>
+            }
 
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px; background: rgba(239, 68, 68, 0.2); border: none;">
-                @TempData["Error"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
-            </div>
-        }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 15px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); color: #f8fafc;">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+                </div>
+            }
 
-        @if (Model.Any())
-        {
-            <div class="row">
-                @foreach (var playlist in Model)
-                {
-                    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-                        <div class="playlist-card" style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; overflow: hidden; transition: all 0.3s ease; cursor: pointer; height: 100%;">
-                            <div class="position-relative">
-                                <div class="playlist-image" style="height: 200px; background: linear-gradient(135deg, @GetRandomGradient()); display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-music" style="font-size: 3rem; color: rgba(255, 255, 255, 0.2);"></i>
+            @if (Model.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var playlist in Model)
+                    {
+                        <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                            <div class="playlist-card" style="background: rgba(248, 250, 252, 0.1); border-radius: 20px; overflow: hidden; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; height: 100%; backdrop-filter: blur(15px); border: 1px solid rgba(248, 250, 252, 0.2); box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+                                <div class="position-relative">
+                                    <div class="playlist-image" style="height: 240px; background: linear-gradient(135deg, @GetRandomGradient()); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                                        <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.1);"></div>
+                                        <i class="fas fa-music" style="font-size: 4rem; color: rgba(255, 255, 255, 0.3); position: relative; z-index: 2;"></i>
+                                    </div>
+                                    <button class="play-button btn rounded-circle position-absolute" style="width: 60px; height: 60px; bottom: -30px; right: 20px; background: linear-gradient(135deg, #10b981, #059669); border: none; box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                                        <i class="fas fa-play" style="color: white; margin-left: 4px; font-size: 1.2rem;"></i>
+                                    </button>
                                 </div>
-                                <button class="play-button btn btn-success rounded-circle position-absolute" style="width: 50px; height: 50px; bottom: -25px; right: 20px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);">
-                                    <i class="fas fa-play"></i>
-                                </button>
-                            </div>
-                            <div class="p-3 pt-4">
-                                <h5 class="mb-1" style="font-weight: 600;">@playlist.Name</h5>
-                                <p class="text-muted mb-2" style="font-size: 0.85rem;">
-                                    Por: @playlist.UserName • @playlist.Songs.Count canciones
-                                </p>
-                                <div class="d-flex justify-content-between mt-3">
-                                    <a asp-action="Details" asp-route-id="@playlist.Id" class="btn btn-sm btn-outline-light" style="border-radius: 15px;">
-                                        <i class="fas fa-eye me-1"></i> Ver
-                                    </a>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-light rounded-circle" style="width: 32px; height: 32px;" data-bs-toggle="dropdown">
-                                            <i class="fas fa-ellipsis-h"></i>
-                                        </button>
-                                        <ul class="dropdown-menu" style="background: #2d3748; border: none;">
-                                            <li><a class="dropdown-item text-white" asp-action="Edit" asp-route-id="@playlist.Id"><i class="fas fa-edit me-2"></i>Editar</a></li>
-                                            <li><hr class="dropdown-divider" style="border-color: #4a5568;"></li>
-                                            <li><button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@playlist.Id"><i class="fas fa-trash me-2"></i>Eliminar</button></li>
-                                        </ul>
+                                <div class="p-4 pt-5">
+                                    <h5 class="mb-2" style="font-weight: 600; color: #f8fafc; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); font-size: 1.25rem;">@playlist.Name</h5>
+                                    <p class="text-muted mb-4" style="font-size: 0.95rem; color: rgba(248, 250, 252, 0.7);">
+                                        Por: @playlist.UserName • @playlist.Songs.Count canciones
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a asp-action="Details" asp-route-id="@playlist.Id" class="btn btn-sm" style="border-radius: 20px; background: rgba(248, 250, 252, 0.15); border: 1px solid rgba(248, 250, 252, 0.3); color: #f8fafc; padding: 10px 20px; transition: all 0.3s ease; font-weight: 500;">
+                                            <i class="fas fa-eye me-2"></i> Ver
+                                        </a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm rounded-circle" style="width: 40px; height: 40px; background: rgba(248, 250, 252, 0.15); border: 1px solid rgba(248, 250, 252, 0.3); color: #f8fafc; transition: all 0.3s ease;" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                            </button>
+                                            <ul class="dropdown-menu" style="background: rgba(31, 41, 55, 0.95); border: none; border-radius: 15px; backdrop-filter: blur(20px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); padding: 8px;">
+                                                <li><a class="dropdown-item text-white" asp-action="Edit" asp-route-id="@playlist.Id" style="border-radius: 10px; margin: 2px; transition: all 0.2s ease; padding: 12px 16px;"><i class="fas fa-edit me-2" style="color: #6366f1;"></i>Edit</a></li>
+                                                <li><hr class="dropdown-divider" style="border-color: rgba(248, 250, 252, 0.1); margin: 8px 4px;"></li>
+                                                <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal-@playlist.Id" style="color: #ef4444; border-radius: 10px; margin: 2px; transition: all 0.2s ease; padding: 12px 16px;"><i class="fas fa-trash me-2"></i>Delete</button></li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Modal de confirmación de eliminación -->
-                    <div class="modal fade" id="deleteModal-@playlist.Id" tabindex="-1" style="background: rgba(0, 0, 0, 0.7);">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content" style="background: #1a1a2e; border: none;">
-                                <div class="modal-header" style="border-bottom: 1px solid #2d3748;">
-                                    <h5 class="modal-title" style="color: white;">Confirmar Eliminación</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(1);"></button>
-                                </div>
-                                <div class="modal-body" style="color: #a0aec0;">
-                                    ¿Estás seguro de que deseas eliminar la playlist "<strong style="color: white;">@playlist.Name</strong>"?
-                                    <br><small>Esta acción no se puede deshacer.</small>
-                                </div>
-                                <div class="modal-footer" style="border-top: 1px solid #2d3748;">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 20px; background: #2d3748; border: none;">Cancelar</button>
-                                    <form asp-action="Delete" asp-route-id="@playlist.Id" method="post" style="display: inline;">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-danger" style="border-radius: 20px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none;">Eliminar</button>
-                                    </form>
+                        <!-- Delete Confirmation Modal - Fixed Version -->
+                        <div class="modal fade" id="deleteModal-@playlist.Id" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content" style="background: rgba(31, 41, 55, 0.95); border: none; border-radius: 25px; backdrop-filter: blur(25px); box-shadow: 0 15px 50px rgba(0,0,0,0.4); border: 1px solid rgba(248, 250, 252, 0.1);">
+                                    <div class="modal-header" style="border-bottom: 1px solid rgba(248, 250, 252, 0.1); border-radius: 25px 25px 0 0; padding: 2rem 2rem 1.5rem;">
+                                        <h5 class="modal-title" style="color: #f8fafc; font-weight: 600; font-size: 1.3rem;">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+                                    </div>
+                                    <div class="modal-body" style="color: rgba(248, 250, 252, 0.8); padding: 2rem; font-size: 1.1rem;">
+                                        Are you sure you want to delete the playlist "<strong style="color: #f8fafc;">@playlist.Name</strong>"?
+                                        <br><small style="color: rgba(248, 250, 252, 0.6); margin-top: 10px; display: block;">This action cannot be undone.</small>
+                                    </div>
+                                    <div class="modal-footer" style="border-top: 1px solid rgba(248, 250, 252, 0.1); padding: 1.5rem 2rem 2rem;">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 25px; background: rgba(248, 250, 252, 0.15); border: 1px solid rgba(248, 250, 252, 0.3); color: #f8fafc; padding: 12px 28px; font-weight: 500;">Cancel</button>
+                                        <form asp-action="Delete" asp-route-id="@playlist.Id" method="post" style="display: inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger ms-2" style="border-radius: 25px; background: linear-gradient(135deg, #ef4444, #dc2626); border: none; padding: 12px 28px; box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); font-weight: 500;">Delete</button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="text-center py-5" style="margin-top: 100px;">
-                <div class="empty-state-icon" style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                    <i class="fas fa-music fa-3x" style="color: rgba(255, 255, 255, 0.2);"></i>
+                    }
                 </div>
-                <h4 class="mb-3" style="color: white;">No hay playlists disponibles</h4>
-                <p class="text-muted mb-4">¡Crea tu primera playlist para comenzar!</p>
-                <a asp-action="Create" class="btn btn-primary" style="border-radius: 20px; padding: 8px 25px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none;">
-                    <i class="fas fa-plus me-2"></i> Crear Primera Playlist
-                </a>
-            </div>
-        }
+            }
+            else
+            {
+                <div class="text-center py-5" style="margin-top: 60px;">
+                    <div class="empty-state-icon" style="width: 160px; height: 160px; background: rgba(248, 250, 252, 0.1); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 40px; backdrop-filter: blur(15px); border: 1px solid rgba(248, 250, 252, 0.2); box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+                        <i class="fas fa-music fa-5x" style="color: rgba(248, 250, 252, 0.3);"></i>
+                    </div>
+                    <h4 class="mb-4" style="color: #f8fafc; font-weight: 600; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); font-size: 1.8rem;">No hay playlists disponibles</h4>
+                    <p class="text-muted mb-5" style="color: rgba(248, 250, 252, 0.7); font-size: 1.2rem;">¡Crea tu primera playlist para comenzar!</p>
+                    <a asp-action="Create" class="btn btn-primary" style="border-radius: 30px; padding: 15px 35px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5); font-weight: 500; font-size: 1.1rem; transition: all 0.3s ease;">
+                        <i class="fas fa-plus me-2"></i> Crear Primera Playlist
+                    </a>
+                </div>
+            }
+        </div>
     </div>
 </div>
 
@@ -140,43 +143,145 @@
     }
 }
 
+<!-- Modal Fix Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fix for stuck modal backdrops
+        const removeBackdrops = () => {
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        };
+
+        // Initialize modal event listeners
+        document.querySelectorAll('[data-bs-toggle="modal"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetModal = document.querySelector(this.getAttribute('data-bs-target'));
+                if (targetModal) {
+                    // Clean up any existing backdrops
+                    removeBackdrops();
+                    
+                    // Initialize the modal
+                    const modal = new bootstrap.Modal(targetModal);
+                    modal.show();
+                    
+                    // Ensure proper cleanup when modal hides
+                    targetModal.addEventListener('hidden.bs.modal', removeBackdrops);
+                }
+            });
+        });
+    });
+</script>
+
 <style>
+    body {
+        overflow-x: hidden;
+    }
+    
+    .playlists-container {
+        margin: 0;
+        padding: 0;
+    }
+    .modal-backdrop {
+        display: none !important;
+    }
+    
+    .modal {
+        z-index: 1050;
+    }
     .playlist-card:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        background: rgba(248, 250, 252, 0.2) !important;
+        transform: translateY(-12px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        border-color: rgba(248, 250, 252, 0.4) !important;
     }
     
     .play-button {
         opacity: 0;
-        transform: translateY(10px);
-        transition: all 0.3s ease;
+        transform: translateY(20px) scale(0.7);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     
     .playlist-card:hover .play-button {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
+    }
+    
+    .play-button:hover {
+        transform: translateY(-5px) scale(1.15);
+        box-shadow: 0 12px 40px rgba(16, 185, 129, 0.7);
     }
     
     .dropdown-menu {
-        border-radius: 10px !important;
-        padding: 0.5rem 0;
-    }
-    
-    .dropdown-item {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
+        min-width: 180px;
     }
     
     .dropdown-item:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(248, 250, 252, 0.15) !important;
+        transform: translateX(4px);
     }
     
-    .btn-outline-light {
-        border-color: rgba(255, 255, 255, 0.2);
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
     
     .btn-outline-light:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(248, 250, 252, 0.2) !important;
+        border-color: rgba(248, 250, 252, 0.5) !important;
+        transform: translateY(-3px);
     }
+    
+    .alert {
+        animation: slideInDown 0.4s ease;
+    }
+    
+    @@keyframes slideInDown {
+        from {
+            transform: translateY(-40px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .modal-content {
+        animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    @@keyframes modalSlideIn {
+        from {
+            transform: translateY(-60px) scale(0.7);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+    
+    .playlist-card {
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+    
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .playlist-card:nth-child(1) { animation-delay: 0.1s; }
+    .playlist-card:nth-child(2) { animation-delay: 0.2s; }
+    .playlist-card:nth-child(3) { animation-delay: 0.3s; }
+    .playlist-card:nth-child(4) { animation-delay: 0.4s; }
 </style>

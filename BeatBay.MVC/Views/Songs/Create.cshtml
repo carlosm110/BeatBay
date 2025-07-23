@@ -4,18 +4,18 @@
     ViewData["Title"] = "Subir Canción";
 }
 
-<div class="container py-5">
+<div class="upload-container">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="security-card p-4 p-md-5">
+            <div class="upload-content p-4 p-md-5">
                 <div class="text-center mb-5">
-                    <div class="security-icon-container mb-4">
-                        <div class="security-icon">
+                    <div class="upload-icon-container mb-4">
+                        <div class="upload-icon">
                             <i class="fas fa-music"></i>
                         </div>
                     </div>
-                    <h2 class="fw-bold mb-3" style="color: #4c51bf;">Subir Nueva Canción</h2>
-                    <p class="text-muted">Comparte tu música con la comunidad de BeatBay</p>
+                    <h2 class="upload-title mb-3">Subir Nueva Canción</h2>
+                    <p class="upload-subtitle">Comparte tu música con la comunidad de BeatBay</p>
                 </div>
 
                 @if (ViewBag.Error != null)
@@ -30,49 +30,49 @@
 
                 <form asp-action="Create" enctype="multipart/form-data" method="post">
                     <div class="mb-4">
-                        <label asp-for="Title" class="form-label fw-bold" style="color: #4c51bf;"></label>
+                        <label asp-for="Title" class="form-label-custom"></label>
                         <div class="form-floating">
-                            <input asp-for="Title" class="form-control" placeholder="Título de la canción" />
+                            <input asp-for="Title" class="form-control-custom" placeholder="Título de la canción" />
                             <label>Título de la canción</label>
                         </div>
                         <span asp-validation-for="Title" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="Duration" class="form-label fw-bold" style="color: #4c51bf;"></label>
+                        <label asp-for="Duration" class="form-label-custom"></label>
                         <div class="form-floating">
-                            <input asp-for="Duration" class="form-control" id="durationInput" type="text" placeholder="Duración" readonly />
+                            <input asp-for="Duration" class="form-control-custom duration-input" id="durationInput" type="text" placeholder="Duración" readonly />
                             <label>Duración (se calculará automáticamente)</label>
                         </div>
                         <span asp-validation-for="Duration" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="Genre" class="form-label fw-bold" style="color: #4c51bf;"></label>
+                        <label asp-for="Genre" class="form-label-custom"></label>
                         <div class="form-floating">
-                            <input asp-for="Genre" class="form-control" placeholder="Género musical" />
+                            <input asp-for="Genre" class="form-control-custom" placeholder="Género musical" />
                             <label>Género musical</label>
                         </div>
                         <span asp-validation-for="Genre" class="text-danger small"></span>
                     </div>
 
                     <div class="mb-5">
-                        <label for="audioFile" class="form-label fw-bold" style="color: #4c51bf;">Archivo de audio</label>
+                        <label for="audioFile" class="form-label-custom">Archivo de audio</label>
                         <div class="file-upload-wrapper">
-                            <input type="file" name="audioFile" id="audioFile" class="form-control" accept=".mp3,.wav,.flac,.m4a" required />
-                            <div class="file-upload-info mt-2 small text-muted">Formatos aceptados: .mp3, .wav, .flac, .m4a</div>
+                            <input type="file" name="audioFile" id="audioFile" class="form-control-custom" accept=".mp3,.wav,.flac,.m4a" required />
+                            <div class="file-upload-info mt-2 small">Formatos aceptados: .mp3, .wav, .flac, .m4a</div>
                         </div>
-                        <div id="audioInfo" class="mt-2 small text-muted" style="display: none;">
+                        <div id="audioInfo" class="mt-2 small file-info-text" style="display: none;">
                             <i class="fas fa-info-circle me-1"></i>
                             <span id="fileDetails"></span>
                         </div>
                     </div>
 
                     <div class="d-grid gap-3 d-md-flex justify-content-md-end">
-                        <a asp-action="Index" class="btn btn-light me-md-2">
+                        <a asp-action="Index" class="btn-custom btn-light-custom me-md-2">
                             <i class="fas fa-times me-2"></i>Cancelar
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn-custom btn-primary-custom">
                             <i class="fas fa-upload me-2"></i>Subir Canción
                         </button>
                     </div>
@@ -118,14 +118,26 @@
 }
 
 <style>
-    .security-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        transition: all 0.3s ease;
+    /* Contenedor principal que ocupa toda la pantalla excepto el navbar */
+    .upload-container {
+        min-height: calc(100vh - 80px);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem 1rem;
+        margin: 0;
+        position: relative;
     }
 
-    .security-icon {
+    /* Contenido sin card, directamente sobre el fondo */
+    .upload-content {
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+        transition: none;
+    }
+
+    /* Icono principal */
+    .upload-icon {
         width: 80px;
         height: 80px;
         background: linear-gradient(135deg, #6366f1, #8b5cf6);
@@ -135,76 +147,200 @@
         justify-content: center;
         color: white;
         font-size: 2rem;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
         margin: 0 auto;
-    }
-
-    .form-control {
-        border-radius: 12px;
-        padding: 0.75rem 1rem;
-        border: 2px solid #e5e7eb;
         transition: all 0.3s ease;
     }
 
-        .form-control:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+        .upload-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
         }
 
-    .btn {
+    /* Títulos */
+    .upload-title {
+        font-weight: 700;
+        color: white;
+        font-size: 2rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .upload-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.1rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Labels personalizados */
+    .form-label-custom {
+        font-weight: 600;
+        color: white;
+        margin-bottom: 0.5rem;
+        display: block;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Controles de formulario */
+    .form-control-custom {
+        border-radius: 16px;
+        padding: 0.875rem 1.25rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        color: white;
+    }
+
+        .form-control-custom::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-control-custom:focus {
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
+            outline: none;
+            color: white;
+        }
+
+        .form-control-custom:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+    /* Input de duración (readonly) */
+    .duration-input {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    /* Botones personalizados */
+    .btn-custom {
         border-radius: 12px;
         font-weight: 600;
-        padding: 0.75rem 1.5rem;
+        padding: 0.875rem 1.75rem;
         transition: all 0.3s ease;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         border: none;
+        cursor: pointer;
     }
 
-        .btn-primary:hover {
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+        .btn-primary-custom:hover {
             background: linear-gradient(135deg, #5856eb, #7c3aed);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            color: white;
         }
 
-    .btn-light {
-        background: #f8fafc;
-        border: 2px solid #e5e7eb;
+    .btn-light-custom {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
     }
 
-        .btn-light:hover {
-            background: #e5e7eb;
+        .btn-light-custom:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            text-decoration: none;
         }
 
+    /* Información de archivo */
+    .file-upload-info {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.875rem;
+    }
+
+    .file-info-text {
+        color: #10b981;
+        background: rgba(16, 185, 129, 0.2);
+        padding: 0.5rem;
+        border-radius: 8px;
+        border-left: 3px solid #10b981;
+        backdrop-filter: blur(5px);
+    }
+
+    /* Alertas personalizadas */
+    .custom-alert {
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        backdrop-filter: blur(10px);
+    }
+
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fecaca;
+    }
+
+    .custom-alert i {
+        margin-right: 12px;
+        font-size: 1.2rem;
+    }
+
+    /* Wrapper para upload de archivos */
     .file-upload-wrapper {
         position: relative;
     }
 
-    .file-upload-info {
-        font-size: 0.85rem;
+    /* Floating labels */
+    .form-floating > label {
+        color: rgba(255, 255, 255, 0.7);
+        padding: 1rem 1.25rem;
     }
 
-    .custom-alert {
-        border-radius: 12px;
-        padding: 1rem;
-        display: flex;
-        align-items: center;
+    .form-floating > .form-control-custom:focus ~ label,
+    .form-floating > .form-control-custom:not(:placeholder-shown) ~ label {
+        color: rgba(255, 255, 255, 0.9);
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
     }
 
-    .alert-danger {
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.2);
-        color: #991b1b;
+    /* Responsividad */
+    @@media (max-width: 768px) {
+        .upload-container
+
+    {
+        padding: 1rem 0.5rem;
+        min-height: calc(100vh - 70px);
     }
 
-    .custom-alert i {
-        margin-right: 10px;
-        font-size: 1.2rem;
+    .upload-content {
+        margin: 0 0.5rem;
     }
 
-    #durationInput {
-        background-color: #f8f9fa;
+    .upload-title {
+        font-size: 1.75rem;
+    }
+
+    .upload-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 1.75rem;
+    }
+
+    }
+
+    /* Validación de errores */
+    .text-danger {
+        color: #dc2626 !important;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
     }
 </style>
