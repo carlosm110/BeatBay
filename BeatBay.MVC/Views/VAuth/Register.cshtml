@@ -4,104 +4,146 @@
     ViewData["Title"] = "Register";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow-lg border-0">
-            <div class="card-header bg-success text-white text-center">
-                <h3><i class="fas fa-user-plus"></i> Join BeatBay</h3>
-                <p class="mb-0">Create your account and start listening!</p>
-            </div>
-            <div class="card-body p-4">
-                <form asp-action="Register" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input asp-for="UserName" class="form-control" id="floatingUserName" placeholder="Username" />
-                                <label for="floatingUserName"><i class="fas fa-user"></i> Username *</label>
-                                <span asp-validation-for="UserName" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input asp-for="Email" type="email" class="form-control" id="floatingEmail" placeholder="Email" />
-                                <label for="floatingEmail"><i class="fas fa-envelope"></i> Email *</label>
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                        </div>
+<div class="register-container">
+    <div class="row justify-content-center h-100 align-items-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="register-card">
+                <!-- Card header -->
+                <div class="card-header">
+                    <div class="register-icon">
+                        <i class="fas fa-user-plus"></i>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input asp-for="Password" type="password" class="form-control" id="floatingPassword" placeholder="Password" />
-                                <label for="floatingPassword"><i class="fas fa-lock"></i> Password *</label>
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                                <div class="form-text">Password must be at least 6 characters long</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input asp-for="ConfirmPassword" type="password" class="form-control" id="floatingConfirmPassword" placeholder="Confirm Password" />
-                                <label for="floatingConfirmPassword"><i class="fas fa-lock"></i> Confirm Password *</label>
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input asp-for="Name" class="form-control" id="floatingName" placeholder="Full Name" />
-                        <label for="floatingName"><i class="fas fa-id-card"></i> Full Name (Optional)</label>
-                        <span asp-validation-for="Name" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <textarea asp-for="Bio" class="form-control" id="floatingBio" placeholder="Bio" style="height: 100px"></textarea>
-                        <label for="floatingBio"><i class="fas fa-info-circle"></i> Bio (Optional)</label>
-                        <span asp-validation-for="Bio" class="text-message"></span>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <select asp-for="PlanId" class="form-select" id="floatingPlan">
-                            <option value="">Select a Plan (Optional)</option>
-                            <option value="1">Free Plan - $0/month</option>
-                            <option value="2">Personal Plan - $1/month</option>
-                            <option value="3">Family Plan - $3.50/month</option>
-                            <option value="4">Business Plan - $35/month</option>
-                        </select>
-                        <label for="floatingPlan"><i class="fas fa-crown"></i> Subscription Plan</label>
-                        <span asp-validation-for="PlanId" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="termsCheck" required>
-                        <label class="form-check-label" for="termsCheck">
-                            I agree to the <a href="#" class="text-success">Terms of Service</a> and <a href="#" class="text-success">Privacy Policy</a> *
-                        </label>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-success btn-lg">
-                            <i class="fas fa-user-plus"></i> Create Account
-                        </button>
-                    </div>
-                </form>
-
-                <hr class="my-4">
-
-                <div class="text-center">
-                    <p class="mb-2">Already have an account?</p>
-                    <a asp-action="Login" class="btn btn-outline-primary">
-                        <i class="fas fa-sign-in-alt"></i> Login Here
-                    </a>
+                    <h3 class="register-title">
+                        <i class="fas fa-music me-2"></i>
+                        Join BeatBay
+                    </h3>
+                    <p class="register-subtitle">Create your account and start listening to music</p>
                 </div>
 
-                <div class="text-center mt-3">
-                    <p class="text-muted">
-                        <i class="fas fa-microphone"></i>
-                        Are you an artist? <a asp-action="RegisterArtist" class="text-warning">Register as Artist</a>
-                    </p>
+                <!-- Form body -->
+                <div class="card-body">
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+                        <!-- Row 1: Username and Email -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="floatingUserName" class="form-label">
+                                        <i class="fas fa-user"></i> USERNAME *
+                                    </label>
+                                    <input asp-for="UserName" class="form-control custom-input"
+                                           id="floatingUserName" placeholder="Your unique username" />
+                                    <span asp-validation-for="UserName" class="validation-error"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="floatingEmail" class="form-label">
+                                        <i class="fas fa-envelope"></i> EMAIL *
+                                    </label>
+                                    <input asp-for="Email" type="email" class="form-control custom-input"
+                                           id="floatingEmail" placeholder="your@email.com" />
+                                    <span asp-validation-for="Email" class="validation-error"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Password and Confirm Password -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="floatingPassword" class="form-label">
+                                        <i class="fas fa-lock"></i> PASSWORD *
+                                    </label>
+                                    <input asp-for="Password" type="password" class="form-control custom-input"
+                                           id="floatingPassword" placeholder="Minimum 6 characters" />
+                                    <span asp-validation-for="Password" class="validation-error"></span>
+                                    <div class="form-text">Password must be at least 6 characters</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="floatingConfirmPassword" class="form-label">
+                                        <i class="fas fa-lock"></i> CONFIRM PASSWORD *
+                                    </label>
+                                    <input asp-for="ConfirmPassword" type="password" class="form-control custom-input"
+                                           id="floatingConfirmPassword" placeholder="Repeat your password" />
+                                    <span asp-validation-for="ConfirmPassword" class="validation-error"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Full name -->
+                        <div class="form-group">
+                            <label for="floatingName" class="form-label">
+                                <i class="fas fa-id-card"></i> FULL NAME
+                            </label>
+                            <input asp-for="Name" class="form-control custom-input"
+                                   id="floatingName" placeholder="Your full name (optional)" />
+                            <span asp-validation-for="Name" class="validation-error"></span>
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="form-group">
+                            <label for="floatingBio" class="form-label">
+                                <i class="fas fa-info-circle"></i> BIO
+                            </label>
+                            <textarea asp-for="Bio" class="form-control custom-textarea"
+                                      id="floatingBio" placeholder="Tell us a bit about yourself (optional)" rows="3"></textarea>
+                            <span asp-validation-for="Bio" class="validation-error"></span>
+                        </div>
+
+                        <!-- Subscription plan -->
+                        <div class="form-group">
+                            <label for="floatingPlan" class="form-label">
+                                <i class="fas fa-crown"></i> SUBSCRIPTION PLAN
+                            </label>
+                            <select asp-for="PlanId" class="form-select custom-select" id="floatingPlan">
+                                <option value="">Select a plan (optional)</option>
+                                <option value="1">Free Plan - $0/month</option>
+                                <option value="2">Personal Plan - $1/month</option>
+                                <option value="3">Family Plan - $3.50/month</option>
+                                <option value="4">Business Plan - $35/month</option>
+                            </select>
+                            <span asp-validation-for="PlanId" class="validation-error"></span>
+                        </div>
+
+                        <!-- Terms and conditions -->
+                        <div class="form-check-group">
+                            <input class="form-check-input custom-checkbox" type="checkbox" id="termsCheck" required>
+                            <label class="form-check-label" for="termsCheck">
+                                I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="terms-link">Privacy Policy</a> *
+                            </label>
+                        </div>
+
+                        <!-- Register button -->
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-success register-btn">
+                                <i class="fas fa-user-plus me-2"></i> Create Account
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider">
+                        <span>Already have an account?</span>
+                    </div>
+
+                    <!-- Login button -->
+                    <div class="text-center mb-3">
+                        <a asp-action="Login" class="btn btn-outline-primary login-link-btn">
+                            <i class="fas fa-sign-in-alt me-2"></i> Login
+                        </a>
+                    </div>
+
+                    <!-- Artist link -->
+                    <div class="text-center">
+                        <p class="artist-text">
+                            <i class="fas fa-microphone me-1"></i>
+                            Are you an artist? <a asp-action="RegisterArtist" class="artist-link">Register as Artist</a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -109,146 +151,418 @@
 </div>
 
 <style>
-    .card {
-        border-radius: 15px;
-        margin-top: 30px;
-        margin-bottom: 30px;
-    }
-
-    .card-header {
-        border-radius: 15px 15px 0 0 !important;
-        padding: 25px;
-    }
-
-    .form-floating > label {
-        padding-left: 2.5rem;
-    }
-
-    .form-floating > .form-control,
-    .form-floating > .form-select {
-        padding-left: 2.5rem;
-    }
-
-    .form-floating > label i {
-        position: absolute;
-        left: -1.5rem;
-        top: 50%;
-        transform: -translate(-50%);
-    }
-
+    /* Base styles */
     body {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .btn-lg {
-        padding: 12px 24px;
-        font-size: 1.1rem;
+    .register-container {
+        background: transparent;
+        min-height: calc(100vh - 80px);
+        color: white;
+        position: relative;
+        padding: 1.5rem 0;
     }
 
-    .form-text {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-top: 5px;
+    .register-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        backdrop-filter: blur(15px);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease;
+        margin: 1rem 0;
     }
 
-    .text-success {
-        color: #28a745 !important;
-    }
-
-        .text-success:hover {
-            color: #1e7e34 !important;
-            text-decoration: none;
+        .register-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
         }
 
-    .btn-outline-primary {
-        color: #007bff;
-        border-color: #007bff;
+    /* Card header */
+    .card-header {
+        background: rgba(16, 185, 129, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 2rem;
+        text-align: center;
+        position: relative;
     }
 
-        .btn-outline-primary:hover {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-
-    .text-warning {
-        color: #ffc107 !important;
-    }
-
-        .text-warning:hover {
-            color: #e0a800 !important;
-            text-decoration: none;
-        }
-
-    /* Mejoras en la responsividad */
-    @@media (max-width: 768px) {
-        .card-header
-
-    {
-        padding: 20px 15px;
-    }
-
-    .card-body {
-        padding: 20px 15px;
-    }
-
-    .form-floating > label {
-        padding-left: 2rem;
-    }
-
-    .form-floating > .form-control,
-    .form-floating > .form-select {
-        padding-left: 2rem;
-    }
-
-    .form-floating > label i {
-        left: -1rem;
-    }
-
-    }
-
-    /* Animaciones suaves */
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #28a745;
-        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-    }
-
-    .btn-success {
-        background-color: #28a745;
-        border-color: #28a745;
+    .register-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
         transition: all 0.3s ease;
     }
 
-        .btn-success:hover {
-            background-color: #218838;
-            border-color: #1e7e34;
+        .register-icon:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+        }
+
+        .register-icon i {
+            font-size: 1.8rem;
+            color: white;
+        }
+
+    .register-title {
+        color: #f8fafc;
+        font-weight: 700;
+        font-size: 1.6rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .register-subtitle {
+        color: rgba(248, 250, 252, 0.7);
+        font-size: 1rem;
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+
+    /* Form body */
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Form groups */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: rgba(248, 250, 252, 0.9);
+        margin-bottom: 0.75rem;
+        display: block;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+        .form-label i {
+            color: #10b981;
+            margin-right: 0.5rem;
+            width: 16px;
+            text-align: center;
+        }
+
+    /* Custom inputs */
+    .custom-input, .custom-select, .custom-textarea {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 15px 18px;
+        color: white !important;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+
+    .custom-input {
+        height: 55px;
+    }
+
+    .custom-textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+
+        .custom-input:focus, .custom-select:focus, .custom-textarea:focus {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25) !important;
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+        .custom-input:hover, .custom-select:hover, .custom-textarea:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .custom-input::placeholder, .custom-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+            font-weight: 400;
+        }
+
+    /* Custom select */
+    .custom-select option {
+        background: #1f2937;
+        color: white;
+        padding: 10px;
+    }
+
+    /* Help text */
+    .form-text {
+        font-size: 0.8rem;
+        color: rgba(248, 250, 252, 0.6);
+        margin-top: 0.5rem;
+        font-style: italic;
+    }
+
+    /* Validation */
+    .validation-summary {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        color: #fecaca;
+        backdrop-filter: blur(5px);
+    }
+
+    .validation-error {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: block;
+        color: #fca5a5;
+        font-weight: 500;
+    }
+
+    /* Custom checkbox */
+    .form-check-group {
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .custom-checkbox {
+        width: 18px;
+        height: 18px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+
+        .custom-checkbox:checked {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #10b981;
+        }
+
+        .custom-checkbox:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25);
+        }
+
+    .form-check-label {
+        color: rgba(248, 250, 252, 0.8);
+        font-size: 0.9rem;
+        line-height: 1.4;
+        cursor: pointer;
+    }
+
+    .terms-link {
+        color: #10b981;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+        .terms-link:hover {
+            color: #059669;
+            text-decoration: underline;
+        }
+
+    /* Register button */
+    .register-btn {
+        background: linear-gradient(135deg, #10b981, #059669);
+        border: none;
+        border-radius: 12px;
+        padding: 15px 24px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        text-decoration: none;
+    }
+
+        .register-btn:hover {
+            background: linear-gradient(135deg, #0f9e78, #047857);
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+            color: white;
         }
 
-    .card {
-        transition: transform 0.3s ease;
-    }
-
-        .card:hover {
-            transform: translateY(-5px);
+        .register-btn:active {
+            transform: translateY(0);
         }
 
-    /* Estilos para los mensajes de validación */
-    .text-danger {
-        font-size: 0.875rem;
-        margin-top: 5px;
+    /* Divider */
+    .divider {
+        text-align: center;
+        margin: 2rem 0 1.5rem 0;
+        position: relative;
     }
 
-    .form-check-input:checked {
-        background-color: #28a745;
-        border-color: #28a745;
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        .divider span {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0 1rem;
+            color: rgba(248, 250, 252, 0.7);
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+        }
+
+    /* Login button */
+    .login-link-btn {
+        background: transparent;
+        border: 2px solid rgba(99, 102, 241, 0.5);
+        color: #6366f1;
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
     }
 
-    .form-check-input:focus {
-        border-color: #28a745;
-        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        .login-link-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: #6366f1;
+            color: #6366f1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+    /* Artist text and link */
+    .artist-text {
+        color: rgba(248, 250, 252, 0.7);
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .artist-link {
+        color: #f59e0b;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+        .artist-link:hover {
+            color: #d97706;
+            text-decoration: underline;
+        }
+
+    /* Error states */
+    .is-invalid {
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25) !important;
+    }
+
+    /* Animations */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsiveness */
+    @@media (max-width: 768px) {
+        .register-container {
+            padding: 1rem;
+        }
+
+        .register-card {
+            margin: 0;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .register-icon {
+            width: 60px;
+            height: 60px;
+        }
+
+            .register-icon i {
+                font-size: 1.5rem;
+            }
+
+        .register-title {
+            font-size: 1.4rem;
+        }
+
+        .custom-input, .custom-textarea {
+            height: 50px;
+            padding: 12px 15px;
+        }
+
+        .custom-textarea {
+            min-height: 70px;
+        }
+
+        .form-check-group {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .register-title {
+            font-size: 1.2rem;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+        }
+
+        .register-btn, .login-link-btn {
+            padding: 12px 20px;
+            font-size: 1rem;
+        }
+    }
+
+    /* Improved focus states */
+    .form-group:focus-within .form-label {
+        color: #10b981;
+        transition: color 0.3s ease;
+    }
+
+    /* Accessibility improvements */
+    .btn:focus {
+        outline: 2px solid rgba(16, 185, 129, 0.5);
+        outline-offset: 2px;
     }
 </style>
 
@@ -258,45 +572,88 @@
     }
 
     <script>
-        // Validación adicional del formulario
+        // Additional form validation
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form');
             const password = document.getElementById('floatingPassword');
             const confirmPassword = document.getElementById('floatingConfirmPassword');
             const termsCheck = document.getElementById('termsCheck');
 
-            // Validar que las contraseñas coincidan
+            // Validate password match
             function validatePasswords() {
                 if (password.value !== confirmPassword.value) {
-                    confirmPassword.setCustomValidity('Las contraseñas no coinciden');
+                    confirmPassword.setCustomValidity('Passwords do not match');
+                    confirmPassword.classList.add('is-invalid');
                 } else {
                     confirmPassword.setCustomValidity('');
+                    confirmPassword.classList.remove('is-invalid');
                 }
             }
 
             password.addEventListener('input', validatePasswords);
             confirmPassword.addEventListener('input', validatePasswords);
 
-            // Validar términos y condiciones
+            // Validate terms and conditions
             form.addEventListener('submit', function(e) {
                 if (!termsCheck.checked) {
                     e.preventDefault();
-                    alert('Debes aceptar los términos y condiciones para continuar');
+
+                    // Create custom alert
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                    alertDiv.style.cssText = `
+                        border-radius: 10px;
+                        background: rgba(239, 68, 68, 0.2);
+                        border: 1px solid rgba(239, 68, 68, 0.3);
+                        color: #fecaca;
+                        backdrop-filter: blur(5px);
+                        margin-bottom: 1rem;
+                    `;
+                    alertDiv.innerHTML = `
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        You must accept the terms and conditions to continue
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: invert(1);"></button>
+                    `;
+
+                    // Insert alert at the beginning of the form
+                    const firstElement = form.firstElementChild;
+                    form.insertBefore(alertDiv, firstElement);
+
+                    // Auto-remove after 5 seconds
+                    setTimeout(() => {
+                        if (alertDiv.parentNode) {
+                            alertDiv.remove();
+                        }
+                    }, 5000);
+
                     return false;
                 }
             });
 
-            // Efecto visual para campos con error
-            const inputs = document.querySelectorAll('.form-control, .form-select');
+            // Visual effect for error fields
+            const inputs = document.querySelectorAll('.custom-input, .custom-select, .custom-textarea');
             inputs.forEach(input => {
                 input.addEventListener('blur', function() {
-                    const errorSpan = this.parentElement.querySelector('.text-danger');
+                    const errorSpan = this.parentElement.querySelector('.validation-error');
                     if (errorSpan && errorSpan.textContent.trim() !== '') {
                         this.classList.add('is-invalid');
                     } else {
                         this.classList.remove('is-invalid');
                     }
                 });
+
+                // Clear error state when typing
+                input.addEventListener('input', function() {
+                    this.classList.remove('is-invalid');
+                });
+            });
+
+            // Animation for terms checkbox
+            termsCheck.addEventListener('change', function() {
+                this.style.transform = this.checked ? 'scale(1.1)' : 'scale(1)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
             });
         });
     </script>

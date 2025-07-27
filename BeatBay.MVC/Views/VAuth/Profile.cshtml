@@ -8,12 +8,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            color: #f8fafc;
         }
 
         .profile-header {
-            background: linear-gradient(135deg, #6c5ce7 0%, #0984e3 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             color: white;
             border-radius: 0 0 20px 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -40,20 +44,22 @@
 
         .profile-card {
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             border: none;
             transition: transform 0.3s;
             margin-bottom: 2rem;
-            background-color: white;
+            background: rgba(31, 41, 55, 0.8);
+            backdrop-filter: blur(10px);
         }
 
             .profile-card:hover {
                 transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.2);
             }
 
         .stat-card {
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: all 0.3s;
             cursor: pointer;
             height: 100%;
@@ -63,27 +69,27 @@
 
             .stat-card:hover {
                 transform: translateY(-5px);
-                box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.2);
             }
 
         .stat-icon {
             font-size: 2rem;
             margin-bottom: 15px;
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         .premium-badge {
-            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
-            color: #000;
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            color: #fff;
             font-weight: 600;
             padding: 8px 20px;
             border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(253, 203, 110, 0.3);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
             border: none;
         }
 
         .free-badge {
-            background: linear-gradient(135deg, #636e72 0%, #2d3436 100%);
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
             color: #fff;
             font-weight: 600;
             padding: 8px 20px;
@@ -93,19 +99,20 @@
 
         .activity-card {
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             border: none;
-            background-color: white;
+            background: rgba(31, 41, 55, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         .activity-item {
             padding: 15px;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             transition: background-color 0.2s;
         }
 
             .activity-item:hover {
-                background-color: rgba(0,0,0,0.02);
+                background-color: rgba(255,255,255,0.05);
             }
 
             .activity-item:last-child {
@@ -113,9 +120,9 @@
             }
 
         .btn-upgrade {
-            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
             border: none;
-            color: #000;
+            color: #fff;
             font-weight: 600;
             border-radius: 50px;
             padding: 10px 25px;
@@ -124,8 +131,8 @@
 
             .btn-upgrade:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(253, 203, 110, 0.4);
-                color: #000;
+                box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+                color: #fff;
             }
 
         .section-title {
@@ -133,6 +140,7 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
             font-weight: 600;
+            color: #f8fafc;
         }
 
             .section-title:after {
@@ -142,7 +150,7 @@
                 left: 0;
                 width: 50px;
                 height: 3px;
-                background: linear-gradient(135deg, #6c5ce7 0%, #0984e3 100%);
+                background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
                 border-radius: 3px;
             }
 
@@ -155,36 +163,92 @@
             justify-content: center;
             margin-right: 15px;
             flex-shrink: 0;
+            background-color: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
         }
 
         .toast {
             border: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .bg-stat-1 {
-            background: linear-gradient(135deg, #6c5ce7 0%, #0984e3 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         }
 
         .bg-stat-2 {
-            background: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
 
         .bg-stat-3 {
-            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
 
         .security-card {
-            background-color: #f8f9fa;
+            background: rgba(31, 41, 55, 0.6);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .btn-rounded {
             border-radius: 50px;
             padding: 8px 20px;
             font-weight: 500;
+        }
+
+        .text-muted {
+            color: #d1d5db !important;
+        }
+
+        .alert {
+            background-color: rgba(31, 41, 55, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #f8fafc;
+        }
+
+        .alert-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.2);
+            color: #f8fafc;
+        }
+
+        .alert-info {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.2);
+            color: #f8fafc;
+        }
+
+        .form-control {
+            background-color: rgba(31, 41, 55, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #f8fafc;
+        }
+
+            .form-control:focus {
+                background-color: rgba(31, 41, 55, 0.8);
+                border-color: #6366f1;
+                color: #f8fafc;
+                box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+            }
+
+        .modal-content {
+            background: rgba(31, 41, 55, 0.95);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #f8fafc;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-close {
+            filter: invert(1);
         }
     </style>
 </head>
@@ -261,11 +325,11 @@
                             </a>
                         </div>
 
-                        <hr class="my-4">
+                        <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
 
                         <div class="text-start">
                             <div class="d-flex align-items-center mb-3">
-                                <div class="info-icon bg-primary bg-opacity-10 text-primary">
+                                <div class="info-icon">
                                     <i class="fas fa-envelope"></i>
                                 </div>
                                 <div>
@@ -512,21 +576,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Global variables
-        let twoFactorEnabled = false;
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            check2FAStatus();
 
             // Show TempData messages if they exist
             @if (TempData["Success"] != null)
             {
-                        <text>showToast('success', '@TempData["Success"]');</text>
+                                <text>showToast('success', '@TempData["Success"]');</text>
             }
             @if (TempData["Error"] != null)
             {
-                        <text>showToast('error', '@TempData["Error"]');</text>
+                                <text>showToast('error', '@TempData["Error"]');</text>
             }
         });
 
@@ -538,175 +599,6 @@
             document.getElementById(messageId).textContent = message;
             const toast = new bootstrap.Toast(document.getElementById(toastId));
             toast.show();
-        }
-
-        // Check 2FA status from API
-        async function check2FAStatus() {
-            try {
-                const response = await fetch('@Url.Action("Get2FAStatus", "VAuth")', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        update2FAStatus(data.is2FAEnabled);
-                    } else {
-                        console.error('Error checking 2FA status:', data.message);
-                        document.getElementById('2faStatus').textContent = 'Error loading status';
-                    }
-                } else {
-                    console.error('HTTP error:', response.status);
-                    document.getElementById('2faStatus').textContent = 'Error loading status';
-                }
-            } catch (error) {
-                console.error('Error checking 2FA status:', error);
-                document.getElementById('2faStatus').textContent = 'Error loading status';
-            }
-        }
-
-        // Update UI based on 2FA status
-        function update2FAStatus(enabled) {
-            twoFactorEnabled = enabled;
-
-            const statusText = document.getElementById('2faStatus');
-
-            if (enabled) {
-                statusText.innerHTML = `
-                    <button type="button" class="btn btn-danger rounded-pill" onclick="show2FADisable()">
-                        <i class="fas fa-shield-alt me-1"></i> Disable
-                    </button>`;
-            } else {
-                statusText.innerHTML = `
-                    <button type="button" class="btn btn-primary rounded-pill" onclick="show2FASetup()">
-                        <i class="fas fa-shield-alt me-1"></i> Enable
-                    </button>`;
-            }
-        }
-
-        // Show 2FA setup modal
-        function show2FASetup() {
-            const modal = new bootstrap.Modal(document.getElementById('enable2FAModal'));
-            modal.show();
-        }
-
-        // Show 2FA disable modal
-        function show2FADisable() {
-            const modal = new bootstrap.Modal(document.getElementById('disable2FAModal'));
-            modal.show();
-        }
-
-        // Enable 2FA
-        async function enable2FA() {
-            const password = document.getElementById('passwordConfirm').value;
-            const button = event.target;
-
-            if (!password) {
-                showToast('error', 'Please enter your password');
-                return;
-            }
-
-            // Disable button and show loading
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enabling...';
-
-            try {
-                const response = await fetch('@Url.Action("Enable2FA", "VAuth")', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ Password: password })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-
-                    if (data.success) {
-                        // Close enable modal
-                        const enableModal = bootstrap.Modal.getInstance(document.getElementById('enable2FAModal'));
-                        enableModal.hide();
-
-                        // Clear password field
-                        document.getElementById('passwordConfirm').value = '';
-
-                        // Update status
-                        update2FAStatus(true);
-
-                        showToast('success', data.message || 'Two-factor authentication enabled successfully!');
-                    } else {
-                        showToast('error', data.message || 'Failed to enable 2FA');
-                    }
-                } else {
-                    const errorData = await response.json();
-                    showToast('error', errorData.message || 'Failed to enable 2FA');
-                }
-            } catch (error) {
-                console.error('Error enabling 2FA:', error);
-                showToast('error', 'An error occurred while enabling 2FA');
-            } finally {
-                // Re-enable button
-                button.disabled = false;
-                button.innerHTML = '<i class="fas fa-check"></i> Enable 2FA';
-            }
-        }
-
-        // Disable 2FA
-        async function disable2FA() {
-            const password = document.getElementById('passwordConfirmDisable').value;
-            const button = event.target;
-
-            if (!password) {
-                showToast('error', 'Please enter your password');
-                return;
-            }
-
-            // Disable button and show loading
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Disabling...';
-
-            try {
-                const response = await fetch('@Url.Action("Disable2FA", "VAuth")', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ Password: password })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-
-                    if (data.success) {
-                        // Close disable modal
-                        const disableModal = bootstrap.Modal.getInstance(document.getElementById('disable2FAModal'));
-                        disableModal.hide();
-
-                        // Clear password field
-                        document.getElementById('passwordConfirmDisable').value = '';
-
-                        // Update status
-                        update2FAStatus(false);
-
-                        showToast('success', data.message || 'Two-factor authentication disabled successfully!');
-                    } else {
-                        showToast('error', data.message || 'Failed to disable 2FA');
-                    }
-                } else {
-                    const errorData = await response.json();
-                    showToast('error', errorData.message || 'Failed to disable 2FA');
-                }
-            } catch (error) {
-                console.error('Error disabling 2FA:', error);
-                showToast('error', 'An error occurred while disabling 2FA');
-            } finally {
-                // Re-enable button
-                button.disabled = false;
-                button.innerHTML = '<i class="fas fa-times"></i> Disable 2FA';
-            }
         }
 
         // Handle form submission for profile updates

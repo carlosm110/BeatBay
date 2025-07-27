@@ -1,54 +1,80 @@
 ﻿@model BeatBay.DTOs.LoginDto
-
 @{
     ViewData["Title"] = "Login";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card shadow-lg border-0">
-            <div class="card-header bg-primary text-white text-center">
-                <h3><i class="fas fa-sign-in-alt"></i> Login to BeatBay</h3>
-            </div>
-            <div class="card-body p-4">
-                <form asp-action="Login" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                    <div class="form-floating mb-3">
-                        <input asp-for="UserName" class="form-control" id="floatingUserName" placeholder="Username" />
-                        <label for="floatingUserName"><i class="fas fa-user"></i> Username</label>
-                        <span asp-validation-for="UserName" class="text-danger"></span>
+<div class="login-container">
+    <div class="row justify-content-center h-100 align-items-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="login-card">
+                <!-- Card header -->
+                <div class="card-header">
+                    <div class="login-icon">
+                        <i class="fas fa-music"></i>
                     </div>
-
-                    <div class="form-floating mb-3">
-                        <input asp-for="Password" type="password" class="form-control" id="floatingPassword" placeholder="Password" />
-                        <label for="floatingPassword"><i class="fas fa-lock"></i> Password</label>
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-sign-in-alt"></i> Login
-                        </button>
-                    </div>
-                </form>
-
-                <hr class="my-4">
-
-                <div class="text-center">
-                    <p class="mb-2">Don't have an account?</p>
-                    <a asp-action="Register" class="btn btn-outline-success me-2">
-                        <i class="fas fa-user-plus"></i> Register as User
-                    </a>
-                    <a asp-action="RegisterArtist" class="btn btn-outline-warning">
-                        <i class="fas fa-microphone"></i> Register as Artist
-                    </a>
+                    <h3 class="login-title">
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        Welcome to BeatBay
+                    </h3>
+                    <p class="login-subtitle">Login to continue</p>
                 </div>
 
-                <div class="text-center mt-3">
-                    <a asp-action="ForgotPassword" class="text-muted">
-                        <i class="fas fa-question-circle"></i> Forgot your password?
-                    </a>
+                <!-- Form body -->
+                <div class="card-body">
+                    <form asp-action="Login" method="post">
+                        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+                        <!-- Username field -->
+                        <div class="form-group">
+                            <label for="floatingUserName" class="form-label">
+                                <i class="fas fa-user"></i> USERNAME
+                            </label>
+                            <input asp-for="UserName" class="form-control custom-input"
+                                   id="floatingUserName" placeholder="Enter your username" />
+                            <span asp-validation-for="UserName" class="validation-error"></span>
+                        </div>
+
+                        <!-- Password field -->
+                        <div class="form-group">
+                            <label for="floatingPassword" class="form-label">
+                                <i class="fas fa-lock"></i> PASSWORD
+                            </label>
+                            <input asp-for="Password" type="password" class="form-control custom-input"
+                                   id="floatingPassword" placeholder="Enter your password" />
+                            <span asp-validation-for="Password" class="validation-error"></span>
+                        </div>
+
+                        <!-- Login button -->
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-primary login-btn">
+                                <i class="fas fa-sign-in-alt me-2"></i> Login
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider">
+                        <span>Don't have an account?</span>
+                    </div>
+
+                    <!-- Register buttons -->
+                    <div class="register-section">
+                        <div class="d-grid gap-2">
+                            <a asp-action="Register" class="btn btn-outline-success register-btn">
+                                <i class="fas fa-user-plus me-2"></i> Register as User
+                            </a>
+                            <a asp-action="RegisterArtist" class="btn btn-outline-warning artist-btn">
+                                <i class="fas fa-microphone me-2"></i> Register as Artist
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Forgot password link -->
+                    <div class="text-center mt-4">
+                        <a asp-action="ForgotPassword" class="forgot-password">
+                            <i class="fas fa-question-circle me-1"></i> Forgot your password?
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -56,39 +82,350 @@
 </div>
 
 <style>
-    .card {
-        border-radius: 15px;
-        margin-top: 50px;
-    }
-
-    .card-header {
-        border-radius: 15px 15px 0 0 !important;
-        padding: 20px;
-    }
-
-    .form-floating > label {
-        padding-left: 2.5rem;
-    }
-
-    .form-floating > .form-control {
-        padding-left: 2.5rem;
-    }
-
-    .form-floating > label i {
-        position: absolute;
-        left: -1.5rem;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-
+    /* Base styles */
     body {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .btn-lg {
-        padding: 12px 24px;
+    .login-container {
+        background: transparent;
+        min-height: calc(100vh - 80px);
+        color: white;
+        position: relative;
+        padding: 2rem 0;
+    }
+
+    .login-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        backdrop-filter: blur(15px);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease;
+    }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+        }
+
+    /* Card header */
+    .card-header {
+        background: rgba(99, 102, 241, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .login-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        transition: all 0.3s ease;
+    }
+
+        .login-icon:hover {
+            transform: scale(1.05) rotate(10deg);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.5);
+        }
+
+        .login-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+
+    .login-title {
+        color: #f8fafc;
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .login-subtitle {
+        color: rgba(248, 250, 252, 0.7);
+        font-size: 1rem;
+        margin-bottom: 0;
+        font-weight: 500;
+    }
+
+    /* Form body */
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Form groups */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: rgba(248, 250, 252, 0.9);
+        margin-bottom: 0.75rem;
+        display: block;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+        .form-label i {
+            color: #6366f1;
+            margin-right: 0.5rem;
+            width: 16px;
+            text-align: center;
+        }
+
+    /* Custom inputs */
+    .custom-input {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 15px 18px;
+        height: 55px;
+        color: white !important;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+
+        .custom-input:focus {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25) !important;
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+        .custom-input:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .custom-input::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+            font-weight: 400;
+        }
+
+    /* Validation */
+    .validation-summary {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        color: #fecaca;
+        backdrop-filter: blur(5px);
+    }
+
+    .validation-error {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: block;
+        color: #fca5a5;
+        font-weight: 500;
+    }
+
+    /* Login button */
+    .login-btn {
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border: none;
+        border-radius: 12px;
+        padding: 15px 24px;
         font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        text-decoration: none;
+    }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+    /* Divider */
+    .divider {
+        text-align: center;
+        margin: 2rem 0;
+        position: relative;
+    }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        .divider span {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0 1rem;
+            color: rgba(248, 250, 252, 0.7);
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+        }
+
+    /* Register section */
+    .register-section {
+        margin-bottom: 1rem;
+    }
+
+    .register-btn {
+        background: transparent;
+        border: 2px solid rgba(16, 185, 129, 0.5);
+        color: #10b981;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+        .register-btn:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+            color: #10b981;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+    .artist-btn {
+        background: transparent;
+        border: 2px solid rgba(245, 158, 11, 0.5);
+        color: #f59e0b;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+        .artist-btn:hover {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: #f59e0b;
+            color: #f59e0b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+    /* Forgot password link */
+    .forgot-password {
+        color: rgba(248, 250, 252, 0.6);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .forgot-password:hover {
+            color: #6366f1;
+            text-decoration: none;
+        }
+
+    /* Animations */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsiveness */
+    @@media (max-width: 768px) {
+        .login-container {
+            padding: 1rem;
+        }
+
+        .login-card {
+            margin: 0;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .login-icon {
+            width: 60px;
+            height: 60px;
+        }
+
+            .login-icon i {
+                font-size: 1.5rem;
+            }
+
+        .login-title {
+            font-size: 1.3rem;
+        }
+
+        .custom-input {
+            height: 50px;
+            padding: 12px 15px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .login-title {
+            font-size: 1.2rem;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+        }
+
+        .login-btn {
+            padding: 12px 20px;
+            font-size: 1rem;
+        }
+    }
+
+    /* Improved focus states */
+    .form-group:focus-within .form-label {
+        color: #6366f1;
+        transition: color 0.3s ease;
+    }
+
+    /* Accessibility improvements */
+    .btn:focus {
+        outline: 2px solid rgba(99, 102, 241, 0.5);
+        outline-offset: 2px;
     }
 </style>
 

@@ -4,119 +4,121 @@
     ViewData["Title"] = "Register as Artist";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow-lg border-0">
-            <div class="card-header bg-warning text-dark text-center">
-                <h3><i class="fas fa-microphone"></i> Join BeatBay as Artist</h3>
-                <p class="mb-0">Share your music with the world!</p>
-            </div>
-            <div class="card-body p-4">
-                <div class="alert alert-info" role="alert">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Artist Account Benefits:</strong>
-                    <ul class="mb-0 mt-2">
-                        <li>Upload and manage your music</li>
-                        <li>Track your song performance</li>
-                        <li>Connect with your fans</li>
-                        <li>Earn revenue from your streams</li>
-                    </ul>
+<div class="main-container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-white text-center">
+                    <h3><i class="fas fa-microphone me-2"></i>Join BeatBay as Artist</h3>
+                    <p class="mb-0 opacity-90">Share your music with the world!</p>
                 </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Artist Account Benefits:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Upload and manage your music</li>
+                            <li>Track your song performance</li>
+                            <li>Connect with your fans</li>
+                            <li>Earn revenue from your streams</li>
+                        </ul>
+                    </div>
 
-                <form asp-action="RegisterArtist" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <form asp-action="RegisterArtist" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input asp-for="UserName" class="form-control" id="floatingUserName" placeholder="Username" />
-                                <label for="floatingUserName"><i class="fas fa-user"></i> Artist Username *</label>
-                                <span asp-validation-for="UserName" class="text-danger"></span>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="UserName" class="form-control" id="floatingUserName" placeholder="Username" />
+                                    <label for="floatingUserName"><i class="fas fa-user"></i> Artist Username *</label>
+                                    <span asp-validation-for="UserName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Email" type="email" class="form-control" id="floatingEmail" placeholder="Email" />
+                                    <label for="floatingEmail"><i class="fas fa-envelope"></i> Email *</label>
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input asp-for="Email" type="email" class="form-control" id="floatingEmail" placeholder="Email" />
-                                <label for="floatingEmail"><i class="fas fa-envelope"></i> Email *</label>
-                                <span asp-validation-for="Email" class="text-danger"></span>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="Password" type="password" class="form-control" id="floatingPassword" placeholder="Password" />
+                                    <label for="floatingPassword"><i class="fas fa-lock"></i> Password *</label>
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="ConfirmPassword" type="password" class="form-control" id="floatingConfirmPassword" placeholder="Confirm Password" />
+                                    <label for="floatingConfirmPassword"><i class="fas fa-lock"></i> Confirm Password *</label>
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                        <div class="form-text mb-3">Password must be at least 6 characters long</div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input asp-for="Password" type="password" class="form-control" id="floatingPassword" placeholder="Password" />
-                                <label for="floatingPassword"><i class="fas fa-lock"></i> Password *</label>
-                                <span asp-validation-for="Password" class="text-danger"></span>
+                        <div class="form-floating mb-3">
+                            <input asp-for="Name" class="form-control" id="floatingName" placeholder="Artist Name" />
+                            <label for="floatingName"><i class="fas fa-music"></i> Artist/Band Name *</label>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <div class="form-text">This will be displayed as your public artist name</div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <textarea asp-for="Bio" class="form-control" id="floatingBio" placeholder="Artist Bio" style="height: 120px"></textarea>
+                            <label for="floatingBio"><i class="fas fa-pen"></i> Artist Bio *</label>
+                            <span asp-validation-for="Bio" class="text-danger"></span>
+                            <div class="form-text">Tell your fans about your music, influences, and journey</div>
+                        </div>
+
+                        <div class="card agreement-card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title"><i class="fas fa-star me-2"></i>Artist Agreement</h6>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                    <label class="form-check-label" for="termsCheck">
+                                        I agree to the <a href="#" class="link-primary">Terms of Service</a> and <a href="#" class="link-primary">Privacy Policy</a> *
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="artistTerms" required>
+                                    <label class="form-check-label" for="artistTerms">
+                                        I agree to the <a href="#" class="link-primary">Artist Agreement</a> and content guidelines *
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="copyrightCheck" required>
+                                    <label class="form-check-label" for="copyrightCheck">
+                                        I confirm that I own or have rights to all music I will upload *
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-floating mb-3">
-                                <input asp-for="ConfirmPassword" type="password" class="form-control" id="floatingConfirmPassword" placeholder="Confirm Password" />
-                                <label for="floatingConfirmPassword"><i class="fas fa-lock"></i> Confirm Password *</label>
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                            </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary-custom btn-lg">
+                                <i class="fas fa-microphone me-2"></i>Create Artist Account
+                            </button>
                         </div>
-                    </div>
-                    <div class="form-text mb-3">Password must be at least 6 characters long</div>
+                    </form>
 
-                    <div class="form-floating mb-3">
-                        <input asp-for="Name" class="form-control" id="floatingName" placeholder="Artist Name" />
-                        <label for="floatingName"><i class="fas fa-music"></i> Artist/Band Name *</label>
-                        <span asp-validation-for="Name" class="text-danger"></span>
-                        <div class="form-text">This will be displayed as your public artist name</div>
-                    </div>
+                    <hr class="my-4 hr-custom">
 
-                    <div class="form-floating mb-3">
-                        <textarea asp-for="Bio" class="form-control" id="floatingBio" placeholder="Artist Bio" style="height: 120px"></textarea>
-                        <label for="floatingBio"><i class="fas fa-pen"></i> Artist Bio *</label>
-                        <span asp-validation-for="Bio" class="text-danger"></span>
-                        <div class="form-text">Tell your fans about your music, influences, and journey</div>
-                    </div>
-
-                    <div class="card bg-light mb-3">
-                        <div class="card-body">
-                            <h6 class="card-title"><i class="fas fa-star"></i> Artist Agreement</h6>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
-                                <label class="form-check-label" for="termsCheck">
-                                    I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a> *
-                                </label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="artistTerms" required>
-                                <label class="form-check-label" for="artistTerms">
-                                    I agree to the <a href="#" class="text-primary">Artist Agreement</a> and content guidelines *
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="copyrightCheck" required>
-                                <label class="form-check-label" for="copyrightCheck">
-                                    I confirm that I own or have rights to all music I will upload *
-                                </label>
-                            </div>
+                    <div class="text-center">
+                        <p class="mb-3 text-muted">Already have an account?</p>
+                        <div class="d-grid gap-2 d-md-block">
+                            <a asp-action="Login" class="btn btn-outline-primary-custom me-2">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </a>
+                            <a asp-action="Register" class="btn btn-outline-success-custom">
+                                <i class="fas fa-user-plus me-2"></i>Register as User
+                            </a>
                         </div>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-warning btn-lg text-dark">
-                            <i class="fas fa-microphone"></i> Create Artist Account
-                        </button>
-                    </div>
-                </form>
-
-                <hr class="my-4">
-
-                <div class="text-center">
-                    <p class="mb-2">Already have an account?</p>
-                    <div class="d-grid gap-2 d-md-block">
-                        <a asp-action="Login" class="btn btn-outline-primary me-2">
-                            <i class="fas fa-sign-in-alt"></i> Login
-                        </a>
-                        <a asp-action="Register" class="btn btn-outline-success">
-                            <i class="fas fa-user-plus"></i> Register as User
-                        </a>
                     </div>
                 </div>
             </div>
@@ -125,57 +127,246 @@
 </div>
 
 <style>
+    /* Layout principal */
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+
+    .main-container {
+        position: relative;
+        min-height: 100vh;
+        padding: 30px 15px;
+    }
+
+    /* Card principal */
     .card {
-        border-radius: 15px;
-        margin-top: 30px;
-        margin-bottom: 30px;
+        border-radius: 20px;
+        border: none;
+        background: rgba(248, 250, 252, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     }
 
     .card-header {
-        border-radius: 15px 15px 0 0 !important;
-        padding: 25px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-radius: 20px 20px 0 0 !important;
+        padding: 30px;
+        border: none;
     }
 
+    .card-body {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 0 0 20px 20px;
+    }
+
+    /* Formularios flotantes */
     .form-floating > label {
         padding-left: 2.5rem;
+        color: #6b7280;
+        font-weight: 500;
     }
 
     .form-floating > .form-control,
     .form-floating > .form-select {
         padding-left: 2.5rem;
+        border: 2px solid rgba(99, 102, 241, 0.1);
+        border-radius: 12px;
+        background: rgba(248, 250, 252, 0.8);
+        transition: all 0.3s ease;
     }
+
+        .form-floating > .form-control:focus,
+        .form-floating > .form-select:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.2);
+            background: #ffffff;
+        }
 
     .form-floating > label i {
         position: absolute;
         left: -1.5rem;
         top: 50%;
         transform: translateY(-50%);
+        color: #6366f1;
     }
 
-    body {
-        background: linear-gradient(135deg, #ffc107 0%, #ff8f00 100%);
-        min-height: 100vh;
+    /* Botones personalizados */
+    .btn-primary-custom {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-weight: 600;
+        padding: 15px 30px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+            background: linear-gradient(135deg, #5a5fc7 0%, #7c3aed 100%);
+            color: white;
+        }
+
+    .btn-outline-primary-custom {
+        border: 2px solid #6366f1;
+        color: #6366f1;
+        background: transparent;
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 12px 24px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-primary-custom:hover {
+            background: #6366f1;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+    .btn-outline-success-custom {
+        border: 2px solid #10b981;
+        color: #10b981;
+        background: transparent;
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 12px 24px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-success-custom:hover {
+            background: #10b981;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+    /* Alert personalizado */
+    .alert-info {
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-left: 4px solid #6366f1;
+        border-radius: 12px;
+        color: #374151;
+    }
+
+    /* Card de acuerdo */
+    .agreement-card {
+        background: rgba(99, 102, 241, 0.05) !important;
+        border: 1px solid rgba(99, 102, 241, 0.1) !important;
+        border-radius: 15px !important;
+    }
+
+        .agreement-card .card-title {
+            color: #6366f1;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+    /* Checkbox personalizado */
+    .form-check-input:checked {
+        background-color: #6366f1;
+        border-color: #6366f1;
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.2);
+        border-color: #6366f1;
+    }
+
+    /* Links */
+    .link-primary {
+        color: #6366f1 !important;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .link-primary:hover {
+            color: #5a5fc7 !important;
+            text-decoration: underline;
+        }
+
+    /* Divisor personalizado */
+    .hr-custom {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+        margin: 30px 0;
+    }
+
+    /* Texto de ayuda */
+    .form-text {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 8px;
+        font-weight: 400;
+    }
+
+    /* Validación */
+    .text-danger {
+        color: #ef4444 !important;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .main-container
+
+    {
+        padding: 15px 10px;
+    }
+
+    .card-header {
+        padding: 20px;
+    }
+
+    .card-body {
+        padding: 20px !important;
     }
 
     .btn-lg {
-        padding: 12px 24px;
-        font-size: 1.1rem;
+        padding: 12px 20px;
+        font-size: 1rem;
     }
 
-    .form-text {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-top: 5px;
     }
 
-    .alert-info {
-        border-left: 4px solid #0dcaf0;
+    /* Animaciones suaves */
+    .card {
+        animation: fadeInUp 0.6s ease-out;
     }
 
-    .bg-light {
-        background-color: #f8f9fa !important;
-        border: 1px solid #dee2e6;
-        border-radius: 10px;
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Mejoras de accesibilidad */
+    .form-control:focus,
+    .form-select:focus,
+    .btn:focus {
+        outline: none;
+    }
+
+    /* Prevenir líneas blancas */
+    html, body {
+        overflow-x: hidden;
     }
 </style>
 
