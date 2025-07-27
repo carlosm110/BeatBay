@@ -109,6 +109,7 @@ builder.Services.AddCors(options => {
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<PdfReportService>();
+builder.Services.AddScoped<PayPalService>();
 
 
 var app = builder.Build();
@@ -125,7 +126,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Permitir servir archivos estáticos (ej. wwwroot)
+// Permitir servir archivos est�ticos (ej. wwwroot)
 app.UseStaticFiles();
 
 app.UseRouting();

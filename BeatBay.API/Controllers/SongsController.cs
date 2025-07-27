@@ -59,7 +59,6 @@ namespace BeatBay.API.Controllers
         {
             var songs = await _context.Songs
                 .Include(s => s.Artist)
-                .Where(s => s.IsActive)
                 .Select(s => new SongDto
                 {
                     Id = s.Id,

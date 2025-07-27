@@ -1,130 +1,26 @@
 ﻿@model BeatBay.DTOs.CreateSongDto
 
 @{
-    ViewData["Title"] = "Subir Canción";
-}
-
-<div class="upload-container">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="upload-content p-4 p-md-5">
-                <div class="text-center mb-5">
-                    <div class="upload-icon-container mb-4">
-                        <div class="upload-icon">
-                            <i class="fas fa-music"></i>
-                        </div>
-                    </div>
-                    <h2 class="upload-title mb-3">Subir Nueva Canción</h2>
-                    <p class="upload-subtitle">Comparte tu música con la comunidad de BeatBay</p>
-                </div>
-
-                @if (ViewBag.Error != null)
-                {
-                    <div class="custom-alert alert-danger mb-4">
-                        <div class="alert-content">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <div>@ViewBag.Error</div>
-                        </div>
-                    </div>
-                }
-
-                <form asp-action="Create" enctype="multipart/form-data" method="post">
-                    <div class="mb-4">
-                        <label asp-for="Title" class="form-label-custom"></label>
-                        <div class="form-floating">
-                            <input asp-for="Title" class="form-control-custom" placeholder="Título de la canción" />
-                            <label>Título de la canción</label>
-                        </div>
-                        <span asp-validation-for="Title" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-4">
-                        <label asp-for="Duration" class="form-label-custom"></label>
-                        <div class="form-floating">
-                            <input asp-for="Duration" class="form-control-custom duration-input" id="durationInput" type="text" placeholder="Duración" readonly />
-                            <label>Duración (se calculará automáticamente)</label>
-                        </div>
-                        <span asp-validation-for="Duration" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-4">
-                        <label asp-for="Genre" class="form-label-custom"></label>
-                        <div class="form-floating">
-                            <input asp-for="Genre" class="form-control-custom" placeholder="Género musical" />
-                            <label>Género musical</label>
-                        </div>
-                        <span asp-validation-for="Genre" class="text-danger small"></span>
-                    </div>
-
-                    <div class="mb-5">
-                        <label for="audioFile" class="form-label-custom">Archivo de audio</label>
-                        <div class="file-upload-wrapper">
-                            <input type="file" name="audioFile" id="audioFile" class="form-control-custom" accept=".mp3,.wav,.flac,.m4a" required />
-                            <div class="file-upload-info mt-2 small">Formatos aceptados: .mp3, .wav, .flac, .m4a</div>
-                        </div>
-                        <div id="audioInfo" class="mt-2 small file-info-text" style="display: none;">
-                            <i class="fas fa-info-circle me-1"></i>
-                            <span id="fileDetails"></span>
-                        </div>
-                    </div>
-
-                    <div class="d-grid gap-3 d-md-flex justify-content-md-end">
-                        <a asp-action="Index" class="btn-custom btn-light-custom me-md-2">
-                            <i class="fas fa-times me-2"></i>Cancelar
-                        </a>
-                        <button type="submit" class="btn-custom btn-primary-custom">
-                            <i class="fas fa-upload me-2"></i>Subir Canción
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        document.getElementById('audioFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Mostrar información del archivo
-            document.getElementById('fileDetails').textContent = `Archivo seleccionado: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
-            document.getElementById('audioInfo').style.display = 'block';
-
-            // Crear objeto de audio para obtener la duración
-            const audio = document.createElement('audio');
-            audio.preload = 'metadata';
-
-            audio.onloadedmetadata = function() {
-                window.URL.revokeObjectURL(audio.src);
-                const duration = audio.duration;
-                const minutes = Math.floor(duration / 60);
-                const seconds = Math.floor(duration % 60);
-                const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-                // Formatear para el input time (HH:MM:SS)
-                const hours = Math.floor(minutes / 60);
-                const remainingMinutes = minutes % 60;
-                const timeFormatted = `${hours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                document.getElementById('durationInput').value = timeFormatted;
-            };
-
-            audio.src = URL.createObjectURL(file);
-        });
-    </script>
+    ViewData["Title"] = "Upload Song";
 }
 
 <style>
+    /* Asegurar que el body tenga el gradiente completo */
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+
     /* Contenedor principal que ocupa toda la pantalla excepto el navbar */
     .upload-container {
         min-height: calc(100vh - 80px);
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: transparent; /* El gradiente ya está en el body */
         padding: 2rem 1rem;
         margin: 0;
         position: relative;
+        width: 100%;
     }
 
     /* Contenido sin card, directamente sobre el fondo */
@@ -339,8 +235,129 @@
 
     /* Validación de errores */
     .text-danger {
-        color: #dc2626 !important;
+        color: #ef4444 !important;
         font-size: 0.875rem;
         margin-top: 0.25rem;
     }
+
+    /* Asegurar que no haya márgenes en el contenedor principal */
+    .container-fluid {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Resetear cualquier margen del row */
+    .row {
+        margin: 0 !important;
+    }
 </style>
+
+<div class="upload-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="upload-content p-4 p-md-5">
+                <div class="text-center mb-5">
+                    <div class="upload-icon-container mb-4">
+                        <div class="upload-icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                    </div>
+                    <h2 class="upload-title mb-3">Upload New Song</h2>
+                    <p class="upload-subtitle">Share your music with the BeatBay community</p>
+                </div>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="custom-alert alert-danger mb-4">
+                        <div class="alert-content">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>@ViewBag.Error</div>
+                        </div>
+                    </div>
+                }
+
+                <form asp-action="Create" enctype="multipart/form-data" method="post">
+                    <div class="mb-4">
+                        <div class="form-floating">
+                            <input asp-for="Title" class="form-control-custom" placeholder="Song title" />
+                            <label>Song Title</label>
+                        </div>
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-floating">
+                            <input asp-for="Duration" class="form-control-custom duration-input" id="durationInput" type="text" placeholder="Duration" readonly />
+                            <label>Duration (will be calculated automatically)</label>
+                        </div>
+                        <span asp-validation-for="Duration" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-floating">
+                            <input asp-for="Genre" class="form-control-custom" placeholder="Musical genre" />
+                            <label>Musical Genre</label>
+                        </div>
+                        <span asp-validation-for="Genre" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-5">
+                        <label for="audioFile" class="form-label-custom">Audio File</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" name="audioFile" id="audioFile" class="form-control-custom" accept=".mp3,.wav,.flac,.m4a" required />
+                            <div class="file-upload-info mt-2 small">Accepted formats: .mp3, .wav, .flac, .m4a</div>
+                        </div>
+                        <div id="audioInfo" class="mt-2 small file-info-text" style="display: none;">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <span id="fileDetails"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-3 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn-custom btn-light-custom me-md-2">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn-custom btn-primary-custom">
+                            <i class="fas fa-upload me-2"></i>Upload Song
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('audioFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Show file information
+            document.getElementById('fileDetails').textContent = `Selected file: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+            document.getElementById('audioInfo').style.display = 'block';
+
+            // Create audio object to get duration
+            const audio = document.createElement('audio');
+            audio.preload = 'metadata';
+
+            audio.onloadedmetadata = function() {
+                window.URL.revokeObjectURL(audio.src);
+                const duration = audio.duration;
+                const minutes = Math.floor(duration / 60);
+                const seconds = Math.floor(duration % 60);
+                const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                // Format for time input (HH:MM:SS)
+                const hours = Math.floor(minutes / 60);
+                const remainingMinutes = minutes % 60;
+                const timeFormatted = `${hours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                document.getElementById('durationInput').value = timeFormatted;
+            };
+
+            audio.src = URL.createObjectURL(file);
+        });
+    </script>
+}

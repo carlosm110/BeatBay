@@ -1,34 +1,37 @@
 ﻿@model BeatBay.DTOs.UserPlanStatusDto
 @{
-    ViewData["Title"] = "Mis Planes";
+    ViewData["Title"] = "My Plans";
 }
 
 <div class="container-fluid px-4 py-4">
-    <!-- Header con gradient -->
+    <!-- Header with gradient -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="header-card">
+            <div class="header-card floating">
                 <div class="d-flex align-items-center">
-                    <div class="icon-wrapper me-3">
+                    <div class="icon-wrapper me-4">
                         <i class="fas fa-crown"></i>
                     </div>
                     <div>
-                        <h1 class="mb-1">Gestión de Planes</h1>
-                        <p class="text-muted mb-0">Administra tu suscripción y conexiones</p>
+                        <h1 class="mb-1">Plan Management</h1>
+                        <p class="mb-0" style="opacity: 0.9; font-size: 1.1rem;">Manage your subscription and connections</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Mensajes de estado -->
+    <!-- Improved status messages -->
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-modern fade show" role="alert">
             <div class="d-flex align-items-center">
-                <i class="fas fa-check-circle me-2"></i>
-                <span>@TempData["SuccessMessage"]</span>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                <i class="fas fa-check-circle me-3 fa-lg"></i>
+                <div>
+                    <h5 class="alert-title mb-1">Success!</h5>
+                    <p class="mb-0">@TempData["SuccessMessage"]</p>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
     }
@@ -37,25 +40,32 @@
     {
         <div class="alert alert-danger alert-modern fade show" role="alert">
             <div class="d-flex align-items-center">
-                <i class="fas fa-exclamation-circle me-2"></i>
-                <span>@TempData["ErrorMessage"]</span>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                <i class="fas fa-exclamation-triangle me-3 fa-lg"></i>
+                <div>
+                    <h5 class="alert-title mb-1">Something went wrong!</h5>
+                    <p class="mb-0">@TempData["ErrorMessage"]</p>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
     }
 
     @if (ViewBag.ErrorMessage != null)
     {
-        <div class="alert alert-warning alert-modern">
+        <div class="alert alert-warning alert-modern fade show" role="alert">
             <div class="d-flex align-items-center">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <span>@ViewBag.ErrorMessage</span>
+                <i class="fas fa-exclamation-circle me-3 fa-lg"></i>
+                <div>
+                    <h5 class="alert-title mb-1">Warning</h5>
+                    <p class="mb-0">@ViewBag.ErrorMessage</p>
+                </div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
     }
 
     <div class="row">
-        <!-- Estado actual del plan -->
+        <!-- Current plan status -->
         <div class="col-lg-8 mb-4">
             <div class="card modern-card">
                 <div class="card-header">
@@ -63,16 +73,19 @@
                         <div class="card-icon me-3">
                             <i class="fas fa-info-circle"></i>
                         </div>
-                        <h5 class="mb-0">Estado Actual</h5>
+                        <h5 class="mb-0">Current Status</h5>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     @if (Model.HasPlan && Model.CurrentSubscription != null)
                     {
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="info-section">
-                                    <h6 class="section-title">Plan Actual</h6>
+                                    <h6 class="section-title">
+                                        <i class="fas fa-star"></i>
+                                        Current Plan
+                                    </h6>
                                     <div class="plan-info">
                                         <h4 class="plan-name">@Model.CurrentSubscription.PlanName</h4>
                                         <div class="price-tag">
@@ -83,37 +96,48 @@
                                 </div>
 
                                 <div class="info-section mt-4">
-                                    <h6 class="section-title">Conexiones</h6>
+                                    <h6 class="section-title">
+                                        <i class="fas fa-users"></i>
+                                        Connections
+                                    </h6>
                                     <div class="connections-info">
-                                        <div class="progress-circle">
+                                        <div class="progress-circle pulse">
                                             <div class="progress-text">
                                                 <span class="used">@Model.CurrentSubscription.UsedConnections</span>
                                                 <span class="separator">/</span>
                                                 <span class="total">@Model.CurrentSubscription.MaxConnections</span>
                                             </div>
                                         </div>
-                                        <p class="usage-text">conexiones utilizadas</p>
+                                        <div>
+                                            <p class="usage-text mb-1">connections used</p>
+                                            <small class="text-muted">@(Model.CurrentSubscription.MaxConnections - Model.CurrentSubscription.UsedConnections) slots available</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="info-section">
-                                    <h6 class="section-title">Vigencia</h6>
+                                    <h6 class="section-title">
+                                        <i class="fas fa-calendar"></i>
+                                        Validity
+                                    </h6>
                                     <div class="date-info">
-                                        <div class="date-item">
-                                            <i class="fas fa-play-circle me-2 text-success"></i>
-                                            <span class="date-label">Inicio:</span>
-                                            <span class="date-value">@Model.CurrentSubscription.StartDate.ToString("dd/MM/yyyy")</span>
+                                        <div class="feature-item mb-2">
+                                            <i class="fas fa-play-circle me-3 text-success"></i>
+                                            <span>
+                                                <strong>Start:</strong> @Model.CurrentSubscription.StartDate.ToString("dd/MM/yyyy")
+                                            </span>
                                         </div>
-                                        <div class="date-item">
-                                            <i class="fas fa-stop-circle me-2 text-warning"></i>
-                                            <span class="date-label">Vencimiento:</span>
-                                            <span class="date-value">@Model.CurrentSubscription.EndDate.ToString("dd/MM/yyyy")</span>
+                                        <div class="feature-item mb-3">
+                                            <i class="fas fa-stop-circle me-3 text-warning"></i>
+                                            <span>
+                                                <strong>Expiration:</strong> @Model.CurrentSubscription.EndDate.ToString("dd/MM/yyyy")
+                                            </span>
                                         </div>
                                         <div class="status-badge">
                                             <span class="badge badge-modern @(Model.CurrentSubscription.IsActive ? "badge-success" : "badge-danger")">
-                                                <i class="fas fa-circle me-1"></i>
-                                                @(Model.CurrentSubscription.IsActive ? "Activo" : "Inactivo")
+                                                <i class="fas fa-circle me-2"></i>
+                                                @(Model.CurrentSubscription.IsActive ? "Active" : "Inactive")
                                             </span>
                                         </div>
                                     </div>
@@ -123,9 +147,12 @@
 
                         @if (Model.CurrentSubscription.ConnectedUsers.Any())
                         {
-                            <div class="divider"></div>
+                            <div style="height: 2px; background: linear-gradient(90deg, var(--primary-color), transparent); margin: 2rem 0;"></div>
                             <div class="info-section">
-                                <h6 class="section-title">Usuarios Conectados</h6>
+                                <h6 class="section-title">
+                                    <i class="fas fa-user-friends"></i>
+                                    Connected Users
+                                </h6>
                                 <div class="users-grid">
                                     @foreach (var user in Model.CurrentSubscription.ConnectedUsers)
                                     {
@@ -152,77 +179,79 @@
                             <div class="empty-icon">
                                 <i class="fas fa-inbox"></i>
                             </div>
-                            <h5 class="empty-title">No tienes un plan activo</h5>
-                            <p class="empty-description">Adquiere un plan para disfrutar de todas las funcionalidades</p>
+                            <h5 class="empty-title">You don't have an active plan</h5>
+                            <p class="empty-description">Subscribe to a plan to enjoy all features</p>
                         </div>
                     }
                 </div>
             </div>
         </div>
 
-        <!-- Panel de acciones -->
+        <!-- Action panel - Squares of same size -->
         <div class="col-lg-4 mb-4">
-            <div class="card modern-card">
+            <div class="card modern-card h-100">
                 <div class="card-header">
                     <div class="d-flex align-items-center">
                         <div class="card-icon me-3">
                             <i class="fas fa-bolt"></i>
                         </div>
-                        <h5 class="mb-0">Acciones</h5>
+                        <h5 class="mb-0">Quick Actions</h5>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="actions-list">
+                <div class="card-body d-flex flex-column">
+                    <div class="actions-grid">
                         @if (Model.CanPurchasePlan)
                         {
-                            <a href="@Url.Action("Purchase")" class="action-btn btn-primary">
-                                <div class="btn-icon">
+                            <a href="@Url.Action("Purchase")" class="action-card bg-primary">
+                                <div class="action-icon">
                                     <i class="fas fa-shopping-cart"></i>
                                 </div>
-                                <span>Comprar Plan</span>
+                                <div class="action-content">
+                                    <h6>Purchase Plan</h6>
+                                    <p>Get a new subscription</p>
+                                </div>
                             </a>
                         }
 
                         @if (Model.HasPlan && Model.CurrentSubscription != null)
                         {
-                            <a href="@Url.Action("Change")" class="action-btn btn-warning">
-                                <div class="btn-icon">
-                                    <i class="fas fa-exchange-alt"></i>
-                                </div>
-                                <span>Cambiar Plan</span>
-                            </a>
 
                             @if (Model.CurrentSubscription.MaxConnections > 1)
                             {
-                                <a href="@Url.Action("ManageConnections")" class="action-btn btn-info">
-                                    <div class="btn-icon">
+                                <a href="@Url.Action("ManageConnections")" class="action-card bg-info">
+                                    <div class="action-icon">
                                         <i class="fas fa-users"></i>
                                     </div>
-                                    <span>Gestionar Conexiones</span>
+                                    <div class="action-content">
+                                        <h6>Manage Connections</h6>
+                                        <p>Control user access</p>
+                                    </div>
                                 </a>
                             }
 
-                            <div class="action-divider"></div>
-
                             <form method="post" action="@Url.Action("Cancel")"
-                                  onsubmit="return confirm('¿Estás seguro de que quieres cancelar tu suscripción?');">
+                                  onsubmit="return confirm('Are you sure you want to cancel your subscription?');">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="action-btn btn-danger">
-                                    <div class="btn-icon">
+                                <button type="submit" class="action-card bg-danger w-100 border-0">
+                                    <div class="action-icon">
                                         <i class="fas fa-times"></i>
                                     </div>
-                                    <span>Cancelar Suscripción</span>
+                                    <div class="action-content">
+                                        <h6>Cancel Subscription</h6>
+                                        <p>End your current plan</p>
+                                    </div>
                                 </button>
                             </form>
                         }
 
-                        <div class="action-divider"></div>
-
-                        <a href="@Url.Action("History")" class="action-btn btn-outline">
-                            <div class="btn-icon">
+                        <a href="@Url.Action("History")" class="action-card bg-secondary">
+                            <div class="action-icon">
                                 <i class="fas fa-history"></i>
                             </div>
-                            <span>Ver Historial</span>
+                            <div class="action-content">
+                                <h6>View History</h6>
+                                <p>Check your transactions</p>
+                            </div>
                         </a>
                     </div>
                 </div>
@@ -230,7 +259,7 @@
         </div>
     </div>
 
-    <!-- Planes disponibles -->
+    <!-- Available plans -->
     @if (Model.AvailablePlans.Any())
     {
         <div class="row">
@@ -241,10 +270,10 @@
                             <div class="card-icon me-3">
                                 <i class="fas fa-th-large"></i>
                             </div>
-                            <h5 class="mb-0">Planes Disponibles</h5>
+                            <h5 class="mb-0">Available Plans</h5>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="plans-grid">
                             @foreach (var plan in Model.AvailablePlans)
                             {
@@ -253,24 +282,32 @@
                                     {
                                         <div class="plan-badge">
                                             <i class="fas fa-crown me-1"></i>
-                                            Plan Actual
+                                            Current Plan
                                         </div>
                                     }
                                     <div class="plan-header">
                                         <h5 class="plan-title">@plan.Name</h5>
                                         <div class="plan-price">
                                             <span class="price">$@plan.PriceUSD</span>
-                                            <span class="period">USD/mes</span>
+                                            <span class="period">USD/month</span>
                                         </div>
                                     </div>
                                     <div class="plan-features">
                                         <div class="feature-item">
-                                            <i class="fas fa-users me-2"></i>
-                                            <span>@plan.MaxConnections conexión@(plan.MaxConnections > 1 ? "es" : "")</span>
+                                            <i class="fas fa-users me-3"></i>
+                                            <span>@plan.MaxConnections connection@(plan.MaxConnections > 1 ? "s" : "")</span>
                                         </div>
                                         <div class="feature-item">
-                                            <i class="fas fa-user-check me-2"></i>
-                                            <span>@plan.UserCount usuarios activos</span>
+                                            <i class="fas fa-user-check me-3"></i>
+                                            <span>Unlimited Skips</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-music me-3"></i>
+                                            <span>Loop playback</span>
+                                        </div>
+                                        <div class="feature-item">
+                                            <i class="fas fa-headphones me-3"></i>
+                                            <span>Downloads</span>
                                         </div>
                                     </div>
                                 </div>
@@ -283,436 +320,495 @@
     }
 </div>
 
+<script>
+    // Enhanced cancellation confirmation
+    document.addEventListener('DOMContentLoaded', function() {
+        const cancelForm = document.querySelector('form[action*="Cancel"]');
+        if (cancelForm) {
+            cancelForm.onsubmit = function(e) {
+                e.preventDefault();
+
+                // Create confirmation modal
+                const modal = document.createElement('div');
+                modal.style.position = 'fixed';
+                modal.style.top = '0';
+                modal.style.left = '0';
+                modal.style.width = '100%';
+                modal.style.height = '100%';
+                modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                modal.style.display = 'flex';
+                modal.style.justifyContent = 'center';
+                modal.style.alignItems = 'center';
+                modal.style.zIndex = '1000';
+
+                // Modal content
+                modal.innerHTML = `
+                    <div style="background: rgba(255,255,255,0.95);
+                                padding: 2rem;
+                                border-radius: var(--radius-lg);
+                                max-width: 500px;
+                                width: 90%;
+                                box-shadow: var(--shadow-large);
+                                border: 1px solid rgba(255,255,255,0.2)">
+                        <h4 style="color: var(--danger-color); margin-top: 0">Cancel Subscription?</h4>
+                        <p>Are you sure you want to cancel your subscription?</p>
+                        <div style="background: rgba(239,68,68,0.1);
+                                    padding: 1rem;
+                                    border-radius: var(--radius-sm);
+                                    margin: 1rem 0;
+                                    border-left: 3px solid var(--danger-color)">
+                            <i class="fas fa-exclamation-triangle" style="color: var(--danger-color)"></i>
+                            <strong> Important:</strong> You will lose access at the end of current billing period.
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem">
+                            <button id="cancelConfirm" style="background: var(--danger-color);
+                                                              color: white;
+                                                              border: none;
+                                                              padding: 0.5rem 1.5rem;
+                                                              border-radius: var(--radius-sm);
+                                                              cursor: pointer">
+                                Yes, cancel
+                            </button>
+                            <button id="cancelCancel" style="background: var(--text-muted);
+                                                            color: white;
+                                                            border: none;
+                                                            padding: 0.5rem 1.5rem;
+                                                            border-radius: var(--radius-sm);
+                                                            cursor: pointer">
+                                No, keep it
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                // Handle buttons
+                modal.querySelector('#cancelConfirm').onclick = function() {
+                    cancelForm.submit();
+                };
+
+                modal.querySelector('#cancelCancel').onclick = function() {
+                    document.body.removeChild(modal);
+                };
+
+                return false;
+            };
+        }
+    });
+</script>
+
 <style>
-    /* Variables CSS */
+    /* CSS Variables with new palette */
     :root {
-        --primary-color: #4f46e5;
-        --primary-light: #6366f1;
+        --primary-color: #6366f1;
+        --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
         --success-color: #10b981;
+        --success-dark: #059669;
         --warning-color: #f59e0b;
         --danger-color: #ef4444;
-        --info-color: #3b82f6;
+        --danger-dark: #dc2626;
+        --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --text-primary: #1f2937;
         --text-secondary: #6b7280;
         --text-muted: #9ca3af;
+        --bg-lightest: #f8fafc;
+        --bg-light: #f1f5f9;
+        --bg-medium: #e2e8f0;
         --border-color: #e5e7eb;
-        --bg-light: #f8fafc;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --radius-sm: 0.375rem;
-        --radius-md: 0.5rem;
-        --radius-lg: 0.75rem;
+        --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --radius-sm: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
     }
 
-    /* Header */
-    .header-card {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-        padding: 2rem;
-        border-radius: var(--radius-lg);
-        color: white;
-        box-shadow: var(--shadow-lg);
+    body {
+        background: var(--background-gradient);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
+    /* Improved header */
+    .header-card {
+        background: var(--primary-gradient);
+        padding: 2.5rem;
+        border-radius: var(--radius-xl);
+        color: white;
+        box-shadow: var(--shadow-large);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+        }
 
     .icon-wrapper {
         background: rgba(255, 255, 255, 0.2);
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: 1.8rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .header-card h1 {
-        font-size: 2rem;
-        font-weight: 600;
+        font-size: 2.5rem;
+        font-weight: 700;
         margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    /* Cards modernas */
+    /* Improved modern cards */
     .modern-card {
         border: none;
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
+        box-shadow: var(--shadow-soft);
         overflow: hidden;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
         .modern-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-large);
         }
 
         .modern-card .card-header {
-            background: var(--bg-light);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.75rem;
             font-weight: 600;
+            backdrop-filter: blur(10px);
         }
 
     .card-icon {
-        background: var(--primary-color);
+        background: var(--primary-gradient);
         color: white;
-        width: 40px;
-        height: 40px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.1rem;
+        font-size: 1.2rem;
+        box-shadow: var(--shadow-subtle);
     }
 
-    /* Alertas modernas */
+    /* Improved alerts */
     .alert-modern {
         border: none;
         border-radius: var(--radius-md);
-        padding: 1rem 1.5rem;
+        padding: 1.25rem 1.75rem;
         margin-bottom: 1.5rem;
-        box-shadow: var(--shadow-sm);
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: blur(10px);
+        border-left: 4px solid;
+        transition: all 0.3s ease;
     }
 
-        .alert-modern .btn-close {
-            background: none;
-            border: none;
-            opacity: 0.7;
+        .alert-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
         }
 
-    /* Secciones de información */
-    .info-section {
-        margin-bottom: 1.5rem;
+    .alert-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-dark);
+        border-left-color: var(--success-color);
     }
 
-    .section-title {
-        color: var(--text-primary);
-        font-weight: 600;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.75rem;
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-dark);
+        border-left-color: var(--danger-color);
     }
 
-    .plan-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
+    .alert-warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: #92400e;
+        border-left-color: var(--warning-color);
     }
 
-    .plan-name {
-        color: var(--text-primary);
+    .alert-title {
         font-weight: 700;
-        margin: 0;
+        margin-bottom: 0.25rem;
     }
 
-    .price-tag {
-        background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: var(--radius-sm);
-        font-weight: 600;
+    /* Action panel with same-size squares */
+    .actions-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        flex-grow: 1;
     }
 
-    .price {
-        font-size: 1.1rem;
-    }
-
-    .currency {
-        font-size: 0.875rem;
-        opacity: 0.9;
-    }
-
-    /* Información de conexiones */
-    .connections-info {
+    .action-card {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        padding: 1.5rem;
+        border-radius: var(--radius-md);
+        text-decoration: none;
+        color: white;
+        transition: all 0.3s ease;
+        height: 100%;
+        box-shadow: var(--shadow-subtle);
+        border: none;
+        text-align: left;
     }
 
-    .progress-circle {
-        width: 60px;
-        height: 60px;
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            color: white;
+            text-decoration: none;
+        }
+
+    .action-icon {
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
-        background: linear-gradient(45deg, var(--info-color), #60a5fa);
+        background: rgba(255, 255, 255, 0.2);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
-        font-weight: 600;
+        font-size: 1.25rem;
+        margin-right: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .action-content h6 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        font-size: 1.1rem;
+    }
+
+    .action-content p {
+        opacity: 0.9;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .bg-primary {
+        background: var(--primary-gradient);
+    }
+
+    .bg-warning {
+        background: linear-gradient(135deg, var(--warning-color), #fbbf24);
+    }
+
+    .bg-info {
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    }
+
+    .bg-danger {
+        background: linear-gradient(135deg, var(--danger-color), #f87171);
+    }
+
+    .bg-secondary {
+        background: linear-gradient(135deg, #6b7280, #9ca3af);
+    }
+
+    /* Improved information sections */
+    .section-title {
+        color: var(--text-primary);
+        font-weight: 700;
         font-size: 0.875rem;
-    }
-
-    .progress-text {
-        display: flex;
-        align-items: center;
-        gap: 2px;
-    }
-
-    .separator {
-        opacity: 0.7;
-    }
-
-    .usage-text {
-        color: var(--text-secondary);
-        margin: 0;
-        font-size: 0.875rem;
-    }
-
-    /* Información de fechas */
-    .date-info {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .date-item {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
 
-    .date-label {
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-        min-width: 80px;
-    }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), transparent);
+        }
 
-    .date-value {
-        color: var(--text-primary);
-        font-weight: 500;
-    }
-
-    .status-badge {
-        margin-top: 0.5rem;
-    }
-
-    /* Badges modernos */
-    .badge-modern {
-        padding: 0.5rem 1rem;
-        border-radius: var(--radius-sm);
-        font-size: 0.875rem;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .badge-success {
-        background: var(--success-color);
-        color: white;
-    }
-
-    .badge-danger {
-        background: var(--danger-color);
-        color: white;
-    }
-
-    /* Divisor */
-    .divider {
-        height: 1px;
-        background: var(--border-color);
-        margin: 2rem 0;
-    }
-
-    /* Grid de usuarios */
-    .users-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-
-    .user-card {
-        background: var(--bg-light);
-        padding: 1rem;
-        border-radius: var(--radius-md);
+    .plan-info {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        border: 1px solid var(--border-color);
+        gap: 1.5rem;
+        flex-wrap: wrap;
     }
 
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: var(--primary-color);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-    }
-
-    .user-name {
+    .plan-name {
         color: var(--text-primary);
-        font-weight: 500;
-        font-size: 0.875rem;
-    }
-
-    .user-fullname {
-        color: var(--text-secondary);
-        font-size: 0.75rem;
-    }
-
-    /* Estado vacío */
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-    }
-
-    .empty-icon {
-        font-size: 4rem;
-        color: var(--text-muted);
-        margin-bottom: 1rem;
-    }
-
-    .empty-title {
-        color: var(--text-primary);
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .empty-description {
-        color: var(--text-secondary);
+        font-weight: 800;
+        font-size: 1.5rem;
         margin: 0;
     }
 
-    /* Lista de acciones */
-    .actions-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .action-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 1rem;
-        border: none;
+    .price-tag {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 0.75rem 1.25rem;
         border-radius: var(--radius-md);
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.875rem;
-        transition: all 0.2s ease;
-        cursor: pointer;
+        font-weight: 700;
+        box-shadow: var(--shadow-subtle);
+        position: relative;
+        overflow: hidden;
     }
 
-        .action-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-            text-decoration: none;
+        .price-tag::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent);
         }
 
-    .btn-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
+    .price {
+        font-size: 1.25rem;
+    }
+
+    /* Improved connections info */
+    .connections-info {
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 0.875rem;
-    }
-
-    .btn-primary {
-        background: var(--primary-color);
-        color: white;
-    }
-
-        .btn-primary .btn-icon {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-    .btn-warning {
-        background: var(--warning-color);
-        color: white;
-    }
-
-        .btn-warning .btn-icon {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-    .btn-info {
-        background: var(--info-color);
-        color: white;
-    }
-
-        .btn-info .btn-icon {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-    .btn-danger {
-        background: var(--danger-color);
-        color: white;
-    }
-
-        .btn-danger .btn-icon {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-    .btn-outline {
-        background: white;
-        color: var(--text-primary);
-        border: 1px solid var(--border-color);
-    }
-
-        .btn-outline .btn-icon {
-            background: var(--bg-light);
-            color: var(--text-secondary);
-        }
-
-    .action-divider {
-        height: 1px;
-        background: var(--border-color);
-        margin: 0.5rem 0;
-    }
-
-    /* Grid de planes */
-    .plans-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.5rem;
     }
 
-    .plan-card {
-        background: white;
-        border: 2px solid var(--border-color);
-        border-radius: var(--radius-lg);
-        padding: 1.5rem;
+    .progress-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, var(--primary-color), #8b5cf6, var(--primary-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
         position: relative;
-        transition: all 0.2s ease;
+        box-shadow: var(--shadow-medium);
     }
 
-        .plan-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
+        .progress-circle::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
         }
+
+    .progress-text {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    /* Completely redesigned plans grid */
+    .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .plan-card {
+        background: rgba(255, 255, 255, 0.95);
+        border: 2px solid transparent;
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(20px);
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
+    }
+
+        .plan-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-large);
+            border-color: var(--primary-color);
+        }
+
+            .plan-card:hover::before {
+                opacity: 0.05;
+            }
 
         .plan-card.current-plan {
             border-color: var(--primary-color);
-            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(99, 102, 241, 0.05));
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(1.05);
         }
+
+            .plan-card.current-plan::before {
+                opacity: 0.1;
+            }
 
     .plan-badge {
         position: absolute;
-        top: -10px;
-        right: 1rem;
-        background: var(--primary-color);
+        top: -12px;
+        right: 2rem;
+        background: var(--primary-gradient);
         color: white;
-        padding: 0.5rem 1rem;
-        border-radius: var(--radius-sm);
-        font-size: 0.75rem;
-        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-md);
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: var(--shadow-medium);
+        z-index: 2;
     }
 
     .plan-header {
         text-align: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
+        position: relative;
     }
 
     .plan-title {
         color: var(--text-primary);
-        font-weight: 600;
-        margin-bottom: 0.5rem;
+        font-weight: 800;
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .plan-price {
@@ -720,71 +816,208 @@
         align-items: baseline;
         justify-content: center;
         gap: 0.5rem;
+        margin-bottom: 1rem;
     }
 
         .plan-price .price {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-color);
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            line-height: 1;
         }
 
         .plan-price .period {
             color: var(--text-secondary);
-            font-size: 0.875rem;
+            font-size: 1rem;
+            font-weight: 500;
         }
 
     .plan-features {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 1rem;
     }
 
     .feature-item {
         display: flex;
         align-items: center;
         color: var(--text-secondary);
-        font-size: 0.875rem;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 0.75rem;
+        border-radius: var(--radius-sm);
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease;
     }
+
+        .feature-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateX(5px);
+        }
 
         .feature-item i {
             color: var(--primary-color);
-            width: 20px;
+            width: 24px;
+            font-size: 1.1rem;
         }
 
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .container-fluid
-
-    {
-        padding-left: 1rem;
-        padding-right: 1rem;
+    /* Special states */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
     }
 
-    .header-card {
+    .empty-icon {
+        font-size: 5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-title {
+        color: var(--text-primary);
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Improved connected users */
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .user-card {
+        background: rgba(255, 255, 255, 0.8);
         padding: 1.5rem;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-subtle);
     }
 
-        .header-card h1 {
+        .user-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        box-shadow: var(--shadow-subtle);
+    }
+
+    /* Improved responsive */
+    @@media (max-width: 768px) {
+        .header-card {
+            padding: 2rem;
+        }
+
+            .header-card h1 {
+                font-size: 2rem;
+            }
+
+        .plans-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .plan-price .price {
+            font-size: 2.5rem;
+        }
+
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
             font-size: 1.5rem;
         }
-
-    .plans-grid {
-        grid-template-columns: 1fr;
     }
 
-    .users-grid {
-        grid-template-columns: 1fr;
+    @@media (max-width: 576px) {
+        .container-fluid {
+            padding: 1rem;
+        }
+
+        .plan-card {
+            padding: 1.5rem;
+        }
+
+        .users-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
-    .plan-info {
-        flex-direction: column;
-        align-items: flex-start;
+    /* Additional animations */
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
     }
 
-    .connections-info {
-        flex-direction: column;
-        align-items: flex-start;
+    .floating {
+        animation: float 6s ease-in-out infinite;
     }
 
+    @@keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .plan-card.current-plan {
+        border-color: var(--primary-color);
+        background: rgba(99, 102, 241, 0.15) !important; /* More opaque for better visibility */
+        transform: scale(1.05);
+    }
+
+        .plan-card.current-plan::before {
+            opacity: 0.15;
+        }
+
+    .plan-badge {
+        background: var(--primary-gradient) !important;
+        color: white !important;
+    }
+
+    /* Improved status badges */
+    .badge-modern.badge-success {
+        background: rgba(16, 185, 129, 0.2) !important;
+        color: var(--success-dark) !important;
+        border: 1px solid var(--success-color);
+    }
+
+    .badge-modern.badge-danger {
+        background: rgba(239, 68, 68, 0.2) !important;
+        color: var(--danger-dark) !important;
+        border: 1px solid var(--danger-color);
     }
 </style>

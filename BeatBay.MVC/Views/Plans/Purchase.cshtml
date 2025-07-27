@@ -1,139 +1,96 @@
 ﻿@model BeatBay.DTOs.UserPlanStatusDto
 @{
-    ViewData["Title"] = "Comprar Plan";
+    ViewData["Title"] = "Purchase Plan";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <h2 class="mb-4">
-                <i class="fas fa-shopping-cart me-2"></i>
-                Comprar Plan
-            </h2>
-
-            @if (TempData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    @TempData["ErrorMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<div class="purchase-container">
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="page-header">
+                    <h2 class="page-title">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        Purchase Plan
+                    </h2>
                 </div>
-            }
 
-            <!-- Navegación -->
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="@Url.Action("Index")">Mis Planes</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Comprar Plan</li>
-                </ol>
-            </nav>
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="custom-alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
 
-            <!-- Planes disponibles para comprar -->
-            @if (Model.AvailablePlans.Any())
-            {
-                <div class="row">
-                    @foreach (var plan in Model.AvailablePlans)
-                    {
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100 plan-card">
-                                <div class="card-header text-center bg-primary text-white">
-                                    <h4 class="mb-0">@plan.Name</h4>
-                                </div>
-                                <div class="card-body text-center">
-                                    <div class="price-section mb-3">
-                                        <h2 class="text-primary mb-0">$@plan.PriceUSD</h2>
-                                        <p class="text-muted">USD/mes</p>
+                <nav aria-label="breadcrumb" class="custom-breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">My Plans</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Purchase Plan</li>
+                    </ol>
+                </nav>
+
+                @if (Model.AvailablePlans.Any())
+                {
+                    <div class="plans-grid">
+                        @foreach (var plan in Model.AvailablePlans)
+                        {
+                            <div class="plan-card-wrapper">
+                                <div class="plan-card">
+                                    <div class="card-header">
+                                        <h4 class="plan-name">@plan.Name</h4>
                                     </div>
-
-                                    <div class="features-section mb-4">
-                                        <ul class="list-unstyled">
-                                            <li class="mb-2">
-                                                <i class="fas fa-users text-success me-2"></i>
-                                                <strong>@plan.MaxConnections</strong> conexión@(plan.MaxConnections > 1 ? "es" : "")
+                                    <div class="card-body">
+                                        <div class="price-section">
+                                            <h2 class="price">$@plan.PriceUSD</h2>
+                                            <p class="price-period">USD/month</p>
+                                        </div>
+                                        <ul class="features-list">
+                                            <li class="feature-item">
+                                                <i class="fas fa-users feature-icon"></i>
+                                                <span><strong>@plan.MaxConnections</strong> connection@(plan.MaxConnections > 1 ? "s" : "")</span>
                                             </li>
-                                            <li class="mb-2">
-                                                <i class="fas fa-music text-success me-2"></i>
-                                                Acceso completo a la biblioteca
+                                            <li class="feature-item">
+                                                <i class="fas fa-forward feature-icon"></i>
+                                                <span>Unlimited Skips</span>
                                             </li>
-                                            <li class="mb-2">
-                                                <i class="fas fa-download text-success me-2"></i>
-                                                Descargas ilimitadas
+                                            <li class="feature-item">
+                                                <i class="fas fa-redo feature-icon"></i>
+                                                <span>Loop playback</span>
                                             </li>
-                                            <li class="mb-2">
-                                                <i class="fas fa-mobile-alt text-success me-2"></i>
-                                                Sincronización multi-dispositivo
+                                            <li class="feature-item">
+                                                <i class="fas fa-download feature-icon"></i>
+                                                <span>Downloads</span>
                                             </li>
                                         </ul>
                                     </div>
-
-                                    <div class="stats-section mb-3">
-                                        <small class="text-muted">
-                                            <i class="fas fa-chart-line me-1"></i>
-                                            @plan.UserCount usuarios activos
-                                        </small>
+                                    <div class="card-footer">
+                                        <form method="post" action="@Url.Action("Purchase")" class="purchase-form">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="planId" value="@plan.Id" />
+                                            <button type="submit" class="purchase-btn">
+                                                <i class="fas fa-credit-card me-2"></i>
+                                                Purchase Now
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
-                                <div class="card-footer text-center">
-                                    <form method="post" action="@Url.Action("Purchase")">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="planId" value="@plan.Id" />
-                                        <button type="submit" class="btn btn-primary btn-lg w-100 purchase-btn">
-                                            <i class="fas fa-credit-card me-2"></i>
-                                            Comprar Ahora
-                                        </button>
-                                    </form>
-                                </div>
                             </div>
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-info text-center">
-                    <i class="fas fa-info-circle me-2"></i>
-                    No hay planes disponibles para comprar en este momento.
-                </div>
-            }
-
-            <!-- Información adicional -->
-            <div class="row mt-4">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header bg-info text-white">
-                            <h5 class="mb-0">
-                                <i class="fas fa-info-circle me-2"></i>
-                                Información Importante
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6><i class="fas fa-shield-alt text-success me-2"></i>Garantía</h6>
-                                    <p class="text-muted">30 días de garantía de devolución de dinero</p>
-
-                                    <h6><i class="fas fa-sync text-primary me-2"></i>Facturación</h6>
-                                    <p class="text-muted">Renovación automática mensual</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6><i class="fas fa-headset text-warning me-2"></i>Soporte</h6>
-                                    <p class="text-muted">Soporte técnico 24/7 disponible</p>
-
-                                    <h6><i class="fas fa-times text-danger me-2"></i>Cancelación</h6>
-                                    <p class="text-muted">Cancela en cualquier momento sin penalización</p>
-                                </div>
-                            </div>
-                        </div>
+                        }
                     </div>
-                </div>
-            </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-info-circle empty-icon"></i>
+                        <p>No plans available for purchase at this time.</p>
+                    </div>
+                }
 
-            <!-- Botones de navegación -->
-            <div class="row mt-4">
-                <div class="col-md-12 text-center">
-                    <a href="@Url.Action("Index")" class="btn btn-secondary me-2">
+                <div class="back-section">
+                    <a href="@Url.Action("Index")" class="back-btn">
                         <i class="fas fa-arrow-left me-2"></i>
-                        Volver a Mis Planes
+                        Back to My Plans
                     </a>
                 </div>
             </div>
@@ -142,45 +99,306 @@
 </div>
 
 <style>
-    .plan-card {
-        border: 2px solid #e9ecef;
-        transition: all 0.3s ease;
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow-x: hidden;
     }
 
-        .plan-card:hover {
-            border-color: #007bff;
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15);
+    .purchase-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        width: 100vw;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow-y: auto;
+        padding: 0;
+    }
+
+    .container {
+        background: rgba(248, 250, 252, 0.95);
+        border-radius: 0;
+        padding: 2rem;
+        box-shadow: none;
+        backdrop-filter: blur(10px);
+        min-height: 100vh;
+        margin: 0;
+        max-width: none;
+        width: 100%;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        color: #1f2937;
+        font-weight: 700;
+        font-size: 2.5rem;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .custom-alert {
+        border: none;
+        border-radius: 15px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .custom-breadcrumb {
+        margin-bottom: 3rem;
+    }
+
+    .breadcrumb {
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 50px;
+        padding: 1rem 2rem;
+        margin: 0;
+    }
+
+    .breadcrumb-item a {
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .breadcrumb-item a:hover {
+            color: #8b5cf6;
         }
 
-    .price-section {
-        padding: 1rem 0;
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .features-section {
-        padding: 1rem 0;
-    }
-
-    .purchase-btn {
-        transition: all 0.3s ease;
-    }
-
-        .purchase-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
-        }
-
-    .stats-section {
-        padding-top: 1rem;
-        border-top: 1px solid #e9ecef;
-    }
-
-    .card-header h4 {
+    .breadcrumb-item.active {
+        color: #4b5563;
         font-weight: 600;
     }
 
-    .features-section ul li {
-        padding: 0.25rem 0;
+    .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .plan-card-wrapper {
+        display: flex;
+        justify-content: center;
+    }
+
+    .plan-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 350px;
+        border: 1px solid rgba(99, 102, 241, 0.1);
+    }
+
+        .plan-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+    .card-header {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .plan-name {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-body {
+        padding: 2rem 1.5rem;
+        text-align: center;
+    }
+
+    .price-section {
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid rgba(99, 102, 241, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .price {
+        color: #6366f1;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .price-period {
+        color: #6b7280;
+        font-size: 1rem;
+        margin: 0.5rem 0 0 0;
+        font-weight: 500;
+    }
+
+    .features-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 1.5rem 0;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(99, 102, 241, 0.05);
+    }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+    .feature-icon {
+        color: #10b981;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+        min-width: 20px;
+    }
+
+    .feature-item span {
+        color: #374151;
+        font-weight: 500;
+        text-align: left;
+    }
+
+    .card-footer {
+        padding: 1.5rem;
+        background: rgba(99, 102, 241, 0.02);
+    }
+
+    .purchase-btn {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border: none;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        width: 100%;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        text-transform: none;
+    }
+
+        .purchase-btn:hover {
+            background: linear-gradient(135deg, #5b5bd6 0%, #7c3aed 100%);
+        }
+
+        .purchase-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 3rem;
+    }
+
+    .empty-icon {
+        color: #6366f1;
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #6b7280;
+        font-size: 1.2rem;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .back-section {
+        text-align: center;
+    }
+
+    .back-btn {
+        background: rgba(107, 114, 128, 0.1);
+        color: #4b5563;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-block;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(107, 114, 128, 0.2);
+    }
+
+        .back-btn:hover {
+            background: rgba(107, 114, 128, 0.15);
+            color: #374151;
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .container {
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        .page-title {
+            font-size: 2rem;
+        }
+
+        .plans-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .price {
+            font-size: 2rem;
+        }
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Essential purchase form handling only
+        document.querySelectorAll('.purchase-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const btn = this.querySelector('.purchase-btn');
+
+                // Prevent double submission
+                if (btn.disabled) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Update button state
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Redirecting to PayPal...';
+            });
+        });
+    });
+</script>

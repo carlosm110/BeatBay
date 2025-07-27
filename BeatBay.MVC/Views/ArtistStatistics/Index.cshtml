@@ -1,31 +1,332 @@
 ﻿@model List<BeatBay.DTOs.SongStatsDto>
 
 @{
-    ViewData["Title"] = "Estadísticas del Artista";
+    ViewData["Title"] = "Artist Statistics";
 }
 
+<style>
+    /* Variables simplificadas */
+    :root {
+        --primary: #6366f1;
+        --secondary: #8b5cf6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #0ea5e9;
+        --gray: #6b7280;
+        --light: #f8fafc;
+        --white: #ffffff;
+        --border: #e5e7eb;
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Reducir padding del container principal */
+    .container-fluid {
+        padding: 0.5rem 1rem !important;
+        margin-top: -1rem;
+    }
+
+    /* Card principal */
+    .card {
+        background: var(--white);
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 1rem 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        background: var(--light);
+    }
+
+    /* Header principal */
+    .main-header {
+        background: var(--white);
+        border-radius: 1rem;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .main-title {
+        color: var(--primary);
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Botones mejorados */
+    .back-button {
+        background: linear-gradient(135deg, var(--gray), #4b5563);
+        border: none;
+        color: white;
+        border-radius: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #4b5563, #374151);
+            transform: translateY(-1px);
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+    .btn-danger {
+        background: linear-gradient(135deg, var(--danger), #dc2626);
+        border: none;
+        color: white;
+        border-radius: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+    .btn-light {
+        background: linear-gradient(135deg, var(--white), #f1f5f9);
+        border: 2px solid var(--border);
+        color: var(--gray);
+        border-radius: 0.5rem;
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .btn-light:hover {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border: none;
+        color: white;
+        border-radius: 0.5rem;
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5856eb, #7c3aed);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+    .btn-outline-primary {
+        background: transparent;
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        border-radius: 0.5rem;
+        padding: 0.4rem 0.8rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: var(--primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    /* Cards de estadísticas mejoradas */
+    .stats-card {
+        background: var(--white);
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+        height: 100%;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+
+        .stats-card.bg-primary .card-body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .stats-card.bg-success .card-body {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .stats-card.bg-info .card-body {
+            background: linear-gradient(135deg, var(--info), #0284c7);
+            color: white;
+        }
+
+        .stats-card.bg-warning .card-body {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            color: white;
+        }
+
+    /* Headers de cards con gradiente */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+    }
+
+    .bg-gradient-secondary {
+        background: linear-gradient(135deg, var(--gray), #4b5563) !important;
+    }
+
+    /* Alertas mejoradas */
+    .alert {
+        border: none;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        color: #991b1b;
+        border-left: 4px solid var(--danger);
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        color: #065f46;
+        border-left: 4px solid var(--success);
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
+        color: #01579b;
+        border-left: 4px solid var(--info);
+    }
+
+    /* Tabla mejorada */
+    .table {
+        background: var(--white);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .table-light {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    }
+
+    .table-hover tbody tr:hover {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    }
+
+    /* Badges mejorados */
+    .badge {
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+    }
+
+        .badge.bg-success {
+            background: linear-gradient(135deg, var(--success), #059669) !important;
+        }
+
+        .badge.bg-info {
+            background: linear-gradient(135deg, var(--info), #0284c7) !important;
+        }
+
+        .badge.bg-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+        }
+
+    /* List group mejorado */
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid var(--border);
+        transition: all 0.3s ease;
+    }
+
+        .list-group-item:hover {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            transform: translateX(5px);
+        }
+
+    /* Iconos grandes mejorados */
+    .display-4 {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="text-primary">
-                    <i class="fas fa-chart-line me-2"></i>
-                    Estadísticas del Artista
-                </h2>
-                <div>
-                    <a href="@Url.Action("DownloadReport")" class="btn btn-danger btn-lg">
-                        <i class="fas fa-file-pdf me-2"></i>
-                        Descargar Reporte PDF
-                    </a>
-                </div>
-            </div>
+    <!-- Improved Main Header -->
+    <div class="main-header">
+        <h2 class="main-title">
+            <i class="fas fa-chart-line"></i>
+            Artist Statistics
+        </h2>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="https://localhost:7194/Home/IndexArtista" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Artist Panel
+            </a>
+            <a href="@Url.Action("DownloadReport")" class="btn btn-danger">
+                <i class="fas fa-file-pdf"></i>
+                Download PDF Report
+            </a>
         </div>
     </div>
 
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-triangle me-2"></i>
+            <i class="fas fa-exclamation-triangle"></i>
             @TempData["Error"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
@@ -34,69 +335,143 @@
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>
+            <i class="fas fa-check-circle"></i>
             @TempData["Success"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
-
-    <!-- Resumen mejorado -->
+    <!-- Improved Summary - CORRECTED SECTION -->
     @if (ViewBag.Summary != null)
     {
         <div class="row mb-4">
             <div class="col-md-12">
-                <h3 class="text-secondary mb-3">
-                    <i class="fas fa-chart-pie me-2"></i>
-                    Resumen General
-                </h3>
-                <div class="row">
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="card bg-primary text-white h-100">
-                            <div class="card-body text-center">
-                                <div class="display-4 mb-2">
-                                    <i class="fas fa-music"></i>
-                                </div>
-                                <h4 class="card-title">@ViewBag.Summary.TotalSongs</h4>
-                                <p class="card-text">Total Canciones</p>
-                            </div>
-                        </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-pie"></i>
+                            General Summary
+                        </h3>
                     </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="card bg-success text-white h-100">
-                            <div class="card-body text-center">
-                                <div class="display-4 mb-2">
-                                    <i class="fas fa-play"></i>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="stats-card bg-primary">
+                                    <div class="card-body text-center">
+                                        <div class="display-4 mb-2">
+                                            <i class="fas fa-music"></i>
+                                        </div>
+                                        <h4 class="card-title">
+                                            @{
+                                                var totalSongs = 0;
+                                                try
+                                                {
+                                                    // Try to access the property directly from the dynamic object
+                                                    totalSongs = (int)(ViewBag.Summary.totalSongs ?? ViewBag.Summary.TotalSongs ?? 0);
+                                                }
+                                                catch
+                                                {
+                                                    // If it fails, try to convert from the complete object
+                                                    var summaryObj = ViewBag.Summary as dynamic;
+                                                    if (summaryObj != null)
+                                                    {
+                                                        totalSongs = (int)(summaryObj.totalSongs ?? summaryObj.TotalSongs ?? 0);
+                                                    }
+                                                }
+                                            }
+                                            @totalSongs.ToString("N0")
+                                        </h4>
+                                        <p class="card-text">Total Songs</p>
+                                    </div>
                                 </div>
-                                <h4 class="card-title">@ViewBag.Summary.TotalPlays</h4>
-                                <p class="card-text">Total Reproducciones</p>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="card bg-info text-white h-100">
-                            <div class="card-body text-center">
-                                <div class="display-4 mb-2">
-                                    <i class="fas fa-check-circle"></i>
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="stats-card bg-success">
+                                    <div class="card-body text-center">
+                                        <div class="display-4 mb-2">
+                                            <i class="fas fa-play"></i>
+                                        </div>
+                                        <h4 class="card-title">
+                                            @{
+                                                var totalPlays = 0;
+                                                try
+                                                {
+                                                    totalPlays = (int)(ViewBag.Summary.totalPlays ?? ViewBag.Summary.TotalPlays ?? 0);
+                                                }
+                                                catch
+                                                {
+                                                    var summaryObj = ViewBag.Summary as dynamic;
+                                                    if (summaryObj != null)
+                                                    {
+                                                        totalPlays = (int)(summaryObj.totalPlays ?? summaryObj.TotalPlays ?? 0);
+                                                    }
+                                                }
+                                            }
+                                            @totalPlays.ToString("N0")
+                                        </h4>
+                                        <p class="card-text">Total Plays</p>
+                                    </div>
                                 </div>
-                                <h4 class="card-title">@ViewBag.Summary.ActiveSongs</h4>
-                                <p class="card-text">Canciones Activas</p>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="card bg-warning text-white h-100">
-                            <div class="card-body text-center">
-                                <div class="display-4 mb-2">
-                                    <i class="fas fa-clock"></i>
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="stats-card bg-info">
+                                    <div class="card-body text-center">
+                                        <div class="display-4 mb-2">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <h4 class="card-title">
+                                            @{
+                                                var activeSongs = 0;
+                                                try
+                                                {
+                                                    activeSongs = (int)(ViewBag.Summary.activeSongs ?? ViewBag.Summary.ActiveSongs ?? 0);
+                                                }
+                                                catch
+                                                {
+                                                    var summaryObj = ViewBag.Summary as dynamic;
+                                                    if (summaryObj != null)
+                                                    {
+                                                        activeSongs = (int)(summaryObj.activeSongs ?? summaryObj.ActiveSongs ?? 0);
+                                                    }
+                                                }
+                                            }
+                                            @activeSongs.ToString("N0")
+                                        </h4>
+                                        <p class="card-text">Active Songs</p>
+                                    </div>
                                 </div>
-                                <h4 class="card-title">
-                                    @{
-                                        var totalDuration = ViewBag.Summary.TotalDurationPlayed ?? 0;
-                                        var timeSpan = TimeSpan.FromSeconds(Convert.ToDouble(totalDuration));
-                                    }
-                                    @timeSpan.ToString(@"hh\:mm\:ss")
-                                </h4>
-                                <p class="card-text">Tiempo Total Reproducido</p>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="stats-card bg-warning">
+                                    <div class="card-body text-center">
+                                        <div class="display-4 mb-2">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <h4 class="card-title">
+                                            @{
+                                                var totalDuration = 0.0;
+                                                try
+                                                {
+                                                    totalDuration = Convert.ToDouble(ViewBag.Summary.totalDurationPlayed ?? ViewBag.Summary.TotalDurationPlayed ?? 0);
+                                                }
+                                                catch
+                                                {
+                                                    var summaryObj = ViewBag.Summary as dynamic;
+                                                    if (summaryObj != null)
+                                                    {
+                                                        totalDuration = Convert.ToDouble(summaryObj.totalDurationPlayed ?? summaryObj.TotalDurationPlayed ?? 0);
+                                                    }
+                                                }
+
+                                                var timeSpan = TimeSpan.FromSeconds(totalDuration);
+                                                string formattedTime = totalDuration > 0 ?
+                                                (timeSpan.TotalHours >= 1 ? timeSpan.ToString(@"hh\:mm\:ss") : timeSpan.ToString(@"mm\:ss"))
+                                                : "00:00";
+                                            }
+                                            @formattedTime
+                                        </h4>
+                                        <p class="card-text">Total Play Time</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -104,17 +479,42 @@
             </div>
         </div>
     }
+    else
+    {
+        <!-- Message when there's no summary data -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-pie"></i>
+                            General Summary
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info text-center">
+                            <div class="display-1 text-muted mb-3">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h4>Loading statistics...</h4>
+                            <p class="mb-0">Data is being processed. If this persists, check that you have published songs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 
-    <!-- Top 5 Canciones mejorado -->
+    <!-- Improved Top 5 Songs -->
     @if (ViewBag.TopSongs != null)
     {
         <div class="row mb-4">
             <div class="col-md-12">
-                <div class="card shadow">
+                <div class="card">
                     <div class="card-header bg-gradient-primary text-white">
                         <h3 class="card-title mb-0">
-                            <i class="fas fa-trophy me-2"></i>
-                            Top 5 Canciones Más Reproducidas
+                            <i class="fas fa-trophy"></i>
+                            Top 5 Most Played Songs
                         </h3>
                     </div>
                     <div class="card-body">
@@ -131,15 +531,15 @@
                                             <h6 class="mb-1 fw-bold">@song.Title</h6>
                                             <small class="text-muted">
                                                 <i class="fas fa-headphones me-1"></i>
-                                                @song.PlayCount reproducciones
+                                                @song.PlayCount plays
                                             </small>
                                         </div>
                                     </div>
                                     <div class="btn-group">
-                                        <a href="@Url.Action("SongDetails", new { id = song.SongId })" 
+                                        <a href="@Url.Action("SongDetails", new { id = song.SongId })"
                                            class="btn btn-outline-primary btn-sm">
                                             <i class="fas fa-eye me-1"></i>
-                                            Ver Detalles
+                                            View Details
                                         </a>
                                     </div>
                                 </div>
@@ -152,19 +552,19 @@
         </div>
     }
 
-    <!-- Todas las canciones mejorado -->
+    <!-- Improved All Songs -->
     <div class="row">
         <div class="col-md-12">
-            <div class="card shadow">
+            <div class="card">
                 <div class="card-header bg-gradient-secondary text-white">
                     <div class="d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0">
-                            <i class="fas fa-list me-2"></i>
-                            Todas mis Canciones
+                            <i class="fas fa-list"></i>
+                            All My Songs
                         </h3>
                         <a href="@Url.Action("TopSongs")" class="btn btn-light btn-sm">
                             <i class="fas fa-star me-1"></i>
-                            Ver Top 20
+                            View Top 20
                         </a>
                     </div>
                 </div>
@@ -177,19 +577,19 @@
                                     <tr>
                                         <th scope="col">
                                             <i class="fas fa-music me-2"></i>
-                                            Título
+                                            Title
                                         </th>
                                         <th scope="col" class="text-center">
                                             <i class="fas fa-play me-2"></i>
-                                            Reproducciones
+                                            Plays
                                         </th>
                                         <th scope="col" class="text-center">
                                             <i class="fas fa-clock me-2"></i>
-                                            Tiempo Total
+                                            Total Time
                                         </th>
                                         <th scope="col" class="text-center">
                                             <i class="fas fa-cog me-2"></i>
-                                            Acciones
+                                            Actions
                                         </th>
                                     </tr>
                                 </thead>
@@ -210,10 +610,10 @@
                                                 </span>
                                             </td>
                                             <td class="text-center">
-                                                <a href="@Url.Action("SongDetails", new { id = song.SongId })" 
+                                                <a href="@Url.Action("SongDetails", new { id = song.SongId })"
                                                    class="btn btn-primary btn-sm">
                                                     <i class="fas fa-chart-bar me-1"></i>
-                                                    Ver Detalles
+                                                    View Details
                                                 </a>
                                             </td>
                                         </tr>
@@ -228,11 +628,11 @@
                             <div class="display-1 text-muted mb-3">
                                 <i class="fas fa-music"></i>
                             </div>
-                            <h4>No tienes canciones aún</h4>
-                            <p class="mb-3">¡Comienza tu carrera musical subiendo tu primera canción!</p>
+                            <h4>You don't have any songs yet</h4>
+                            <p class="mb-3">Start your music career by uploading your first song!</p>
                             <a href="@Url.Action("Create", "Songs")" class="btn btn-primary btn-lg">
                                 <i class="fas fa-plus me-2"></i>
-                                Crear Primera Canción
+                                Create First Song
                             </a>
                         </div>
                     }

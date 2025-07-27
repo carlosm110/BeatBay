@@ -11,6 +11,14 @@ namespace BeatBay.DTOs
     {
         [Required]
         public int PlanId { get; set; }
+
+        [Required]
+        [Url]
+        public string ReturnUrl { get; set; }   // URL a la que PayPal redirige tras aprobar
+
+        [Required]
+        [Url]
+        public string CancelUrl { get; set; }   // URL a la que PayPal redirige si cancelan
     }
 
     public class ChangePlanDto

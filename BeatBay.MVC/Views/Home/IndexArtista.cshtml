@@ -1,4 +1,192 @@
-﻿<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+﻿@{
+    ViewData["Title"] = "Artist Panel";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Variables simplificadas */
+    :root {
+        --primary: #6366f1;
+        --secondary: #8b5cf6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #0ea5e9;
+        --gray: #6b7280;
+        --light: #f8fafc;
+        --white: #ffffff;
+        --border: #e5e7eb;
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Cards */
+    .card {
+        background: var(--white);
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 1rem 1.5rem;
+        border-bottom: none;
+    }
+
+    .card-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Botones */
+    .btn {
+        border-radius: 0.75rem;
+        padding: 0.6rem 1.25rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, var(--success), #059669);
+    }
+
+    .btn-info {
+        background: linear-gradient(135deg, var(--info), #0284c7);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, var(--warning), #d97706);
+    }
+
+    .btn-outline-primary {
+        background: transparent;
+        border: 1px solid var(--primary);
+        color: var(--primary);
+    }
+
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+    /* Stats cards */
+    .stats-card {
+        background: var(--white);
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+    .stats-number {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .stats-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+        margin-left: auto;
+    }
+
+    /* Quick action buttons */
+    .quick-action-btn {
+        min-height: 100px;
+        border-radius: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+        .quick-action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+    /* List items */
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+        padding: 1rem 1.5rem;
+    }
+
+        .list-group-item:first-child {
+            border-top: none;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+    /* Spinner */
+    .spinner-border {
+        width: 2rem;
+        height: 2rem;
+        border-width: 0.15em;
+    }
+
+    /* Modal */
+    .modal-content {
+        border-radius: 1rem;
+        overflow: hidden;
+        border: none;
+    }
+
+    /* Alert */
+    .alert {
+        border-radius: 0.75rem;
+        border: none;
+        padding: 1rem 1.25rem;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        color: #065f46;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        color: #991b1b;
+    }
+</style>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -30,17 +218,12 @@
     </div>
 </div>
 
-@{
-    ViewData["Title"] = "Artist Panel";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
 <div class="container-fluid py-4">
     <!-- Panel Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm bg-gradient-primary text-white">
-                <div class="card-body">
+            <div class="card">
+                <div class="card-header">
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <h1 class="h2 mb-1">
@@ -55,9 +238,6 @@
                                     <small class="opacity-75">Last access:</small>
                                     <div class="fw-bold">@DateTime.Now.ToString("MM/dd/yyyy HH:mm")</div>
                                 </div>
-                                <div class="bg-white bg-opacity-20 rounded-circle p-3">
-                                    <i class="fas fa-user-music fa-2x"></i>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -69,7 +249,7 @@
     <!-- Quick Actions -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
                         <i class="fas fa-bolt text-warning me-2"></i>
@@ -77,28 +257,28 @@
                     </h5>
                     <div class="row g-3">
                         <div class="col-md-3 col-sm-6">
-                            <a href="@Url.Action("Create", "Songs")" class="btn btn-success btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
+                            <a href="@Url.Action("Create", "Songs")" class="btn btn-success quick-action-btn text-decoration-none">
                                 <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
                                 <span class="fw-bold">Upload Music</span>
                                 <small class="opacity-75">New track</small>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6">
-                            <a href="@Url.Action("MySongs", "Songs")" class="btn btn-primary btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
+                            <a href="@Url.Action("MySongs", "Songs")" class="btn btn-primary quick-action-btn text-decoration-none">
                                 <i class="fas fa-music fa-2x mb-2"></i>
                                 <span class="fw-bold">My Songs</span>
                                 <small class="opacity-75">Manage music</small>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6">
-                            <a href="@Url.Action("Index", "ArtistStatistics")" class="btn btn-info btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none">
+                            <a href="@Url.Action("Index", "ArtistStatistics")" class="btn btn-info quick-action-btn text-decoration-none">
                                 <i class="fas fa-chart-line fa-2x mb-2"></i>
                                 <span class="fw-bold">Statistics</span>
                                 <small class="opacity-75">View metrics</small>
                             </a>
                         </div>
                         <div class="col-md-3 col-sm-6">
-                            <button class="btn btn-warning btn-lg w-100 h-100 d-flex flex-column align-items-center justify-content-center text-decoration-none" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            <button class="btn btn-warning quick-action-btn text-decoration-none" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                                 <i class="fas fa-user-edit fa-2x mb-2"></i>
                                 <span class="fw-bold">My Profile</span>
                                 <small class="opacity-75">Edit data</small>
@@ -113,10 +293,11 @@
     <!-- Alert Container -->
     <div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
 
+
     <!-- Statistics Summary -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">
@@ -127,44 +308,161 @@
                             View Details <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
-                    <div class="row g-3">
-                        <div class="col-md-3 col-sm-6">
-                            <div class="card bg-light border-0">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-music text-primary fa-2x mb-2"></i>
-                                    <h4 class="fw-bold mb-1" id="totalSongs">-</h4>
-                                    <small class="text-muted">Total Songs</small>
+                    @if (ViewBag.Summary != null)
+                    {
+                        <div class="row g-3">
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-music text-primary fa-2x mb-2"></i>
+                                        <h4 class="stats-number mb-1">
+                                            @{
+                                                var totalSongs = 0;
+                                                try
+                                                {
+                                                    totalSongs = (int)(ViewBag.Summary.totalSongs ?? ViewBag.Summary.TotalSongs ?? 0);
+                                                }
+                                                catch
+                                                {
+                                                    var summaryObj = ViewBag.Summary as dynamic;
+                                                    if (summaryObj != null)
+                                                    {
+                                                        totalSongs = (int)(summaryObj.totalSongs ?? summaryObj.TotalSongs ?? 0);
+                                                    }
+                                                }
+                                            }
+                                            @totalSongs.ToString("N0")
+                                        </h4>
+                                        <small class="text-muted">Total Songs</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-play-circle text-success fa-2x mb-2"></i>
+                                        <h4 class="stats-number mb-1">
+                                            @{
+                                                var totalPlays = 0;
+                                                try
+                                                {
+                                                    totalPlays = (int)(ViewBag.Summary.totalPlays ?? ViewBag.Summary.TotalPlays ?? 0);
+                                                }
+                                                catch
+                                                {
+                                                    var summaryObj = ViewBag.Summary as dynamic;
+                                                    if (summaryObj != null)
+                                                    {
+                                                        totalPlays = (int)(summaryObj.totalPlays ?? summaryObj.TotalPlays ?? 0);
+                                                    }
+                                                }
+                                            }
+                                            @totalPlays.ToString("N0")
+                                        </h4>
+                                        <small class="text-muted">Total Plays</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-clock text-warning fa-2x mb-2"></i>
+                                        <h4 class="stats-number mb-1">
+                                            @{
+                                                var totalDuration = 0.0;
+                                                try
+                                                {
+                                                    totalDuration = Convert.ToDouble(ViewBag.Summary.totalDurationPlayed ?? ViewBag.Summary.TotalDurationPlayed ?? 0);
+                                                }
+                                                catch
+                                                {
+                                                    var summaryObj = ViewBag.Summary as dynamic;
+                                                    if (summaryObj != null)
+                                                    {
+                                                        totalDuration = Convert.ToDouble(summaryObj.totalDurationPlayed ?? summaryObj.TotalDurationPlayed ?? 0);
+                                                    }
+                                                }
+
+                                                var timeSpan = TimeSpan.FromSeconds(totalDuration);
+                                                string formattedTime = totalDuration > 0 ?
+                                                (timeSpan.TotalHours >= 1 ? timeSpan.ToString(@"hh\:mm\:ss") : timeSpan.ToString(@"mm\:ss"))
+                                                : "00:00";
+                                            }
+                                            @formattedTime
+                                        </h4>
+                                        <small class="text-muted">Tiempo Total Reproducido</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-check-circle text-info fa-2x mb-2"></i>
+                                        <h4 class="stats-number mb-1">
+                                            @{
+                                                var activeSongs = 0;
+                                                try
+                                                {
+                                                    activeSongs = (int)(ViewBag.Summary.activeSongs ?? ViewBag.Summary.ActiveSongs ?? 0);
+                                                }
+                                                catch
+                                                {
+                                                    var summaryObj = ViewBag.Summary as dynamic;
+                                                    if (summaryObj != null)
+                                                    {
+                                                        activeSongs = (int)(summaryObj.activeSongs ?? summaryObj.ActiveSongs ?? 0);
+                                                    }
+                                                }
+                                            }
+                                            @activeSongs.ToString("N0")
+                                        </h4>
+                                        <small class="text-muted">Active Songs</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="card bg-light border-0">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-play-circle text-success fa-2x mb-2"></i>
-                                    <h4 class="fw-bold mb-1" id="totalPlays">-</h4>
-                                    <small class="text-muted">Total Plays</small>
+                    }
+                    else
+                    {
+                        <div class="row g-3">
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-music text-primary fa-2x mb-2"></i>
+                                        <h4 class="stats-number mb-1" id="totalSongs">-</h4>
+                                        <small class="text-muted">Total Songs</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-play-circle text-success fa-2x mb-2"></i>
+                                        <h4 class="stats-number mb-1" id="totalPlays">-</h4>
+                                        <small class="text-muted">Total Plays</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-clock text-warning fa-2x mb-2"></i>
+                                        <h4 class="stats-number mb-1" id="totalDuration">-</h4>
+                                        <small class="text-muted">Tiempo Total Reproducido</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-trophy text-danger fa-2x mb-2"></i>
+                                        <h4 class="stats-number mb-1" id="topSong">-</h4>
+                                        <small class="text-muted">Top Song</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="card bg-light border-0">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-clock text-warning fa-2x mb-2"></i>
-                                    <h4 class="fw-bold mb-1" id="totalDuration">-</h4>
-                                    <small class="text-muted">Total Minutes</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="card bg-light border-0">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-trophy text-danger fa-2x mb-2"></i>
-                                    <h4 class="fw-bold mb-1" id="topSong">-</h4>
-                                    <small class="text-muted">Top Song</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>
@@ -173,7 +471,7 @@
     <!-- Recent Songs -->
     <div class="row mb-4">
         <div class="col-md-8">
-            <div class="card border-0 shadow-sm">
+            <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0">
@@ -196,7 +494,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
+            <div class="card">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
                         <i class="fas fa-star text-warning me-2"></i>
@@ -218,14 +516,14 @@
     <!-- Additional Tools -->
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-sm">
+            <div class="card">
                 <div class="card-body">
                     <h5 class="card-title mb-3">
                         <i class="fas fa-tools text-dark me-2"></i>
                         Additional Tools
                     </h5>
                     <div class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="d-grid">
                                 <a href="@Url.Action("TopSongs", "ArtistStatistics")" class="btn btn-outline-primary">
                                     <i class="fas fa-medal me-2"></i>
@@ -233,20 +531,12 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="d-grid">
                                 <a href="@Url.Action("DownloadReport", "ArtistStatistics")" class="btn btn-outline-success">
                                     <i class="fas fa-download me-2"></i>
                                     Download Report
                                 </a>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="d-grid">
-                                <button class="btn btn-outline-info" onclick="refreshStats()">
-                                    <i class="fas fa-sync-alt me-2"></i>
-                                    Refresh Data
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -278,58 +568,6 @@
         </div>
     </div>
 }
-
-<style>
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .card {
-        transition: transform 0.2s ease-in-out;
-    }
-
-        .card:hover {
-            transform: translateY(-2px);
-        }
-
-    .btn-lg {
-        min-height: 100px;
-        transition: all 0.3s ease;
-    }
-
-        .btn-lg:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-
-    .list-group-item {
-        border-left: none;
-        border-right: none;
-    }
-
-        .list-group-item:first-child {
-            border-top: none;
-        }
-
-        .list-group-item:last-child {
-            border-bottom: none;
-        }
-
-    .spinner-border {
-        width: 2rem;
-        height: 2rem;
-    }
-
-    .bg-light {
-        background-color: #f8f9fa !important;
-    }
-
-    .text-truncate {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -384,7 +622,6 @@
         }
 
         loadDashboardData();
-        setInterval(refreshStats, 30000);
     });
 
     function showAlert(message, type) {
@@ -423,8 +660,17 @@
                     const totalPlays = songs.reduce((sum, song) => sum + (song.playCount || 0), 0);
                     document.getElementById('totalPlays').textContent = totalPlays.toLocaleString();
 
-                    const totalDuration = songs.reduce((sum, song) => sum + (song.duration || 0), 0);
-                    document.getElementById('totalDuration').textContent = Math.round(totalDuration / 60) + ' min';
+                        const totalDuration = songs.reduce((sum, song) => sum + (song.totalDurationPlayed || 0), 0);
+    const timeSpan = totalDuration > 0 ?
+        (totalDuration >= 3600 ?
+            Math.floor(totalDuration / 3600) + ':' +
+            Math.floor((totalDuration % 3600) / 60).toString().padStart(2, '0') + ':' +
+            Math.floor(totalDuration % 60).toString().padStart(2, '0')
+            :
+            Math.floor(totalDuration / 60).toString().padStart(2, '0') + ':' +
+            Math.floor(totalDuration % 60).toString().padStart(2, '0')
+        ) : '00:00';
+    document.getElementById('totalDuration').textContent = timeSpan;
 
                     const topSong = songs.sort((a, b) => (b.playCount || 0) - (a.playCount || 0))[0];
                     document.getElementById('topSong').textContent = topSong ? topSong.title.substring(0, 15) + '...' : 'N/A';
@@ -544,20 +790,6 @@
                     </div>
                 `;
             });
-    }
-
-    function refreshStats() {
-        const refreshBtn = document.querySelector('button[onclick="refreshStats()"]');
-        const originalContent = refreshBtn.innerHTML;
-        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
-        refreshBtn.disabled = true;
-
-        loadDashboardData();
-
-        setTimeout(() => {
-            refreshBtn.innerHTML = originalContent;
-            refreshBtn.disabled = false;
-        }, 2000);
     }
 
     setTimeout(() => {

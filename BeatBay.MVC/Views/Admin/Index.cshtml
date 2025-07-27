@@ -1,0 +1,612 @@
+﻿@model List<BeatBay.DTOs.UserDto>
+@{
+    ViewData["Title"] = "User Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Variables simplificadas */
+    :root {
+        --primary: #6366f1;
+        --secondary: #8b5cf6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --gray: #6b7280;
+        --light: #f8fafc;
+        --white: #ffffff;
+        --border: #e5e7eb;
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Reducir padding del container principal */
+    .container-fluid {
+        padding: 0.5rem 1rem !important; /* Reducido de 2rem a 0.5rem */
+        margin-top: -1rem; /* Subir aún más el contenido */
+    }
+
+    /* Card principal */
+    .card {
+        background: var(--white);
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-top: 0; /* Asegurar que no tenga margin superior */
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 1rem 1.5rem; /* Reducido el padding vertical de 1.5rem a 1rem */
+    }
+
+    .card-title {
+        font-size: 1.4rem; /* Ligeramente más pequeño */
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .card-body {
+        padding: 1.5rem; /* Reducido de 2rem a 1.5rem */
+        background: var(--light);
+    }
+
+    /* Botón ir atrás */
+    .back-button {
+        background: linear-gradient(135deg, var(--gray), #4b5563);
+        border: none;
+        color: white;
+        margin-bottom: 1rem; /* Reducido de 1.5rem a 1rem */
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem; /* Padding más compacto */
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #4b5563, #374151);
+            transform: translateY(-1px);
+            color: white;
+            text-decoration: none;
+        }
+
+    /* Alertas más compactas */
+    .alert {
+        border: none;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.25rem; /* Reducido el padding */
+        margin-bottom: 1rem; /* Reducido de 1.5rem a 1rem */
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        color: #065f46;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        color: #991b1b;
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+        color: #3730a3;
+    }
+
+    /* Filtros más compactos */
+    .filters-section {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 1rem; /* Reducido de 1.5rem a 1rem */
+        margin-bottom: 1.5rem; /* Reducido de 2rem a 1.5rem */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .form-control, .form-select {
+        border: 2px solid var(--border);
+        border-radius: 0.5rem;
+        padding: 0.6rem 0.8rem; /* Padding más compacto */
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
+
+    /* Botones más compactos */
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 0.9rem; /* Padding más compacto */
+        font-size: 0.9rem;
+    }
+
+    .btn-outline-secondary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border: none;
+        color: white;
+    }
+
+        .btn-outline-secondary:hover {
+            background: linear-gradient(135deg, #5856eb, #7c3aed);
+            color: white;
+        }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--gray), #4b5563);
+        border: none;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #4b5563, #374151);
+            color: white;
+        }
+
+    .btn-success {
+        background: linear-gradient(135deg, var(--success), #059669);
+        border: none;
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+    .btn-warning {
+        background: linear-gradient(135deg, var(--warning), #d97706);
+        border: none;
+    }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #d97706, #b45309);
+        }
+
+    /* Tabla más compacta */
+    .table-container {
+        background: var(--white);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem; /* Reducido de 2rem a 1.5rem */
+    }
+
+    .table {
+        margin: 0;
+    }
+
+        .table thead {
+            background: linear-gradient(135deg, #1f2937, #374151);
+        }
+
+        .table th {
+            border: none;
+            padding: 0.75rem; /* Reducido de 1rem a 0.75rem */
+            font-weight: 600;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .table td {
+            border: none;
+            padding: 0.75rem; /* Reducido de 1rem a 0.75rem */
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .table tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+    /* Badges más compactos */
+    .badge {
+        padding: 0.35rem 0.8rem; /* Padding más pequeño */
+        border-radius: 50px;
+        font-weight: 500;
+        font-size: 0.75rem; /* Más pequeño */
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .bg-primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+    }
+
+    .bg-info {
+        background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+    }
+
+    .bg-success {
+        background: linear-gradient(135deg, var(--success), #059669) !important;
+    }
+
+    .bg-danger {
+        background: linear-gradient(135deg, var(--danger), #dc2626) !important;
+    }
+
+    /* Admin label más compacto */
+    .admin-label {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 0.2rem 0.6rem; /* Más compacto */
+        border-radius: 50px;
+        font-size: 0.7rem; /* Más pequeño */
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        margin-top: 0.2rem;
+    }
+
+    .protected-badge {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #92400e;
+        font-weight: 600;
+    }
+
+    /* Paginación más compacta */
+    .pagination-container {
+        background: var(--white);
+        border-radius: 1rem;
+        padding: 1rem; /* Reducido de 1.5rem a 1rem */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .pagination {
+        margin: 0;
+        gap: 0.4rem; /* Gap más pequeño */
+    }
+
+    .page-item .page-link {
+        border: 2px solid var(--border);
+        border-radius: 0.5rem;
+        color: #374151;
+        padding: 0.5rem 0.8rem; /* Padding más compacto */
+        margin: 0;
+        transition: all 0.3s ease;
+        background: var(--white);
+        font-size: 0.85rem;
+    }
+
+    .page-item:not(.disabled) .page-link:hover {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-color: var(--primary);
+        color: white;
+    }
+
+    .page-item.disabled .page-link {
+        background: #f9fafb;
+        color: var(--gray);
+        opacity: 0.6;
+    }
+
+    /* Info de resultados más compacta */
+    .results-info {
+        color: var(--gray);
+        font-size: 0.85rem; /* Más pequeño */
+        background: var(--white);
+        padding: 0.75rem; /* Padding más compacto */
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+
+    /* Ajustes adicionales para compactar más */
+    .row.g-3 {
+        --bs-gutter-y: 0.75rem; /* Reducir espacio entre filas */
+    }
+
+    /* Reducir espacios en general */
+    .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+
+    .mb-4 {
+        margin-bottom: 1rem !important;
+    }
+
+    /* Asegurar que no haya espacios extra en la parte superior */
+    .card:first-child {
+        margin-top: 0;
+    }
+
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-users"></i>
+                        User Management
+                    </h3>
+                </div>
+
+                <div class="card-body">
+                    <!-- Botón ir atrás -->
+                    <a href="https://localhost:7194/Home/IndexAdmin" class="btn back-button">
+                        <i class="fas fa-arrow-left"></i> Go Back
+                    </a>
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show">
+                            <i class="fas fa-check-circle"></i>
+                            @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            <i class="fas fa-exclamation-circle"></i>
+                            @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <!-- Filtros -->
+                    <div class="filters-section">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <form asp-action="Index" method="get">
+                                    <div class="input-group">
+                                        <input type="text" name="search" value="@ViewBag.SearchFilter"
+                                               class="form-control" placeholder="Search by username, email or name...">
+                                        <button class="btn btn-outline-secondary" type="submit">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <input type="hidden" name="page" value="1">
+                                    <input type="hidden" name="size" value="@ViewBag.PageSize">
+                                    @if (ViewBag.IsActiveFilter != null)
+                                    {
+                                        <input type="hidden" name="isActive" value="@ViewBag.IsActiveFilter">
+                                    }
+                                </form>
+                            </div>
+
+                            <div class="col-md-3">
+                                <form asp-action="Index" method="get">
+                                    <select name="isActive" class="form-select" onchange="this.form.submit()">
+                                        <option value="">All statuses</option>
+                                        <option value="true" selected="@(ViewBag.IsActiveFilter?.ToString() == "True")">Active Only</option>
+                                        <option value="false" selected="@(ViewBag.IsActiveFilter?.ToString() == "False")">Inactive Only</option>
+                                    </select>
+                                    <input type="hidden" name="page" value="1">
+                                    <input type="hidden" name="size" value="@ViewBag.PageSize">
+                                    @if (!string.IsNullOrEmpty(ViewBag.SearchFilter as string))
+                                    {
+                                        <input type="hidden" name="search" value="@ViewBag.SearchFilter">
+                                    }
+                                </form>
+                            </div>
+
+                            <div class="col-md-2">
+                                <a asp-action="Index" class="btn btn-secondary w-100">
+                                    <i class="fas fa-times"></i> Clear
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info de resultados -->
+                    @if (ViewBag.Pagination != null)
+                    {
+                        var pagination = ViewBag.Pagination;
+                        int totalUsers = (int)pagination.totalUsers;
+                        int currentPage = (int)pagination.currentPage;
+                        int pageSize = (int)pagination.pageSize;
+
+                        <div class="results-info">
+                            <i class="fas fa-info-circle"></i>
+                            Showing @(Math.Min((currentPage - 1) * pageSize + 1, totalUsers)) -
+                            @(Math.Min(currentPage * pageSize, totalUsers)) of @totalUsers users
+                            @if (!string.IsNullOrEmpty(ViewBag.SearchFilter as string))
+                            {
+                                <text> | Filtered by: "<strong>@ViewBag.SearchFilter</strong>"</text>
+                            }
+                        </div>
+                    }
+
+                    <!-- Tabla -->
+                    <div class="table-container">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Plan</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model != null && Model.Count > 0)
+                                    {
+                                        @foreach (var user in Model)
+                                        {
+                                            var isAdmin = !string.IsNullOrEmpty(user.PlanName) && user.PlanName.Equals("Admin", StringComparison.OrdinalIgnoreCase);
+
+                                            <tr>
+                                                <td><strong>@user.Id</strong></td>
+                                                <td>
+                                                    <div>
+                                                        <strong>@user.UserName</strong>
+                                                        @if (isAdmin)
+                                                        {
+                                                            <div class="admin-label">
+                                                                <i class="fas fa-shield-alt"></i> Admin
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </td>
+                                                <td>@user.Name</td>
+                                                <td>@user.Email</td>
+                                                <td>
+                                                    <span class="badge @(isAdmin ? "bg-primary" : "bg-info")">
+                                                        @(user.PlanName ?? "No Plan")
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge @(user.IsActive ? "bg-success" : "bg-danger")">
+                                                        <i class="fas @(user.IsActive ? "fa-check" : "fa-times")"></i>
+                                                        @(user.IsActive ? "Active" : "Inactive")
+                                                    </span>
+                                                </td>
+                                                <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                                <td>
+                                                    @if (isAdmin)
+                                                    {
+                                                        <span class="badge protected-badge">
+                                                            <i class="fas fa-shield-alt"></i> Protected
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        @if (user.IsActive)
+                                                        {
+                                                            <form asp-action="DeactivateUser" method="post" style="display:inline;">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="userId" value="@user.Id" />
+                                                                <button type="submit" class="btn btn-warning btn-sm"
+                                                                        onclick="return confirm('Deactivate this user?')">
+                                                                    <i class="fas fa-user-times"></i> Deactivate
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                        else
+                                                        {
+                                                            <form asp-action="ActivateUser" method="post" style="display:inline;">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="userId" value="@user.Id" />
+                                                                <button type="submit" class="btn btn-success btn-sm"
+                                                                        onclick="return confirm('Activate this user?')">
+                                                                    <i class="fas fa-user-check"></i> Activate
+                                                                </button>
+                                                            </form>
+                                                        }
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="8">
+                                                <div class="text-center p-4">
+                                                    <div class="alert alert-info mb-0">
+                                                        <i class="fas fa-info-circle"></i>
+                                                        @if (!string.IsNullOrEmpty(ViewBag.SearchFilter as string))
+                                                        {
+                                                            <text>No users found with "<strong>@ViewBag.SearchFilter</strong>"</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>No users found</text>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Paginación -->
+                    @if (ViewBag.Pagination != null)
+                    {
+                        var pagination = ViewBag.Pagination;
+                        int currentPage = (int)pagination.currentPage;
+                        int totalPages = (int)pagination.totalPages;
+
+                        if (totalPages > 1)
+                        {
+                            <div class="pagination-container">
+                                <nav aria-label="Pagination">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                            <a class="page-link" asp-action="Index"
+                                               asp-route-page="@(currentPage - 1)"
+                                               asp-route-size="@ViewBag.PageSize"
+                                               asp-route-isActive="@ViewBag.IsActiveFilter"
+                                               asp-route-search="@ViewBag.SearchFilter">
+                                                Previous
+                                            </a>
+                                        </li>
+
+                                        @{
+                                            int startPage = Math.Max(1, currentPage - 2);
+                                            int endPage = Math.Min(totalPages, currentPage + 2);
+                                        }
+
+                                        @for (int i = startPage; i <= endPage; i++)
+                                        {
+                                            <li class="page-item @(i == currentPage ? "active" : "")">
+                                                <a class="page-link" asp-action="Index"
+                                                   asp-route-page="@i"
+                                                   asp-route-size="@ViewBag.PageSize"
+                                                   asp-route-isActive="@ViewBag.IsActiveFilter"
+                                                   asp-route-search="@ViewBag.SearchFilter">
+                                                    @i
+                                                </a>
+                                            </li>
+                                        }
+
+                                        <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                            <a class="page-link" asp-action="Index"
+                                               asp-route-page="@(currentPage + 1)"
+                                               asp-route-size="@ViewBag.PageSize"
+                                               asp-route-isActive="@ViewBag.IsActiveFilter"
+                                               asp-route-search="@ViewBag.SearchFilter">
+                                                Next
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

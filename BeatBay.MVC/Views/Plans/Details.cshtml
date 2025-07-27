@@ -1,0 +1,355 @@
+﻿@model BeatBay.DTOs.PlanSubscriptionDto
+@{
+    ViewData["Title"] = "Subscription Details";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Encabezado con título y botón para regresar al historial -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-primary">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Subscription Details
+                </h2>
+                <a href="@Url.Action("History")" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to History
+                </a>
+            </div>
+
+            <!-- Información del Plan -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <!-- Icono y título de la sección -->
+                    <h5 class="mb-0">
+                        <i class="fas fa-crown me-2"></i>
+                        Plan Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Columna izquierda: Nombre, precio y estado -->
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Plan:</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-primary fs-6">
+                                        @Model.PlanName
+                                    </span>
+                                </dd>
+                                <dt class="col-sm-4">Price:</dt>
+                                <dd class="col-sm-8">
+                                    <strong class="text-success">
+                                        $@Model.PriceUSD USD
+                                    </strong>
+                                </dd>
+                                <dt class="col-sm-4">Status:</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactive</span>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                        <!-- Columna derecha: Fechas y duración -->
+                        <div class="col-md-6">
+                            <dl class="row">
+                                <dt class="col-sm-4">Start Date:</dt>
+                                <dd class="col-sm-8">
+                                    @Model.StartDate.ToString("dd/MM/yyyy HH:mm")
+                                </dd>
+                                <dt class="col-sm-4">End Date:</dt>
+                                <dd class="col-sm-8">
+                                    @Model.EndDate.ToString("dd/MM/yyyy HH:mm")
+                                    @if (Model.EndDate > DateTime.UtcNow && Model.IsActive)
+                                    {
+                                        <small class="text-muted">
+                                            (@((Model.EndDate - DateTime.UtcNow).Days)
+                                            days remaining)
+                                        </small>
+                                    }
+                                </dd>
+                                <dt class="col-sm-4">Duration:</dt>
+                                <dd class="col-sm-8">
+                                    @((Model.EndDate - Model.StartDate).Days) days
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestión de Conexiones -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>
+                        Connection Management
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <!-- Recuento y barra de uso de conexiones -->
+                        <div class="col-md-6 d-flex align-items-center">
+                            <i class="fas fa-user-friends fa-2x text-info me-3"></i>
+                            <div>
+                                <h6 class="mb-1">Used Connections</h6>
+                                <span class="h4 text-primary">
+                                    @Model.UsedConnections / @Model.MaxConnections
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="progress" style="height: 20px;">
+                                @{
+                                    var pct = (double)Model.UsedConnections / Model.MaxConnections * 100;
+                                }
+                                <div class="progress-bar @(
+                                     pct >= 100 ? "bg-danger" :
+                                     pct >= 80 ? "bg-warning" :
+                                                  "bg-success")"
+                                     role="progressbar"
+                                     style="width: @pct%"
+                                     aria-valuenow="@Model.UsedConnections"
+                                     aria-valuemin="0"
+                                     aria-valuemax="@Model.MaxConnections">
+                                    @pct.ToString("F1")%
+                                </div>
+                            </div>
+                            <small class="text-muted">Plan capacity</small>
+                        </div>
+                    </div>
+                    <!-- Tabla de usuarios conectados -->
+                    @if (Model.ConnectedUsers?.Any() == true)
+                    {
+                        <h6 class="mb-3">
+                            <i class="fas fa-link me-2"></i>
+                            Connected Users (@Model.ConnectedUsers.Count)
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var usr in Model.ConnectedUsers)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@usr.UserName</strong><br />
+                                            </td>
+                                            <td>@(usr.Name ?? "N/A")</td>
+                                            <td>
+                                                <a href="mailto:@usr.Email">
+                                                    @usr.Email
+                                                </a>
+                                            </td>
+                                            <td>
+                                                @if (usr.IsActive)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Active
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">
+                                                        <i class="fas fa-times-circle me-1"></i>
+                                                        Inactive
+                                                    </span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Mensaje si no hay usuarios conectados -->
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No users connected.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Estadísticas Adicionales -->
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Statistics
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="row">
+                        <!-- ID Suscripción -->
+                        <div class="col-6 col-md-3 mb-3">
+                            <h4 class="text-primary">#@Model.Id</h4>
+                            <small class="text-muted">Subscription ID</small>
+                        </div>
+                        <!-- Monto pagado -->
+                        <div class="col-6 col-md-3 mb-3">
+                            <h4 class="text-success">$@Model.PriceUSD</h4>
+                            <small class="text-muted">Amount Paid</small>
+                        </div>
+                        <!-- Conexiones máximas -->
+                        <div class="col-6 col-md-3 mb-3">
+                            <h4 class="text-info">@Model.MaxConnections</h4>
+                            <small class="text-muted">Max Connections</small>
+                        </div>
+                        <!-- Porcentaje de uso -->
+                        <div class="col-6 col-md-3 mb-3">
+                            @{
+                                var util = (double)Model.UsedConnections / Model.MaxConnections * 100;
+                            }
+                            <h4 class="text-warning">@util.ToString("F1")%</h4>
+                            <small class="text-muted">Utilization</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Disponibles -->
+            @if (Model.IsActive && Model.EndDate > DateTime.UtcNow)
+            {
+                <div class="card mb-4">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cogs me-2"></i>
+                            Available Actions
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <!-- Botón gestionar conexiones -->
+                            <div class="col-6">
+                                <a href="@Url.Action("ManageConnections")" class="btn btn-primary w-100">
+                                    Manage Connections
+                                </a>
+                            </div>
+                            <!-- Botón ir al dashboard -->
+                            <div class="col-6">
+                                <a href="@Url.Action("Index")" class="btn btn-info w-100">
+                                    Go to Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Botones finales de navegación -->
+            <div class="d-flex justify-content-center gap-2 mb-5">
+                <a href="@Url.Action("History")" class="btn btn-outline-secondary">
+                    Back to History
+                </a>
+                <a href="@Url.Action("Index")" class="btn btn-outline-primary">
+                    Dashboard
+                </a>
+                <a href="@Url.Action("Purchase")" class="btn btn-primary">
+                    Purchase New Plan
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Variables globales de color y fondo */
+    :root {
+        /* Colores principales y de estado */
+        --color-primario: #6366f1;
+        --color-primario-hover: #8b5cf6;
+        --color-exito: #10b981;
+        --color-alerta: #f59e0b;
+        --color-peligro: #ef4444;
+        /* Fondos */
+        --fondo-gradiente-principal: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --fondo-claro: #f8fafc;
+        --texto-oscuro: #1f2937;
+        /* Sombra suave */
+        --sombra-clara: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Estilo base del body: fondo y color de texto */
+    body {
+        background: var(--fondo-gradiente-principal);
+        color: var(--texto-oscuro);
+    }
+
+    /* Botón secundario: regresar */
+    .btn-outline-secondary {
+        background-color: rgba(255,255,255,0.7);
+        border-color: #fff;
+        color: var(--texto-oscuro);
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #fff;
+            border-color: var(--color-primario);
+            color: var(--color-primario);
+        }
+
+    /* Botón primario: acciones destacadas */
+    .btn-primary {
+        background-color: var(--color-primario);
+        border-color: var(--color-primario);
+        color: #fff;
+    }
+
+        .btn-primary:hover {
+            background-color: var(--color-primario-hover);
+            border-color: var(--color-primario-hover);
+        }
+
+    /* Botón informativo: dashboard */
+    .btn-info {
+        background-color: #38bdf8;
+        border-color: #38bdf8;
+        color: #fff;
+    }
+
+        .btn-info:hover {
+            background-color: #0ea5e9;
+            border-color: #0ea5e9;
+        }
+
+    /* Tarjetas (.card): estilo general */
+    .card {
+        background-color: var(--fondo-claro);
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 2px 4px var(--sombra-clara);
+    }
+
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        border-radius: 15px 15px 0 0;
+    }
+
+    /* Barra de progreso personalizada */
+    .progress {
+        border-radius: 10px;
+        background-color: rgba(0,0,0,0.1);
+    }
+
+    .progress-bar {
+        border-radius: 10px;
+    }
+</style>

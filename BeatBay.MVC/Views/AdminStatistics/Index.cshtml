@@ -1,0 +1,510 @@
+﻿@{
+    ViewData["Title"] = "Statistics Panel - Administration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    /* Variables simplificadas */
+    :root {
+        --primary: #6366f1;
+        --secondary: #8b5cf6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #0ea5e9;
+        --gray: #6b7280;
+        --light: #f8fafc;
+        --white: #ffffff;
+        --border: #e5e7eb;
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Reducir padding del container principal */
+    .container-fluid {
+        padding: 0.5rem 1rem !important;
+        margin-top: -1rem;
+    }
+
+    /* Card principal */
+    .card {
+        background: var(--white);
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        overflow: hidden;
+        margin-top: 0;
+        margin-bottom: 1rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 1rem 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        background: var(--light);
+    }
+
+    /* Botón ir atrás */
+    .back-button {
+        background: linear-gradient(135deg, var(--gray), #4b5563);
+        border: none;
+        color: white;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+        .back-button:hover {
+            background: linear-gradient(135deg, #4b5563, #374151);
+            transform: translateY(-1px);
+            color: white;
+            text-decoration: none;
+        }
+
+    /* Botón actualizar */
+    .btn-outline-primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border: none;
+        color: white;
+        border-radius: 0.5rem;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #5856eb, #7c3aed);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    /* Cards de estadísticas */
+    .stats-card {
+        background: var(--white);
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+        height: 100%;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .stats-card .card-body {
+            padding: 1.5rem;
+            background: var(--white);
+        }
+
+        /* Cards principales con gradientes */
+        .stats-card.bg-primary .card-body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .stats-card.bg-success .card-body {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+        }
+
+        .stats-card.bg-info {
+            border: 2px solid var(--info);
+        }
+
+            .stats-card.bg-info .card-body {
+                background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
+                color: #01579b;
+            }
+
+        .stats-card.bg-secondary {
+            border: 2px solid var(--gray);
+        }
+
+            .stats-card.bg-secondary .card-body {
+                background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+                color: #424242;
+            }
+
+        /* Cards premium con bordes específicos */
+        .stats-card.border-primary {
+            border: 2px solid var(--primary);
+        }
+
+            .stats-card.border-primary .card-body {
+                background: linear-gradient(135deg, #e8eaff, #d4d8ff);
+                color: #3730a3;
+            }
+
+        .stats-card.border-success {
+            border: 2px solid var(--success);
+        }
+
+            .stats-card.border-success .card-body {
+                background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+                color: #065f46;
+            }
+
+        .stats-card.border-warning {
+            border: 2px solid var(--warning);
+        }
+
+            .stats-card.border-warning .card-body {
+                background: linear-gradient(135deg, #fef3c7, #fde68a);
+                color: #92400e;
+            }
+
+    /* Números grandes */
+    .stats-number {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Iconos */
+    .stats-icon {
+        font-size: 3rem;
+        opacity: 0.8;
+        margin-left: auto;
+    }
+
+    /* Título de sección premium */
+    .premium-header {
+        background: linear-gradient(135deg, var(--warning), #d97706);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem 0.75rem 0 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Alertas mejoradas */
+    .alert {
+        border: none;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+        color: #3730a3;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        color: #991b1b;
+    }
+
+    /* Loading spinner personalizado */
+    .spinner-border {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-width: 0.15em;
+    }
+
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        Statistics Panel
+                    </h3>
+                    <div style="margin-left: auto;">
+                        <button id="refreshStats" class="btn btn-outline-primary">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Botón ir atrás -->
+                    <a href="https://localhost:7194/Home/IndexAdmin" class="btn back-button">
+                        <i class="fas fa-arrow-left"></i> Go Back
+                    </a>
+
+                    <!-- Estadísticas Principales -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="stats-card bg-primary">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1 opacity-90">Total Songs</h6>
+                                            <div id="totalSongs" class="stats-number">
+                                                <div class="spinner-border" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                            <small class="opacity-75">Active songs</small>
+                                        </div>
+                                        <div class="stats-icon">
+                                            <i class="fas fa-music"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="stats-card bg-success">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1 opacity-90">Total Users</h6>
+                                            <div id="totalUsers" class="stats-number">
+                                                <div class="spinner-border" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                            <small class="opacity-75">Registered users</small>
+                                        </div>
+                                        <div class="stats-icon">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Desglose de Usuarios -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="stats-card bg-info">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-microphone fa-2x mb-3"></i>
+                                    <h6 class="fw-bold">Total Artists</h6>
+                                    <div id="totalArtists" class="stats-number">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                    <small class="opacity-75">Active artists</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <div class="stats-card bg-secondary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user fa-2x mb-3"></i>
+                                    <h6 class="fw-bold">Free Users</h6>
+                                    <div id="freeUsers" class="stats-number">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                    <small class="opacity-75">Without premium plan</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Usuarios Premium -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="stats-card">
+                                <div class="premium-header">
+                                    <i class="fas fa-crown"></i>
+                                    <h5 class="mb-0">Premium Users</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="stats-card border-primary">
+                                                <div class="card-body text-center">
+                                                    <i class="fas fa-user-plus fa-2x mb-3"></i>
+                                                    <h6 class="fw-bold">Personal Premium</h6>
+                                                    <div id="personalUsers" class="stats-number">
+                                                        <div class="spinner-border" role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </div>
+                                                    <small class="opacity-75">Individual plan</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <div class="stats-card border-success">
+                                                <div class="card-body text-center">
+                                                    <i class="fas fa-users fa-2x mb-3"></i>
+                                                    <h6 class="fw-bold">Family Premium</h6>
+                                                    <div id="familiarUsers" class="stats-number">
+                                                        <div class="spinner-border" role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </div>
+                                                    <small class="opacity-75">Family plan</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4 mb-3">
+                                            <div class="stats-card border-warning">
+                                                <div class="card-body text-center">
+                                                    <i class="fas fa-building fa-2x mb-3"></i>
+                                                    <h6 class="fw-bold">Business Premium</h6>
+                                                    <div id="businessUsers" class="stats-number">
+                                                        <div class="spinner-border" role="status">
+                                                            <span class="visually-hidden">Loading...</span>
+                                                        </div>
+                                                    </div>
+                                                    <small class="opacity-75">Business plan</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estado de Carga -->
+                    <div id="loadingIndicator" class="row" style="display: none;">
+                        <div class="col-12">
+                            <div class="alert alert-info text-center">
+                                <div class="spinner-border me-2" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <strong>Loading statistics...</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensajes de Error -->
+                    <div id="errorAlert" class="row" style="display: none;">
+                        <div class="col-12">
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span id="errorMessage"></span>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Cargar estadísticas al inicializar
+            loadDashboardStats();
+
+            // Actualizar automáticamente cada 60 segundos
+            setInterval(loadDashboardStats, 60000);
+
+            // Botón de actualizar manual
+            $('#refreshStats').click(function() {
+                loadDashboardStats();
+            });
+        });
+
+        function showLoading() {
+            $('#loadingIndicator').show();
+            $('#errorAlert').hide();
+        }
+
+        function hideLoading() {
+            $('#loadingIndicator').hide();
+        }
+
+        function showError(message) {
+            $('#errorMessage').text(message);
+            $('#errorAlert').show();
+            hideLoading();
+        }
+
+        function loadDashboardStats() {
+            showLoading();
+
+            $.ajax({
+                url: '@Url.Action("Dashboard", "AdminStatistics")',
+                type: 'GET',
+                timeout: 10000,
+                success: function(data) {
+                    try {
+                        // Estadísticas principales con animación
+                        $('#totalSongs').html('<span class="fade-in">' + data.overview.totalSongs.toLocaleString() + '</span>');
+                        $('#totalUsers').html('<span class="fade-in">' + data.overview.totalUsers.toLocaleString() + '</span>');
+                        $('#totalArtists').html('<span class="fade-in">' + data.overview.totalArtists.toLocaleString() + '</span>');
+
+                        // Desglose de usuarios con animación
+                        $('#freeUsers').html('<span class="fade-in">' + data.userBreakdown.freeUsers.toLocaleString() + '</span>');
+                        $('#personalUsers').html('<span class="fade-in">' + data.userBreakdown.personalUsers.toLocaleString() + '</span>');
+                        $('#familiarUsers').html('<span class="fade-in">' + data.userBreakdown.familiarUsers.toLocaleString() + '</span>');
+                        $('#businessUsers').html('<span class="fade-in">' + data.userBreakdown.businessUsers.toLocaleString() + '</span>');
+
+                        hideLoading();
+                    } catch (e) {
+                        showError('Error processing statistics data');
+                        console.error('Error processing data:', e);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    let errorMsg = 'Error loading statistics';
+
+                    if (xhr.status === 403) {
+                        errorMsg = 'You do not have permission to access these statistics';
+                    } else if (xhr.status === 401) {
+                        errorMsg = 'Your session has expired. Please log in again';
+                    } else if (xhr.status >= 500) {
+                        errorMsg = 'Internal server error';
+                    } else if (status === 'timeout') {
+                        errorMsg = 'Request timeout. Please try again';
+                    }
+
+                    showError(errorMsg);
+                    console.error('AJAX Error:', xhr, status, error);
+
+                    // Mostrar valores por defecto en caso de error
+                    $('.spinner-border').parent().html('<span class="text-muted">-</span>');
+                }
+            });
+        }
+    </script>
+}
